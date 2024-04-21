@@ -15,17 +15,16 @@ export class DocumentService {
         private readonly cloudinaryService: CloudinaryService
     ) { }
 
-    async createDocument(coverImage : string , createDocumentDto: CreateDocumentDto) : Promise<string>
-    {
+    async createDocument(coverImage: string, createDocumentDto: CreateDocumentDto): Promise<string> {
         console.log("coverImage : ", coverImage)
         console.log("createDocumentDto : ", createDocumentDto);
 
         try {
-            const { title, iconImage , coverImageUrl, userId, description } = createDocumentDto;
+            const { title, iconImage, coverImageUrl, userId, description } = createDocumentDto;
             const image_url = await this.cloudinaryService.uploadCoverImage(coverImage)
 
             const document = await this.documentModel.create({
-                title, iconImage , coverImageUrl : image_url.url, userId , description, isAvailable : true
+                title, iconImage, coverImageUrl: image_url.url, userId, description, isAvailable: true
             });
             return "document create succesfully";
         }
@@ -42,7 +41,7 @@ export class DocumentService {
 
     async fetchNotesByUserId(userId: string): Promise<Document[]> {
         try {
-            const notes = await this.documentModel.find({ userId, isAvailable : true }).exec();
+            const notes = await this.documentModel.find({ userId, isAvailable: true }).exec();
             console.log(notes);
             return notes;
         } catch (error) {
@@ -64,9 +63,9 @@ export class DocumentService {
     async deleteDocument(documentId: string): Promise<void> {
         try {
             // Check if the document belongs to the user
-           // console.log(isAvailable);
-            const document = await this.documentModel.findOneAndUpdate({ _id: documentId },{isAvailable : false},{new:true}).exec();
-            console.log("document : ",document);
+            // console.log(isAvailable);
+            const document = await this.documentModel.findOneAndUpdate({ _id: documentId }, { isAvailable: false }, { new: true }).exec();
+            console.log("document : ", document);
             if (!document) {
                 throw new NotFoundException('Document not found or does not belong to the user');
             }
@@ -96,7 +95,7 @@ export class DocumentService {
     async restoreDocument(documentId: string): Promise<Document> {
         try {
             // Find the document in the trash
-            const deletedDocument = await this.documentModel.find({_id : documentId}).exec();
+            const deletedDocument = await this.documentModel.find({ _id: documentId }).exec();
 
             if (!deletedDocument) {
                 throw new NotFoundException('Deleted document not found');
@@ -113,6 +112,21 @@ export class DocumentService {
         } catch (error) {
             console.log(error);
             throw new InternalServerErrorException('Failed to restore document');
+        }
+    }
+
+    //search document
+    async searchDocumentsByName(name: string, userId: string, skip: number, limit: number): Promise<Document[]> {
+        try {
+            const documents = await this.documentModel
+                .find({ title: { $regex: new RegExp(name, 'i') }, userId, isAvailable: true })
+                .skip(skip)
+                .limit(limit)
+                .exec();
+            return documents;
+        } catch (error) {
+            console.log(error);
+            throw new InternalServerErrorException('Failed to search documents');
         }
     }
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, HttpException, HttpStatus, Param, Post, Get, UploadedFile, UploadedFiles, UseInterceptors, Delete, Put } from '@nestjs/common';
+import { Body, Controller, HttpException, HttpStatus, Param, Post, Get, UploadedFile, UploadedFiles, UseInterceptors, Delete, Put, Query, InternalServerErrorException } from '@nestjs/common';
 import { DocumentService } from './document.service';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
@@ -62,14 +62,14 @@ export class DocumentController {
     @Delete('/deleteDocument/:documentId')
     async deleteDocument(@Param('documentId') documentId: string): Promise<any> {
         try {
-            console.log("document id : ",documentId);
+            console.log("document id : ", documentId);
             // Call the service method to delete the document
-            await this.documentService.deleteDocument( documentId);
+            await this.documentService.deleteDocument(documentId);
             return { message: 'Document deleted successfully' };
         } catch (error) {
             console.log("Error deleting document:", error);
             throw new HttpException('Failed to delete document', HttpStatus.INTERNAL_SERVER_ERROR);
-        }   
+        }
     }
 
     @Get('/fetchDeletedDocuments/:userId')
@@ -92,6 +92,23 @@ export class DocumentController {
         } catch (error) {
             console.log("Error restoring document:", error);
             throw new HttpException('Failed to restore document', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Get('/searchDocuments/:userId')
+    async searchDocuments(
+        @Query('name') name: string,
+        @Param('userId') userId: string,
+        @Query('page') page: number = 1,
+        @Query('limit') limit: number = 10,
+    ): Promise<any> {
+        try {
+            const skip = (page - 1) * limit;
+            const documents = await this.documentService.searchDocumentsByName(name, userId, skip, limit);
+            return documents;
+        } catch (error) {
+            console.log(error);
+            throw new InternalServerErrorException('Failed to search documents');
         }
     }
 }
