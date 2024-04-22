@@ -1,7 +1,8 @@
 "use client"
-import {  fetchNoteById, fetchNotes, selectAllNotes } from "@/redux_store/slices/notesSlice";
+import { deleteDocument, fetchDeletedDocuments, fetchNoteById, fetchNotes, selectAllNotes } from "@/redux_store/slices/notesSlice";
 import { useDispatch, useSelector } from "react-redux";
 import Avatar from '@mui/material/Avatar';
+import { Item } from "@radix-ui/react-dropdown-menu";
 import SearchIcon from '@mui/icons-material/Search';
 import SettingsIcon from '@mui/icons-material/Settings';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
@@ -17,6 +18,7 @@ import axios from "axios";
 import { Bounce, ToastContainer, toast } from "react-toastify";
 import ConfirmationDialog from "./confirmationDialog";
 import TrashWindow from "./trashWindow";
+import DocumentListItem from "./DocumentListItem";
 
 interface SidebarProps {
     handleNoteClick: (documentId: string) => void;
@@ -29,7 +31,6 @@ const Sidebar: React.FC = () => {
     const documents = useSelector(selectAllNotes);
     console.log("first----", documents)
     const dispatch = useDispatch();
-    const dispatc = useDispatch();
     const [showNewDocumentComponent, setShowNewDocumentComponent] = useState(false);
     const [showSingleNote, setShowSingleNote] = useState(false);
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
@@ -81,6 +82,7 @@ const Sidebar: React.FC = () => {
                 // });
                 console.log(response);
                 dispatch(fetchNotes(user._id));
+                dispatch(fetchDeletedDocuments(user._id));
             }
         } catch (error) {
             console.log(error);
@@ -88,6 +90,8 @@ const Sidebar: React.FC = () => {
             setConfirmDialogOpen(false);
         }
     };
+
+
 
     return (
         <div className="min-h-screen flex flex-row bg-gray-100">
@@ -108,7 +112,7 @@ const Sidebar: React.FC = () => {
                             aria-label="Search"
                             id="exampleFormControlInput2"
                             aria-describedby="button-addon2" /> */}
-                            <input type="search" id="default-search"  className="ext-sm font-medium p-1 w-32 h-7 m-4 rounded-xl bg-gray-100" placeholder="Search.." required />
+                            <input type="search" id="default-search" className="ext-sm font-medium p-1 w-32 h-7 m-4 rounded-xl bg-gray-100" placeholder="Search.." required />
 
                             {/* <span className="text-sm font-medium pl-4">Search</span> */}
                         </a>
@@ -120,17 +124,16 @@ const Sidebar: React.FC = () => {
                         </a>
                     </li>
                     <ul className="flex flex-col py-4">
-                        {/* Mapping through notes to display titles */}
                         {documents.map((document) => (
                             <li key={document._id} className="flex items-center justify-between">
-                                <button
-                                    className="flex flex-row items-center h-12 transform hover:translate-x-2 transition-transform ease-in duration-200 text-gray-500 hover:text-gray-800"
-                                    onClick={() => { handleNoteClick(document._id) }} // Click handler to fetch note data
-                                >
-                                    <span className="text-sm font-medium pl-4">{document.title}</span> </button>
+                                <Link href={`/routes/documents/${document._id}`}>
+                                    <span>{document.title}</span>
+                                </Link>
                                 <BsTrash className="ml-10 " onClick={() => handleDeleteDocument(document._id)} />
+                                
                             </li>
                         ))}
+                    
                         {confirmDialogOpen && (
                             <ConfirmationDialog
                                 open={confirmDialogOpen}
@@ -138,9 +141,14 @@ const Sidebar: React.FC = () => {
                                 handleConfirm={handleConfirmDelete}
                             />
                         )}
-
-
                     </ul>
+                    {/* <ul>
+                        {documents.map((document) => (
+                            <li key={document._id}>
+                                <DocumentListItem document={document} />
+                            </li>
+                        ))}
+                    </ul> */}
                     <li>
                         <Link href="/routes/addpage" className="flex flex-row items-center h-12 transform hover:translate-x-2 transition-transform ease-in duration-200 text-gray-500 hover:text-gray-800">
                             <AddCircleOutlineIcon className="ml-6" />
@@ -150,7 +158,7 @@ const Sidebar: React.FC = () => {
                     <li className="flex flex-row items-center h-12 transform hover:translate-x-2 transition-transform ease-in duration-200 text-gray-500 hover:text-gray-800">
                         <DeleteOutlineIcon className="ml-6" />
                         <TrashWindow />
-                        
+
                         <ToastContainer />
                     </li>
 
