@@ -95,6 +95,19 @@ export class DocumentController {
         }
     }
 
+    @Delete('/permanentDeleteDocument/:documentId')
+    async permanentlyDeleteDocument(@Param('documentId') documentId: string): Promise<any> {
+        try {
+            console.log("document id : ", documentId);
+            // Call the service method to permanently delete the document
+            await this.documentService.permanentlyDeleteDocument(documentId);
+            return { message: 'Document permanently deleted successfully' };
+        } catch (error) {
+            console.log("Error permanently deleting document:", error);
+            throw new HttpException('Failed to permanently delete document', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @Get('/searchDocuments/:userId')
     async searchDocuments(
         @Query('name') name: string,

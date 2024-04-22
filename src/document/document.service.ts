@@ -115,6 +115,20 @@ export class DocumentService {
         }
     }
 
+    async permanentlyDeleteDocument(documentId: string): Promise<void> {
+        try {
+            // Find the document in the trash
+            const deletedDocument = await this.documentModel.findByIdAndDelete(documentId).exec();
+
+            if (!deletedDocument) {
+                throw new NotFoundException('Deleted document not found');
+            }
+        } catch (error) {
+            console.log(error);
+            throw new InternalServerErrorException('Failed to permanently delete document');
+        }
+    }
+
     //search document
     async searchDocumentsByName(name: string, userId: string, skip: number, limit: number): Promise<Document[]> {
         try {

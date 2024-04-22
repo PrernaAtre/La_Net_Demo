@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Res, Get, UseGuards, UseInterceptors, UploadedFile, HttpException, HttpStatus } from '@nestjs/common';
+import { Body, Controller, Post, Res, Get, UseGuards, UseInterceptors, UploadedFile, HttpException, HttpStatus, NotFoundException, Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UserSignupDto } from './dto/signupDto.dto';
 import { User } from './schema/user.schema';
@@ -72,5 +72,19 @@ export class AuthController {
         {
             response.status(200).send("wrong");
         } 
+    }
+
+    @Get('/search')
+    async searchUser(@Query('name') name: string): Promise<User[]> {
+        try {
+            console.log(name);
+            const users = await this.authService.searchUserByName(name);
+            return users;
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw new NotFoundException('No users found with the provided name.');
+            }
+            throw error;
+        }
     }
 }

@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserSignupDto } from "../auth/dto/signupDto.dto";
 import { UserLoginDto } from 'src/auth/dto/loginDto.dto';
@@ -77,4 +77,13 @@ export class AuthService {
             console.log(err);
         }
     }
+
+    async searchUserByName(name: string): Promise<User[]> {
+        const users = await this.userModel.find({ username: { $regex: name, $options: 'i' } }).exec();
+        if (!users || users.length === 0) {
+            throw new NotFoundException('No users found with the provided name.');
+        }
+        return users;
+    }
+
 }
