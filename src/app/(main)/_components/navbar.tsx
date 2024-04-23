@@ -47,7 +47,7 @@ export const Navbar = ({ documentId }) => {
                     <img src={singleDocument.iconImage} alt="Icon" className="h-8 w-8" />
                     <span className=" text-2xl font-semibold whitespace-nowrap dark:text-white">{singleDocument.title}</span>
                     <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
-                        <ShareDocument />
+                        <ShareDocument documentId={singleDocument._id}/>
                     </div>
                 </div>
             </nav >

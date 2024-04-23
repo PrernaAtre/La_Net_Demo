@@ -20,8 +20,8 @@ const initialState : authState = {
 
 export const fetchUsers = createAsyncThunk('notes/users', async (user:string) => {
     console.log("user id : ",user);
-  const response = await axios.get(`http://localhost:3001/document/fetchUsers`, );
-  console.log("notes : ",response);
+  const response = await axios.get(`http://localhost:3001/auth/search?name=${user}`, );
+  //console.log("users : ",response);
   return response.data;
 });
 

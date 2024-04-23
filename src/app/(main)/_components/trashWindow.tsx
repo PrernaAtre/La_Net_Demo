@@ -84,7 +84,8 @@ const TrashWindow: React.FC = () => {
       </button>
       <Modal title="Deleted Items" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
         <ul>
-          {deletedDocuments.map((document) => (
+          {deletedDocuments.length>0 ?
+          deletedDocuments.map((document) => (
             <li key={document._id} className="border border-gray-300 rounded-lg p-3 flex justify-between items-center">
               <span>{document.title}</span>
               <div>
@@ -92,7 +93,8 @@ const TrashWindow: React.FC = () => {
                 <BsTrash className="ml-2 cursor-pointer" onClick={() => handleDeleteDocument(document._id)} />
               </div>
             </li>
-          ))}
+          )) : <p>No deleted items</p>
+        }
           {confirmDialogOpen && (
             <ConfirmationDialog
               open={confirmDialogOpen}
