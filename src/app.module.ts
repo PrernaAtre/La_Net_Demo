@@ -13,6 +13,9 @@ import { DocumentModule } from './document/document.module';
 // import { CorsModule } from '@nestjs/platform-express'; // Import from @nestjs/platform-express
 import { DocumentController } from './document/document.controller';
 import { NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { ShareDocumentModule } from './share-document/share-document.module';
+import { ShareDocumentService } from './share-document/share-document.service';
+import { ShareDocumentController } from './share-document/share-document.controller';
 
 
 // db connection
@@ -36,9 +39,9 @@ const DBURL: string = `mongodb+srv://${username}:${password}@cluster0.89cuca2.mo
   MulterModule.register({
     dest : './images',
   }),
-    MongooseModule.forRoot(DBURL), AuthModule, CloudinaryModule, DocumentModule],
-  controllers: [AppController, AuthController, DocumentController],
-  providers: [AppService, CloudinaryService],
+    MongooseModule.forRoot(DBURL), AuthModule, CloudinaryModule, DocumentModule, ShareDocumentModule],
+  controllers: [AppController, AuthController, DocumentController, ],
+  providers: [AppService, CloudinaryService, ],
 })
 export class AppModule{
   // configure(consumer: MiddlewareConsumer) {

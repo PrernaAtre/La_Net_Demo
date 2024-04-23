@@ -9,43 +9,43 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { UpdateProfileDto } from './dto/updateProfileDto.dto';
 
 
 @Injectable()
 export class AuthService {
     constructor(
-        @InjectModel(User.name) 
+        @InjectModel(User.name)
         private userModel: Model<User>,
         private jwtService: JwtService,
         private readonly cloudinaryService: CloudinaryService
     ) { }
 
-    async createUser(imagePath:string, userSignupDto: UserSignupDto): Promise<string> {
+    async createUser(imagePath: string, userSignupDto: UserSignupDto): Promise<string> {
         try {
             const { username, email, password, confirm_password, profile_image } = userSignupDto;
-            const checkEmail = await this.userModel.findOne({email})
-            if(checkEmail){
+            const checkEmail = await this.userModel.findOne({ email })
+            if (checkEmail) {
                 return "Email is duplicate..";
             }
             const hashedPassword = await bcrypt.hash(password, 10);
-            
-            if(password !== confirm_password)
-            {
+
+            if (password !== confirm_password) {
                 return "your password and confirm password are not same";
             }
-            console.log('---------',userSignupDto)
-            
+            console.log('---------', userSignupDto)
+
             const image_url = await this.cloudinaryService.uploadProfileImage(imagePath)
-            console.log('---121',imagePath);
+            console.log('---121', imagePath);
             await this.userModel.create({
                 username,
                 email,
                 password: hashedPassword,
-                profile_image:image_url?.url,
+                profile_image: image_url?.url,
             });
             return "user register succesfully";
         } catch (error) {
-            console.log('error',error)
+            console.log('error', error)
             if (error.code == '11000') {
                 throw new ConflictException('Duplicate data input')
             }
@@ -55,26 +55,38 @@ export class AuthService {
         }
     }
 
-    
-    async loginUser(userLoginDto : UserLoginDto) : Promise<{ token: string ,user:UserLoginDto}>
-    {
-        try
-        {
-            const {email, password} = userLoginDto;
-            const user = await this.userModel.findOne({email : email});
-            if(user && (await bcrypt.compare(password, user.password)))
-            {
+
+    async loginUser(userLoginDto: UserLoginDto): Promise<{ token: string, user: UserLoginDto }> {
+        try {
+            const { email, password } = userLoginDto;
+            const user = await this.userModel.findOne({ email: email });
+            if (user && (await bcrypt.compare(password, user.password))) {
                 const token = this.jwtService.sign({ id: user._id });
-                return { token,user };
+                return { token, user };
             }
-            else
-            {
+            else {
                 throw new UnauthorizedException("Invalid Email And Password");
             }
         }
-        catch(err)
-        {
+        catch (err) {
             console.log(err);
+        }
+    }
+
+    async updateProfile(imagePath: string, userId: string, updateProfileDto: UpdateProfileDto): Promise<string> {
+        try {
+            const { profile_image } = updateProfileDto;
+            const user = await this.userModel.findById(userId).exec();
+            if (!user) {
+                throw new NotFoundException('User not found.');
+            }
+            const image_url = await this.cloudinaryService.uploadProfileImage(imagePath);
+            user.profile_image = image_url?.url || profile_image; // Update profile image if new image is uploaded
+            await user.save();
+            return "Profile updated successfully";
+        } catch (error) {
+            console.error('Error in updating profile: ', error);
+            throw new InternalServerErrorException('Failed to update profile');
         }
     }
 
@@ -86,4 +98,27 @@ export class AuthService {
         return users;
     }
 
+    async fetchUsers(): Promise<User[]> {
+        try {
+            const users = await this.userModel.find().exec();
+            if (!users || users.length === 0) {
+                throw new NotFoundException('No users found.');
+            }
+            return users;
+        } catch (error) {
+            throw new InternalServerErrorException('Failed to fetch users.');
+        }
+    }
+
+    async findUserById(userId: string): Promise<User> {
+        try {
+            const user = await this.userModel.findById(userId).exec();
+            if (!user) {
+                throw new NotFoundException('User not found.');
+            }
+            return user;
+        } catch (error) {
+            throw new InternalServerErrorException('Failed to find user.');
+        }
+    }
 }

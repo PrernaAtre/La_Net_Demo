@@ -143,4 +143,17 @@ export class DocumentService {
             throw new InternalServerErrorException('Failed to search documents');
         }
     }
+
+    async findDocumentById(documentId: string): Promise<Document> {
+        try {
+            const document = await this.documentModel.findById(documentId).exec();
+            if (!document) {
+                throw new NotFoundException('Document not found.');
+            }
+            return document;
+        } catch (error) {
+            console.log(error);
+            throw new InternalServerErrorException('Failed to find document.');
+        }
+    }
 }

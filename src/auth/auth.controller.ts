@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Res, Get, UseGuards, UseInterceptors, UploadedFile, HttpException, HttpStatus, NotFoundException, Query } from '@nestjs/common';
+import { Body, Controller, Post, Res, Get, UseGuards, UseInterceptors, UploadedFile, HttpException, HttpStatus, NotFoundException, Query, Param } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UserSignupDto } from './dto/signupDto.dto';
 import { User } from './schema/user.schema';
@@ -9,69 +9,75 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { UpdateProfileDto } from './dto/updateProfileDto.dto';
 
 const storage = diskStorage({
     destination: './uploads',
     filename: (req, file, cb) => {
-      const uniqueFilename = Date.now() + extname(file.originalname);
-      cb(null, uniqueFilename);
+        const uniqueFilename = Date.now() + extname(file.originalname);
+        cb(null, uniqueFilename);
     },
-  });
+});
 
 @Controller('auth')
 export class AuthController {
-    constructor(private authService : AuthService,private readonly cloudinaryService: CloudinaryService){}
+    constructor(private authService: AuthService, private readonly cloudinaryService: CloudinaryService) { }
 
     @Post('/signup')
-    @UseInterceptors(FileInterceptor('file',{storage}))
-    async signUp(@Body() userSignupDto : UserSignupDto, @UploadedFile() file: Express.Multer.File) : Promise<string>
-    {
-       
-        try
-        {
+    @UseInterceptors(FileInterceptor('file', { storage }))
+    async signUp(@Body() userSignupDto: UserSignupDto, @UploadedFile() file: Express.Multer.File): Promise<string> {
+
+        try {
             if (!file) {
                 throw new HttpException('No file uploaded', HttpStatus.BAD_REQUEST);
             }
-            
-            
-            // const result = await this.cloudinaryService.uploadProfileImage(file.path)
-            // userSignupDto.profile_image = result.url;
-            // const dta = await this.cloudinaryService.uploadProfileImage(userSignupDto.profile_image)
-            // console.log("profile image : ",userSignupDto.profile_image);
-            // userSignupDto.profile_image = result.url;
-            return this.authService.createUser(file.path,userSignupDto);
+            return this.authService.createUser(file.path, userSignupDto);
         }
-        catch(error)
-        {
+        catch (error) {
             console.log("error in uploading image : ", error);
             throw new HttpException('Failed to upload image', HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @Post('/login')
-    async login(@Body() userLoginDto : UserLoginDto, @Res({passthrough: true}) response: Response) : Promise<void>
-    {
+    async login(@Body() userLoginDto: UserLoginDto, @Res({ passthrough: true }) response: Response): Promise<void> {
         const jwt = await this.authService.loginUser(userLoginDto);
-        
+
         response.cookie('jwt', jwt, {
             httpOnly: true,
             secure: true,
             expires: new Date(Date.now() + 365 * 24 * 60 * 1000),
             domain: 'localhost',
-        }).send({ status: 'ok', jwt, });    
+        }).send({ jwt });
     }
 
     @Get('/test')
     @UseGuards(AuthGuard())
     test(@Res() response: Response): void {
-        try
-        {
+        try {
             response.status(200).send("Hello from Home");
         }
-        catch(err)
-        {
+        catch (err) {
             response.status(200).send("wrong");
-        } 
+        }
+    }
+
+    @Post('/update/:userId')
+    @UseInterceptors(FileInterceptor('file'))
+    async updateProfile(
+        @Param() userId : string,
+        @Body() updateProfileDto: UpdateProfileDto,
+        @UploadedFile() file: Express.Multer.File,
+    ): Promise<string> {
+        try {
+            if (!file) {
+                throw new HttpException('No file uploaded', HttpStatus.BAD_REQUEST);
+            }
+            return this.authService.updateProfile(file.path,userId, updateProfileDto);
+        } catch (error) {
+            console.error('Error in updating profile: ', error);
+            throw new HttpException('Failed to update profile', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Get('/search')
@@ -85,6 +91,16 @@ export class AuthController {
                 throw new NotFoundException('No users found with the provided name.');
             }
             throw error;
+        }
+    }
+
+    @Get('/fetchUsers')
+    @UseGuards(AuthGuard()) // Guard to protect this endpoint
+    async fetchUsers(): Promise<User[]> {
+        try {
+            return await this.authService.fetchUsers();
+        } catch (error) {
+            throw new HttpException('Failed to fetch users', HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
