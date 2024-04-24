@@ -1,7 +1,13 @@
+import { EmptyDocument } from '@/app/(main)/_components/empty_document'
+import MainLayout from '@/app/(main)/layout'
 import React from 'react'
 
-export default function Documents(){
+export default function Documents() {
   return (
-    <div>page</div>
+    <>
+      <MainLayout>
+        <EmptyDocument />
+      </MainLayout>
+    </>
   )
 }

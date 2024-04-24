@@ -6,14 +6,14 @@ import { Logo } from "./logo";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/spinner";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from 'next/navigation'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "@/redux_store/slices/authSlice";
-import { UserProfile } from "./userProfile";
+import ProfileModal, { UserProfile } from "./userProfile";
 // import { useAuth } from "@/app/auth/utils/authContext";
 
 export const Navbar = () => {
@@ -23,7 +23,17 @@ export const Navbar = () => {
     const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
     const user = useSelector((state) => state.auth.user.user);
     
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const dropdownRef = useRef(null);
 
+    const handleProfileClick = () => {
+        setIsDropdownOpen(!isDropdownOpen);
+    };
+
+    const handleLogout = () => {
+        // Dispatch logout action
+        dispatch(logout());
+    };
     console.log("auth : ", isAuthenticated);
     // console.log(user.username);
    
@@ -47,14 +57,6 @@ export const Navbar = () => {
         )}>
             <Logo />
             <div className="md:ml-auto md:justify-end justify-between w-full flex items-center gap-x-2">
-                {!isAuthenticated && <Link href={"/auth/login"}> Login </Link>}
-                {isAuthenticated &&
-                    (<>
-                        <span>{user.username}</span>
-                        <button onClick={()=>{dispatch(logout())}}>Logout</button>
-                    </>
-
-                    )}
 
                 <Button className="text-white" style={{ backgroundColor: loading ? 'transparent' : '#4D5257' }} variant="ghost" size="sm" onClick={handleGetNotionFree}>
                     {loading ? (
@@ -66,11 +68,50 @@ export const Navbar = () => {
                 
                 <ModeToggle />
                 <ToastContainer />
-                
+                {
+                (
+                    <div className="dropdown dropdown-end" ref={dropdownRef}>
+                        <div
+                            tabIndex={0}
+                            role="button"
+                            className="btn btn-ghost btn-circle avatar"
+                            onClick={handleProfileClick}
+                        >
+                            <div className="w-10 rounded-full">
+                                <img
+                                    alt="Profile"
+                                    src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg"
+                                />
+                            </div>
+                        </div>
+                        {isDropdownOpen && (
+                            <ul
+                                tabIndex={0}
+                                className="mt-3 z-[1] p-2 absolute ml-[-30px] shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52"
+                            >
+                                <Link href={`/routes/`}>
+                                    <span>{document.title}</span>
+                                </Link>
+                                
+                                <li>
+                                    <a>Profile</a>
+                                </li>
+                                {!isAuthenticated && <Link href={"/auth/login"}> Login </Link>}
+                                {isAuthenticated && <button onClick={()=>{dispatch(logout())}}>Logout</button> }
+                                
+                            </ul>
+                        )}
+                    </div>
+             
+                )
+            }
+
+            {/* <ProfileModal /> */}
             </div>
             <div>
-            {isAuthenticated && <UserProfile />}
+            
             </div>
+
         </div>
         
     )

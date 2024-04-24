@@ -5,9 +5,7 @@ import React from 'react'
 function Profile() {
     return (
         <>
-            <MainLayout>
-                <EmptyDocument />
-            </MainLayout>
+           
         </>
     )
 }

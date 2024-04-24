@@ -1,61 +1,50 @@
-"use client"
-import { logout } from '@/redux_store/slices/authSlice';
-import React, { useRef, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux';
+'use client';
 
-export const UserProfile = () => {
-    const isAuthenticated = useSelector((state:any) => state.auth.isAuthenticated);
-    console.log(isAuthenticated);
-    const dispatch = useDispatch()
-    const user = useSelector((state:any) => state.auth.user.user);
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const dropdownRef = useRef(null);
+import { useCallback, useEffect, useState } from "react";
 
-    const handleProfileClick = () => {
-        setIsDropdownOpen(!isDropdownOpen);
-    };
+interface ModalProps {
+    label: string;
+    close: () => void;
+    content: React.ReactElement;
+    isOpen: boolean;
+}
+const ProfileModal: React.FC<ModalProps> = ({
+    label,
+    content,
+    isOpen,
+    close
+}) => {
+    const [showModal, setShowModal] = useState(isOpen)
 
-    const handleLogout = () => {
-        // Dispatch logout action
-        dispatch(logout());
-    };
+    useEffect(() => {
+        setShowModal(isOpen)
+    }, [isOpen])
+
+    
     return (
-        <>
-        {
-                isAuthenticated && (
-                    <div className="dropdown dropdown-end" ref={dropdownRef}>
-                        <div
-                            tabIndex={0}
-                            role="button"
-                            className="btn btn-ghost btn-circle avatar"
-                            onClick={handleProfileClick}
-                        >
-                            <div className="w-10 rounded-full">
-                                <img
-                                    alt="Profile"
-                                    src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg"
-                                />
-                            </div>
-                        </div>
-                        {isDropdownOpen && (
-                            <ul
-                                tabIndex={0}
-                                className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52"
+        <div className="flex items-center justify-center fixed inset-0 z-50 bg-black/60">
+            <div className="relative w-[90%] md:w-[80%] lg:w-[700px] my-6 mx-auto h-auto">
+                <div className={`translate duration-600 h-full ${showModal ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-10'}`}>
+                    <div className="w-full h-auto rounded-xl relative flex flex-col bg-white">
+
+                        <header className="h-[60px] flex items-center p-6 rounded-t justify-center relative border-b">
+                            <div 
+                                onClick={handleClose}
+                                className="p-3 absolute left-3 hover:bg-gray-300 rounded-full cursor-pointer"
                             >
-                                <li>
-                                    <a className="justify-between">Profile</a>
-                                </li>
-                                <li>
-                                    <a>Settings</a>
-                                </li>
-                                <li>
-                                    <button onClick={handleLogout}>Logout</button>
-                                </li>
-                            </ul>
-                        )}
+                                <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                </svg>
+                            </div>
+                            <h2 className="text-lg font-bold">{label}</h2>
+                        </header>
+                        <section className="p-6">
+                            {content}
+                        </section>
                     </div>
-                )
-            }
-        </>
+                </div>
+            </div>
+        </div>
     )
 }
+export default ProfileModal;

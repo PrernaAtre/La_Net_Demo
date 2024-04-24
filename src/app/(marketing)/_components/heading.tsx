@@ -69,7 +69,7 @@ export const Heading = () => {
 
             {isAuthenticated && (
                 <Button asChild>
-                    <Link href={"/routes/profile"}>
+                    <Link href={"/routes/documents"}>
                         <span>Enter Notion</span>
                         <ArrowRight />
                     </Link>

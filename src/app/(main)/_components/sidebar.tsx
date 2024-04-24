@@ -18,7 +18,7 @@ import axios from "axios";
 import { Bounce, ToastContainer, toast } from "react-toastify";
 import ConfirmationDialog from "./confirmationDialog";
 import TrashWindow from "./trashWindow";
-import DocumentListItem from "./DocumentListItem";
+import NoteAddIcon from '@mui/icons-material/NoteAdd';
 
 interface SidebarProps {
     handleNoteClick: (documentId: string) => void;
@@ -39,17 +39,11 @@ const Sidebar: React.FC = () => {
 
     //const [isAvailable, setIsAvailable] = useState(true);
     useEffect(() => {
-
-        // Fetch user's notes when the component mounts
         dispatch(fetchNotes(user._id));
-
-
     }, [dispatch, user._id]);
 
     const handleDeleteDocument = async (documentId) => {
         console.log("handleDeleteDocument called");
-        //setIsAvailable(false);
-
         setDocumentIdToDelete(documentId);
         setConfirmDialogOpen(true);
         console.log(confirmDialogOpen);
@@ -105,13 +99,6 @@ const Sidebar: React.FC = () => {
                     <li>
                         <a href="#" className="flex flex-row items-center h-12 transform hover:translate-x-2 transition-transform ease-in duration-200 text-gray-500 hover:text-gray-800">
                             <SearchIcon className="ml-6 " />
-                            {/* <input
-                            type="search"
-                            className="relative m-0 block flex-auto rounded border border-solid border-neutral-200 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-surface outline-none transition duration-200 ease-in-out placeholder:text-neutral-500 focus:z-[3] focus:border-primary focus:shadow-inset focus:outline-none motion-reduce:transition-none dark:border-white/10 dark:text-white dark:placeholder:text-neutral-200 dark:autofill:shadow-autofill dark:focus:border-primary"
-                            placeholder="Search"
-                            aria-label="Search"
-                            id="exampleFormControlInput2"
-                            aria-describedby="button-addon2" /> */}
                             <input type="search" id="default-search" className="ext-sm font-medium p-1 w-32 h-7 m-4 rounded-xl bg-gray-100" placeholder="Search.." required />
 
                             {/* <span className="text-sm font-medium pl-4">Search</span> */}
@@ -123,17 +110,18 @@ const Sidebar: React.FC = () => {
                             <span className="text-sm font-medium pl-4">Setting</span>
                         </a>
                     </li>
-                    <ul className="flex flex-col py-4">
+                    <ul className="flex flex-col my-2">
                         {documents.map((document) => (
-                            <li key={document._id} className="flex items-center justify-between">
+                            <li key={document._id} className="flex flex-row items-center h-12 transform hover:translate-x-2 transition-transform ease-in duration-200 text-gray-500 hover:text-gray-800">
+                                <NoteAddIcon className="ml-6" />
                                 <Link href={`/routes/documents/${document._id}`}>
-                                    <span>{document.title}</span>
+                                    <span className="text-sm font-medium pl-4">{document.title}</span>
                                 </Link>
-                                <BsTrash className="ml-10 " onClick={() => handleDeleteDocument(document._id)} />
-                                
+                                <div className="flex-grow" /> {/* This creates space to push the trash icon to the end */}
+                                <BsTrash className="mr-4" onClick={() => handleDeleteDocument(document._id)} />
                             </li>
                         ))}
-                    
+
                         {confirmDialogOpen && (
                             <ConfirmationDialog
                                 open={confirmDialogOpen}
@@ -142,23 +130,21 @@ const Sidebar: React.FC = () => {
                             />
                         )}
                     </ul>
-                    {/* <ul>
-                        {documents.map((document) => (
-                            <li key={document._id}>
-                                <DocumentListItem document={document} />
-                            </li>
-                        ))}
-                    </ul> */}
                     <li>
                         <Link href="/routes/addpage" className="flex flex-row items-center h-12 transform hover:translate-x-2 transition-transform ease-in duration-200 text-gray-500 hover:text-gray-800">
                             <AddCircleOutlineIcon className="ml-6" />
                             <span className="text-sm font-medium pl-4">Add Page</span>
                         </Link>
                     </li>
+                    <li>
+                        <Link href="/routes/quickNote" className="flex flex-row items-center h-12 transform hover:translate-x-2 transition-transform ease-in duration-200 text-gray-500 hover:text-gray-800">
+                            <AddCircleOutlineIcon className="ml-6" />
+                            <span className="text-sm font-medium pl-4">Quick Note</span>
+                        </Link>
+                    </li>
                     <li className="flex flex-row items-center h-12 transform hover:translate-x-2 transition-transform ease-in duration-200 text-gray-500 hover:text-gray-800">
                         <DeleteOutlineIcon className="ml-6" />
                         <TrashWindow />
-
                         <ToastContainer />
                     </li>
 
