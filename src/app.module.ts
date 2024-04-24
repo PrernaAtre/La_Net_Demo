@@ -16,6 +16,7 @@ import { NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { ShareDocumentModule } from './share-document/share-document.module';
 import { ShareDocumentService } from './share-document/share-document.service';
 import { ShareDocumentController } from './share-document/share-document.controller';
+import { QuickNoteModule } from './quick-note/quick-note.module';
 
 
 // db connection
@@ -39,7 +40,7 @@ const DBURL: string = `mongodb+srv://${username}:${password}@cluster0.89cuca2.mo
   MulterModule.register({
     dest : './images',
   }),
-    MongooseModule.forRoot(DBURL), AuthModule, CloudinaryModule, DocumentModule, ShareDocumentModule],
+    MongooseModule.forRoot(DBURL), AuthModule, CloudinaryModule, DocumentModule, ShareDocumentModule, QuickNoteModule],
   controllers: [AppController, AuthController, DocumentController, ],
   providers: [AppService, CloudinaryService, ],
 })
