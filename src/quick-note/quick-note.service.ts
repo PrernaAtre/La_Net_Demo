@@ -23,17 +23,18 @@ export class QuickNoteService {
         //     apiKey: process.env.OPENAI_API_KEY,
         //   }));
         const openAI = new OpenAI(({
-            apiKey: "sk-proj-7FFF4Lks4j6dXV8NgGaTT3BlbkFJD9CFnsjeMKRM8ajBojRY",
+            apiKey: "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",
           }));
         const completion = await openAI.chat.completions.create({
             model: "gpt-3.5-turbo",
             messages:[{ role: "user", content: title }],
         });
-        console.log(completion);
+      //  console.log(completion);
         console.log(completion.choices[0].message.content);
         const createdNote = new this.quickNoteModel({
             title,
             userId,
+            description : completion.choices[0].message.content
         });
         // Save the new quick note to the database
         return await createdNote.save();
