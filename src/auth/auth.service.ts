@@ -4,7 +4,7 @@ import { UserSignupDto } from "../auth/dto/signupDto.dto";
 import { UserLoginDto } from 'src/auth/dto/loginDto.dto';
 import { User } from './schema/user.schema';
 import * as bcrypt from 'bcryptjs';
-import { Model } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -73,17 +73,33 @@ export class AuthService {
         }
     }
 
-    async updateProfile(imagePath: string, userId: string, updateProfileDto: UpdateProfileDto): Promise<string> {
+    async updateProfile(imagePath: string, userId: string, updateProfileDto: UpdateProfileDto): Promise<Object> {
+        console.log(userId)
+            console.log(updateProfileDto);
         try {
-            const { profile_image } = updateProfileDto;
+            const { username, email, password, confirm_password, profile_image } = updateProfileDto;
+
+            console.log(userId);
             const user = await this.userModel.findById(userId).exec();
             if (!user) {
                 throw new NotFoundException('User not found.');
             }
+            const hashedPassword = await bcrypt.hash(password, 10);
+
+            if (password !== confirm_password) {
+                return "your password and confirm password are not same";
+            }
             const image_url = await this.cloudinaryService.uploadProfileImage(imagePath);
             user.profile_image = image_url?.url || profile_image; // Update profile image if new image is uploaded
-            await user.save();
-            return "Profile updated successfully";
+           
+            const updated_user = await this.userModel.findByIdAndUpdate(userId, { // Use findByIdAndUpdate to update existing user
+                username,
+                email,
+                password: hashedPassword,
+                profile_image: image_url?.url,
+            },{new:true});
+
+            return updated_user;
         } catch (error) {
             console.error('Error in updating profile: ', error);
             throw new InternalServerErrorException('Failed to update profile');

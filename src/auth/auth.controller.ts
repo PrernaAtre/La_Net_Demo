@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Res, Get, UseGuards, UseInterceptors, UploadedFile, HttpException, HttpStatus, NotFoundException, Query, Param } from '@nestjs/common';
+import { Body, Controller, Post, Res, Get, UseGuards, UseInterceptors, UploadedFile, HttpException, HttpStatus, NotFoundException, Query, Param, Put } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UserSignupDto } from './dto/signupDto.dto';
 import { User } from './schema/user.schema';
@@ -10,6 +10,8 @@ import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { UpdateProfileDto } from './dto/updateProfileDto.dto';
+import { ObjectId } from 'mongodb'; // Import ObjectId type
+
 
 const storage = diskStorage({
     destination: './uploads',
@@ -62,13 +64,13 @@ export class AuthController {
         }
     }
 
-    @Post('/update/:userId')
+    @Put('/update/:userId')
     @UseInterceptors(FileInterceptor('file'))
     async updateProfile(
-        @Param() userId : string,
+        @Param('userId') userId :string,
         @Body() updateProfileDto: UpdateProfileDto,
         @UploadedFile() file: Express.Multer.File,
-    ): Promise<string> {
+    ): Promise<Object> {
         try {
             if (!file) {
                 throw new HttpException('No file uploaded', HttpStatus.BAD_REQUEST);
