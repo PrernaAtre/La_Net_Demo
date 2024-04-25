@@ -28,6 +28,7 @@ interface SidebarProps {
 const Sidebar: React.FC = () => {
     const isAuthenticated = useSelector((state: any) => state.auth.isAuthenticated);
     const user = useSelector((state: any) => state.auth.user.user);
+    console.log("user--",user);
     const documents = useSelector(selectAllNotes);
     console.log("first----", documents)
     const dispatch = useDispatch();

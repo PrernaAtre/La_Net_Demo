@@ -63,7 +63,7 @@ const LoginForm: React.FC = () => {
     if (response.jwt) {
       console.log("login successfull");
       const current_user = response.jwt.user;
-      console.log("cur user : ", current_user.username)
+      console.log("cur user : ", current_user)
       await toast.success('Login Successfull');
       dispatch(login({ user: current_user }));
       window.location.href = "/";

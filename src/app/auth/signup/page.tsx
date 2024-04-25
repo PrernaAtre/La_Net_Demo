@@ -3,9 +3,11 @@ import { Button } from '@/components/ui/button'
 import { useFormik } from 'formik';
 import React, { useState } from 'react';
 import { signupFormSchema } from './signupFormSchema';
-import { createUser } from '@/app/api/user_api';
+// import { createUser } from '@/app/api/user_api';
 import { signupFormDataType } from '../schema_datatype';
 import * as Yup from 'yup';
+import { ToastContainer, toast } from 'react-toastify';
+import axios from 'axios';
 
 
 const SignUpForm: React.FC = () => {
@@ -42,6 +44,21 @@ const SignUpForm: React.FC = () => {
         }
     }); 
     console.log(formik.errors);
+
+  const createUser = async (user : any) => {
+        try {
+            console.log("user------------ : ",user);
+            const res = await axios.post("http://localhost:3001/auth/signup",user);
+            console.log("res:" + res);
+            const data = await res.data;
+            console.log("data : " + data); // Handle the response data here
+            await toast.success('Register Successfull');
+            window.location.href = "/auth/login";
+            
+        } catch (error) {
+            console.error("Error posting data:", error);
+        }
+    }
 
     return (
         <>
@@ -171,6 +188,7 @@ const SignUpForm: React.FC = () => {
                         </div>
 
                         <Button type='submit' variant="ghost" size="sm">Sign Up</Button>
+                        <ToastContainer />
                     </form>
 
                     <p className="mt-10 text-center text-sm text-gray-500">

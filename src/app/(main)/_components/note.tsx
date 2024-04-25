@@ -87,8 +87,9 @@ const NoteForm: React.FC = () => {
         if (response.status == 201) {
           console.log("response.status  : ", response.status);
           await toast.success('Document Created Successfully');
+          router.push('/routes/documents');
           dispatch(fetchNotes(user._id));
-          router.push('/')
+          
         }
       }
       catch (error) {
