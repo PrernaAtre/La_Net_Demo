@@ -17,6 +17,8 @@ import { ShareDocumentModule } from './share-document/share-document.module';
 import { ShareDocumentService } from './share-document/share-document.service';
 import { ShareDocumentController } from './share-document/share-document.controller';
 import { QuickNoteModule } from './quick-note/quick-note.module';
+import { BlockModule } from './block/block.module';
+import { StripeModule } from './stripe/stripe.module';
 
 
 // db connection
@@ -32,7 +34,7 @@ const DBURL: string = `mongodb+srv://${username}:${password}@cluster0.89cuca2.mo
     //   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Allow these HTTP methods
     //   allowedHeaders: 'Content-Type,Authorization', // Allow these headers
     // }),
-   
+    StripeModule.forRootAsync(),
     ConfigModule.forRoot({
     envFilePath: '.env',
     isGlobal: true,
@@ -40,7 +42,7 @@ const DBURL: string = `mongodb+srv://${username}:${password}@cluster0.89cuca2.mo
   MulterModule.register({
     dest : './images',
   }),
-    MongooseModule.forRoot(DBURL), AuthModule, CloudinaryModule, DocumentModule, ShareDocumentModule, QuickNoteModule],
+    MongooseModule.forRoot(DBURL), AuthModule, CloudinaryModule, DocumentModule, ShareDocumentModule, QuickNoteModule, BlockModule, StripeModule],
   controllers: [AppController, AuthController, DocumentController, ],
   providers: [AppService, CloudinaryService, ],
 })

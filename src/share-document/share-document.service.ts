@@ -3,16 +3,18 @@ import { ShareDocument } from './schema/shareDocument.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from 'src/auth/schema/user.schema';
+import Stripe from 'stripe';
 
 
 @Injectable()
 export class ShareDocumentService {
-
+    private stripe: Stripe;
     constructor(
         @InjectModel(ShareDocument.name)
         private readonly shareDocumentModel: Model<ShareDocument>,
         @InjectModel('User') private userModel: Model<User>,
         @InjectModel('Document') private documentModel: Model<Document>,
+       
     ) {}
 
     async createShareDocument(
@@ -47,4 +49,6 @@ export class ShareDocumentService {
            return err.message;
         }    
     }
+
+    
 }
