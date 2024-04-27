@@ -29,7 +29,10 @@ export default function EditorTry() {
     loadFromStorage().then((content) => {
       setInitialContent(content);
     });
+   
+    
   }, []);
+  console.log("intial content : ",initialContent);
  
   // Creates a new editor instance.
   // We use useMemo + createBlockNoteEditor instead of useCreateBlockNote so we

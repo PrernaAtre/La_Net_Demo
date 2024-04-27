@@ -46,8 +46,6 @@ export const fetchNoteById = createAsyncThunk('notes/fetchNoteById', async (docu
     }
   });
   
-
-  
 export const fetchDeletedDocuments = createAsyncThunk(
   'notes/fetchDeletedDocuments',
   async (userId: string) => {
