@@ -34,7 +34,7 @@ const DBURL: string = `mongodb+srv://${username}:${password}@cluster0.89cuca2.mo
     //   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Allow these HTTP methods
     //   allowedHeaders: 'Content-Type,Authorization', // Allow these headers
     // }),
-    StripeModule.forRootAsync(),
+
     ConfigModule.forRoot({
     envFilePath: '.env',
     isGlobal: true,
