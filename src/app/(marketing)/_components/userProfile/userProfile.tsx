@@ -23,7 +23,7 @@ interface UserProfileModalProps {
 }
 
 const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onClose }) => {
-    const user = useSelector((state) => state.auth.user.user);
+    const user = useSelector((state : any) => state.auth.user);
     const dispatch = useDispatch();
     const [previewImage, setPreviewImage] = useState<string | null>(user?.profile_image || null);
     console.log("user-------", user);
@@ -57,7 +57,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onClose }) 
             formData.append('confirm_password', values.confirm_password);
             formData.append('file', values.profile_image as File);
             // console.log("form data : ",formData);
-            console.log([...formData.entries()]);
+         //   console.log([...formData.entries()]);
             try {
                 updateUser(formData); // Pass the FormData object to createUser function
             } catch (error) {

@@ -1,53 +1,35 @@
 "use client"
-import Link from 'next/link'
-import React, { useContext } from 'react'
+import Link from 'next/link';
+import React, { useContext } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Grid, TextField, Button } from '@mui/material';
+import { useFormik } from 'formik';
 import { loginFormDataType } from '../schema_datatype';
 import { loginFormSchema } from './loginFormSchema';
-import { useFormik } from 'formik';
 import { useRouter } from 'next/navigation';
-// import { authenticate } from '@/app/api/user_api';
-import { middleware } from '@/app/middleware';
 import { Bounce, toast } from 'react-toastify';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-// import { useDispatch, useSelector } from 'react-redux';
-// import { authenticate } from '@/app/api/user_api';
-import { useDispatch, useSelector } from 'react-redux';
-// import { useAuth } from '../utils/authContext';
 import { login } from '@/redux_store/slices/authSlice';
-import { authenticate } from '@/Store/actions/setUser';
 import apiService from './authapi_service';
 import { Logo } from '@/app/(marketing)/_components/logo';
 
-
-// import { authenticate } from '@/Store/actions/setUser';
-
-
 const LoginForm: React.FC = () => {
-  // const { login } = useAuth();
   const router = useRouter();
-  const dispatch = useDispatch()
-  // const { isLoggedIn, setIsLoggedIn } = useAuth();
+  const dispatch = useDispatch();
   const formInitialValues: loginFormDataType = {
-    email: "",
-    password: ""
+    email: '',
+    password: ''
   };
 
-  // const logindata = useSelector((state)=>state)
-  // console.log(logindata)
   const formik = useFormik({
     initialValues: formInitialValues,
     validationSchema: loginFormSchema,
     onSubmit: (values) => {
-      // console.log('hello')
-      // console.log(values)
-      // createUser(values}
-      handleSubmit(values)
-
+      handleSubmit(values);
     }
-  })
+  });
 
-  // const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
   const handleSubmit = async (loginUser: loginFormDataType) => {
     console.log(loginUser);
 
@@ -62,10 +44,15 @@ const LoginForm: React.FC = () => {
     console.log("res : ", response);
     if (response.jwt) {
       console.log("login successfull");
+      const token = response.jwt.token;
+
       const current_user = response.jwt.user;
-      console.log("cur user : ", current_user)
+      console.log("cur user : ", current_user, token)
       await toast.success('Login Successfull');
-      dispatch(login({ user: current_user }));
+      document.cookie = `token=${token}; path=/; expires=${new Date(
+        (Date.now() + 365 * 24 * 60 * 1000)
+      ).toUTCString()};`;
+      dispatch(login({ user: current_user, token: token }));
       window.location.href = "/";
     }
     else {
@@ -84,94 +71,83 @@ const LoginForm: React.FC = () => {
     }
   };
 
-
   return (
     <>
-
-      <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-        <div className='ml-[49%]'>
-          <Logo />
-        </div>
-        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-
-          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-            Sign in to your account
-          </h2>
-        </div>
-
-        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form className="space-y-6" onSubmit={formik.handleSubmit}>
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
-                Email address
-              </label>
-              <div className="mt-2">
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={formik.values.email}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  autoComplete="email"
-                  required
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
-                />
-                {formik.errors.email && formik.touched.email ? (
-                  <p className='text-red-700'>{formik.errors.email}</p>) : null}
-              </div>
+      <Grid container className="h-screen fixed">
+        <Grid item xs={6} className="flex justify-center">
+          <img src="/login.svg" alt="" className="w-full h-full object-cover" />
+        </Grid>
+        <Grid item xs={6} className="flex justify-center">
+          <Grid item xs={12} sm={6} md={4}>
+            <div className="w-full max-w-md ml-[40%] mt-[52%]">
+             <p>Login</p>
             </div>
 
-            <div>
-              <div className="flex items-center justify-between">
-                <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
-                  Password
-                </label>
+            <form className="space-y-6 mt-6" onSubmit={formik.handleSubmit}>
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  <TextField
+                    id="email"
+                    name="email"
+                    type="email"
+                    label="Email address"
+                    value={formik.values.email}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    autoComplete="email"
+                    required
+                    fullWidth
+                  />
+                  {formik.errors.email && formik.touched.email && <p className="text-red-700">{formik.errors.email}</p>}
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    id="password"
+                    name="password"
+                    type="password"
+                    label="Password"
+                    value={formik.values.password}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    autoComplete="current-password"
+                    required
+                    fullWidth
+                  />
+                  {formik.errors.password && formik.touched.password && <p className="text-red-700">{formik.errors.password}</p>}
+                </Grid>
+                <Grid item xs={12}>
+                  <div className="text-sm">
+                    <a href="#" className="font-semibold text-black hover:text-indigo-500">
+                      Forgot password?
+                    </a>
+                  </div>
+                </Grid>
+                <Grid item xs={12}>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    fullWidth
+                    className="bg-black text-white font-semibold hover:bg-indigo-500"
+                  >
+                    Sign in
+                  </Button>
+                </Grid>
+                <Grid item xs={12}>
+                  <p>
+                    Not Registered?{' '}
+                    <Link href="/auth/signup">
+                      Sign Up
+                    </Link>
+                  </p>
+                </Grid>
+              </Grid>
+              <ToastContainer />
+            </form>
+          </Grid>
+        </Grid>
+        </Grid>
+      </>
+      );
+};
 
-              </div>
-              <div className="mt-2">
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  value={formik.values.password}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  autoComplete="current-password"
-                  required
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-                {formik.errors.password && formik.touched.password ? (
-                  <p className='text-red-700'>{formik.errors.password}</p>) : null}
-              </div>
-            </div>
-            <div className="text-sm">
-              <a href="#" className="font-semibold text-black hover:text-indigo-500">
-                Forgot password?
-              </a>
-            </div>
-            <div>
-              <button
-                type="submit"
-                className="flex w-full justify-center rounded-md bg-black px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-              >
-                Sign in
-              </button>
-            </div>
-
-            <div>
-              <p>Not Register ?
-                <Link href={"/auth/signup"}>
-                  Sign Up
-                </Link>
-              </p>
-            </div>
-            <ToastContainer />
-          </form>
-        </div>
-      </div>
-    </>
-  )
-}
-
-export default LoginForm;
+      export default LoginForm;

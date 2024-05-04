@@ -5,6 +5,7 @@ import { boolean } from "yup";
 interface authState 
 {
     isAuthenticated : boolean;
+    token : string;
     user : [];
     users : [];
     status: 'idle' | 'loading' | 'succeeded' | 'failed';
@@ -13,6 +14,7 @@ interface authState
 
 const initialState : authState = {
     isAuthenticated: false,
+    token : "",
     user : [],
     users : [],
     status: 'idle',
@@ -33,7 +35,9 @@ const authSlice = createSlice({
        {
             console.log('login reducer ',action.payload)
             state.isAuthenticated = true;
-            state.user = action.payload;
+            state.user = action.payload.user;
+            state.token = action.payload.token
+       
        },
        logout: (state) => {
             state.isAuthenticated = false;

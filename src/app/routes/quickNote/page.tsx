@@ -1,4 +1,4 @@
-import {QuickNote} from '@/app/(main)/_components/quickNote/QuickNote';
+import QuickNote from '@/app/(main)/_components/quickNote/QuickNote';
 import MainLayout from '@/app/(main)/layout'
 import React from 'react'
 

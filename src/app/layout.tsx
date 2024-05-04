@@ -1,15 +1,13 @@
-"use client"
+"use client";
 
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { Inter } from "next/font/google";
 import { Provider } from "react-redux";
+import "./globals.css";
 
-import { AuthProvider } from "../app/auth/utils/authContext"
-import { useEffect } from "react";
-import { PersistGate } from "redux-persist/integration/react";
 import { persistor, store } from "@/redux_store/store";
+import React from "react";
+import { PersistGate } from "redux-persist/integration/react";
 // import { persistor, store } from "@/redux_store/store";
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,7 +16,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>

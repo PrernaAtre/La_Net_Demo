@@ -1,24 +1,21 @@
 // components/MyForm.js
-"use client"
-import { Formik, Form, Field, ErrorMessage, useFormik } from 'formik';
-import { SetStateAction, useEffect, useState } from 'react';
-import EmojiPicker from "emoji-picker-react"
-import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import * as Yup from 'yup';
-import 'react-toastify/dist/ReactToastify.css';
+"use client";
+import { Button } from "@/components/ui/button";
+import { fetchNotes } from "@/redux_store/slices/notesSlice";
+import EmojiPicker from "emoji-picker-react";
+import { useFormik } from "formik";
 import { useRouter } from "next/navigation";
-import { fetchNotes } from '@/redux_store/slices/notesSlice';
-import { Button } from '@/components/ui/button';
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import "react-toastify/dist/ReactToastify.css";
+import * as Yup from "yup";
 
-import axios from 'axios';
-import { ToastContainer, toast } from 'react-toastify';
-import Sidebar from './sidebar';
-import MainLayout from '../layout';
 import "@blocknote/core/fonts/inter.css";
-import { BlockNoteView, useCreateBlockNote } from "@blocknote/react";
+import { useCreateBlockNote } from "@blocknote/react";
 import "@blocknote/react/style.css";
-
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import MainLayout from "../layout";
 
 interface NoteFormDataType {
   title: string;
@@ -28,30 +25,32 @@ interface NoteFormDataType {
 }
 
 const NoteForm: React.FC = () => {
-  const [blockNoteContent, setBlockNoteContent] = useState('');
+  const [blockNoteContent, setBlockNoteContent] = useState("");
   const editor = useCreateBlockNote();
-  const router = useRouter()
+  const router = useRouter();
   const user = useSelector((state) => state.auth.user.user);
   const initialValues: NoteFormDataType = {
-    title: '',
+    title: "",
     coverImageUrl: null,
-    iconImage: '',
-    description: '',
+    iconImage: "",
+    description: "",
   };
 
   const noteFormSchema = Yup.object({
-    title: Yup.string().required('Title is required'),
-    coverImageUrl: Yup.mixed().test('fileFormat', 'Image only', (value) => {
-      if (!value) return true
-      const file = value as File
-      return ['image/jpeg', 'image/png', 'image/gif'].includes(file.type)
+    title: Yup.string().required("Title is required"),
+    coverImageUrl: Yup.mixed().test("fileFormat", "Image only", (value) => {
+      if (!value) return true;
+      const file = value as File;
+      return ["image/jpeg", "image/png", "image/gif"].includes(file.type);
     }),
     iconImage: Yup.string(),
     description: Yup.string(),
   });
 
   // const [coverImage, setCoverImage] = useState(null);
-  const [selectedEmoji, setSelectedEmoji] = useState<string | undefined>(undefined);
+  const [selectedEmoji, setSelectedEmoji] = useState<string | undefined>(
+    undefined
+  );
   const [emojiPickerVisible, setEmojiPickerVisible] = useState(false);
   const dispatch = useDispatch();
 
@@ -82,22 +81,23 @@ const NoteForm: React.FC = () => {
       formData.append("userId", user._id);
       try {
         // console.log("create  note try :", [...formdata.entries()]);
-        const response = await axios.post('http://localhost:3001/document/createDocument', formData);
+        const response = await axios.post(
+          "http://localhost:3001/document/createDocument",
+          formData
+        );
         console.log("res : ", response);
         if (response.status == 201) {
           console.log("response.status  : ", response.status);
-          await toast.success('Document Created Successfully');
-          router.push('/routes/documents');
+          await toast.success("Document Created Successfully");
+          router.push("/routes/documents");
           dispatch(fetchNotes(user._id));
-          
         }
-      }
-      catch (error) {
-        console.log("error : ", error)
+      } catch (error) {
+        console.log("error : ", error);
       }
       // console.log([...formData.entries()]);
       // dispatch(fetchNotes(user._id));
-    }
+    },
   });
 
   console.log(formik.errors);
@@ -111,7 +111,7 @@ const NoteForm: React.FC = () => {
       <MainLayout>
         <div>
           <h1>{formik.values.title}</h1>
-          <img src=''></img>
+          <img src=""></img>
         </div>
 
         <form onSubmit={formik.handleSubmit} encType="multipart/form-data">
@@ -146,13 +146,16 @@ const NoteForm: React.FC = () => {
               id="coverImageUrl"
               name="coverImageUrl"
               onChange={(event) => {
-                console.log("testtt---", event.target.files?.[0])
+                console.log("testtt---", event.target.files?.[0]);
                 const files = event.currentTarget.files;
                 if (files && files.length > 0) {
-                  console.log("data---", files)
+                  console.log("data---", files);
                   const fileName = files?.[0];
-                  console.log(fileName)
-                  formik.setFieldValue('coverImageUrl', event.currentTarget.files?.[0]);
+                  console.log(fileName);
+                  formik.setFieldValue(
+                    "coverImageUrl",
+                    event.currentTarget.files?.[0]
+                  );
                 } else {
                   // Handle case where no files are selected
                 }
@@ -163,13 +166,18 @@ const NoteForm: React.FC = () => {
 
           <div>
             <label htmlFor="emoji">Emoji</label>
-            <button type="button" onClick={() => setEmojiPickerVisible(!emojiPickerVisible)}>Select Emoji</button>
+            <button
+              type="button"
+              onClick={() => setEmojiPickerVisible(!emojiPickerVisible)}
+            >
+              Select Emoji
+            </button>
             {emojiPickerVisible && (
               <EmojiPicker
                 onEmojiClick={(data) => {
                   // Extract emoji from data
                   const emoji = data.imageUrl;
-                  console.log("emoji : ", emoji)
+                  console.log("emoji : ", emoji);
                   // Update state
                   setSelectedEmoji(emoji);
                   console.log("selected emoji : ", data.emoji);
@@ -184,19 +192,14 @@ const NoteForm: React.FC = () => {
             )}
           </div>
 
-          <Button type="submit" >
-            Submit
-          </Button>
+          <Button type="submit">Submit</Button>
           <ToastContainer />
         </form>
 
         {/* <BlockNoteView editor={editor} onChange={handleBlockNoteChange}/>; */}
       </MainLayout>
-
     </>
-  )
-}
+  );
+};
 
 export default NoteForm;
-
-

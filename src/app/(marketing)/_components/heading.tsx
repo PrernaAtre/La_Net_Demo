@@ -5,11 +5,15 @@ import { ArrowRight } from "lucide-react"
 import { useState } from "react";
 import Link from "next/link";
 import { useSelector } from "react-redux";
+import { useAuthenticated } from "@/app/routes/editor/hooks/useIsauthenticate";
+import { useCurrentUser } from "@/app/routes/editor/hooks/useCurrentUser";
 
 export const Heading = () => {
     const [loading, setLoading] = useState(false);
     // const { isAuthenticated } = useAuth();
-    const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+    // const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+    const { isAuthenticated } = useAuthenticated()
+    const { user  } = useCurrentUser()
     // const user = useSelector((state) => state.auth.user.user);
 
     console.log("auth on heading : ", isAuthenticated);

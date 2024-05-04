@@ -1,13 +1,12 @@
-import NoteForm from '@/app/(main)/_components/note'
-import React from 'react'
+import NoteForm from "@/app/(main)/_components/note";
+import React from "react";
 
 function AddPage() {
   return (
     <>
-    
-        <NoteForm />
+      <NoteForm />
     </>
-  )
+  );
 }
 
 export default AddPage;

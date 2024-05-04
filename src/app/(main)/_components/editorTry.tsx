@@ -1,61 +1,129 @@
-"use client"
-import { Block, BlockNoteEditor, PartialBlock } from "@blocknote/core";
+"use client";
+
+import { useUpdatePage } from "@/app/routes/editor/hooks/useUpdatePage";
+import { Block } from "@blocknote/core";
 import "@blocknote/core/fonts/inter.css";
-import { BlockNoteView } from "@blocknote/react";
+import { BlockNoteView, useCreateBlockNote } from "@blocknote/react";
 import "@blocknote/react/style.css";
-import { useEffect, useMemo, useState } from "react";
- 
-async function saveToStorage(jsonBlocks: Block[]) {
-  // Save contents to local storage. You might want to debounce this or replace
-  // with a call to your API / database.
-  localStorage.setItem("editorContent", JSON.stringify(jsonBlocks));
-}
- 
-async function loadFromStorage() {
-  // Gets the previously stored editor contents.
-  const storageString = localStorage.getItem("editorContent");
-  return storageString
-    ? (JSON.parse(storageString) as PartialBlock[])
-    : undefined;
-}
- 
-export default function EditorTry() {
-  const [initialContent, setInitialContent] = useState<
-    PartialBlock[] | undefined | "loading"
-  >("loading");
- 
-  // Loads the previously stored editor contents.
-  useEffect(() => {
-    loadFromStorage().then((content) => {
-      setInitialContent(content);
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { IconButton } from "@mui/material";
+import { Share } from "@mui/icons-material";
+import "./styles.css"
+import MainLayout from "../layout";
+import { Publish } from "./publish";
+import Image from "next/image";
+import { useCurrentUserPages } from "@/app/routes/editor/hooks/useCurrentUserPages";
+
+
+function EditorTry() {
+  const { pages } = useCurrentUserPages();
+  const [isEditing, setIsEditing] = useState(false);
+  const searchParams = useSearchParams();
+  const [pageName, setPageName] = useState("");
+  const [url, setUrl] = useState("");
+
+  const { page, handleCreatePage, isPageLoading } = useUpdatePage(
+    searchParams.get("id") || ""
+  );
+
+  console.log("page------",page);
+  async function uploadFile(file: File) {
+    const body = new FormData();
+    body.append("file", file);
+
+    const ret = await fetch("https://tmpfiles.org/api/v1/upload", {
+      method: "POST",
+      body: body,
     });
-   
-    
-  }, []);
-  console.log("intial content : ",initialContent);
- 
-  // Creates a new editor instance.
-  // We use useMemo + createBlockNoteEditor instead of useCreateBlockNote so we
-  // can delay the creation of the editor until the initial content is loaded.
-  const editor = useMemo(() => {
-    if (initialContent === "loading") {
-      return undefined;
-    }
-    return BlockNoteEditor.create({ initialContent });
-  }, [initialContent]);
- 
-  if (editor === undefined) {
+    return (await ret.json()).data.url.replace(
+      "tmpfiles.org/",
+      "tmpfiles.org/dl/"
+    );
+    // setUrl(await ret.json()).data.url.replace(
+    //     "tmpfiles.org/",
+    //     "tmpfiles.org/dl/")
+  }
+
+  const handleSubmit = async (payload: Block[]) => {
+    return handleCreatePage({
+      id: page?._id,
+      name: pageName,
+      document: JSON.stringify(payload),
+    });
+  };
+
+  const editor = useCreateBlockNote(
+    {
+      uploadFile,
+      domAttributes: {
+        // Adds a class to all `blockContainer` elements.
+        block: {
+          class: "hello-world-block",
+        },
+      },
+      initialContent: page?.document
+        ? JSON.parse(page?.document)
+        : [
+
+          {
+            id: "1",
+            type: "heading",
+            content: "",
+            props: { level: 1 },
+          },
+        ],
+    },
+    [page]
+  );
+
+  if (isPageLoading) {
     return "Loading content...";
   }
- 
-  // Renders the editor instance.
+
+  if (!page) {
+    return "Page not found in your library. Please create a new page.";
+  }
+
+  // function handlePublish(event: MouseEvent<HTMLButtonElement, MouseEvent>): void {
+  //   throw new Error("Function not implemented.");
+  // }
+
+  function handleShare(event: MouseEvent<HTMLButtonElement, MouseEvent>): void {
+    throw new Error("Function not implemented.");
+  }
+
   return (
-    <BlockNoteView
-      editor={editor}
-      onChange={() => {
-        saveToStorage(editor.document);
-      }}
-    />
+    <>
+      <div className="editor-container w-[90%]">
+        <div className="flex mb-4">
+          <p>{pageName}</p>
+        </div>
+        <div>
+          <input
+            type="text"
+            value={pageName}
+            onChange={(e) => setPageName(e.target.value)}
+            placeholder="Untitled Page"
+            className="w-10% p-2 rounded-md border-none focus:outline-none focus:border-blue-500"
+          />
+        </div>
+        <div className="w-[40%] fixed">
+          <BlockNoteView
+            editor={editor}
+            onChange={() => handleSubmit(editor.document)}
+            data-changing-font-demo
+          />
+        </div>
+      </div>
+      <div className="fixed top-4 right-4 flex gap-2">
+        <Publish id={page._id} />
+        <IconButton onClick={handleShare}>
+          <Share />
+        </IconButton>
+      </div>
+    </>
   );
 }
- 
+
+export default EditorTry;

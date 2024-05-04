@@ -21,12 +21,14 @@ import { fetchNoteById, fetchNotes, selectAllNotes, selectNoteById } from "@/red
 import { EmptyDocument } from "./empty_document";
 import singleDocument from "./singleDocument";
 import SingleDocument from "./singleDocument";
+import { useAuthenticated } from "@/app/routes/editor/hooks/useIsauthenticate";
+import { useCurrentUser } from "@/app/routes/editor/hooks/useCurrentUser";
 
 
 const Navigation = () => {
     const [isOpen, setIsOpen] = useState(false);
-    const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
-    const user = useSelector((state) => state.auth.user.user);
+    const { isAuthenticated } = useAuthenticated()
+    const { user  } = useCurrentUser()
     const [selectedNote, setSelectedNote] = useState(null);
     const documents = useSelector(selectAllNotes)
     // console.log("single document : ", singleDocument);

@@ -12,7 +12,7 @@ interface EmptyDocumentProps {
 }
 
 export const EmptyDocument: React.FC = () => {
-    const user = useSelector((state: any) => state.auth.user.user);
+    const user = useSelector((state: any) => state.auth.user);
     return (
         <>
             <div className="flex flex-col items-center justify-center h-full mr-[50%]">
