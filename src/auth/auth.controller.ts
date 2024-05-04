@@ -3,7 +3,6 @@ import { AuthService } from './auth.service';
 import { UserSignupDto } from './dto/signupDto.dto';
 import { User } from './schema/user.schema';
 import { UserLoginDto } from './dto/loginDto.dto';
-import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
@@ -11,6 +10,7 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { UpdateProfileDto } from './dto/updateProfileDto.dto';
 import { ObjectId } from 'mongodb'; // Import ObjectId type
+import { AuthGuard } from './jwt-auth.guard';
 
 
 const storage = diskStorage({
@@ -42,19 +42,20 @@ export class AuthController {
     }
 
     @Post('/login')
-    async login(@Body() userLoginDto: UserLoginDto, @Res({ passthrough: true }) response: Response): Promise<void> {
+    async login(@Body() userLoginDto: UserLoginDto, @Res({ passthrough: true }) response: Response) {
         const jwt = await this.authService.loginUser(userLoginDto);
-
-        response.cookie('jwt', jwt, {
+        console.log("jwttttt---",jwt.token);
+        response.cookie('token', jwt.token, {
             httpOnly: true,
-            secure: true,
+            secure:true,
             expires: new Date(Date.now() + 365 * 24 * 60 * 1000),
-            domain: 'localhost',
-        }).send({ jwt });
+            sameSite:"none"
+        }).send({jwt});
+        // response.send({ jwt });
     }
 
     @Get('/test')
-    @UseGuards(AuthGuard())
+    @UseGuards(AuthGuard)
     test(@Res() response: Response): void {
         try {
             response.status(200).send("Hello from Home");
@@ -96,13 +97,13 @@ export class AuthController {
         }
     }
 
-    @Get('/fetchUsers')
-    @UseGuards(AuthGuard()) // Guard to protect this endpoint
-    async fetchUsers(): Promise<User[]> {
-        try {
-            return await this.authService.fetchUsers();
-        } catch (error) {
-            throw new HttpException('Failed to fetch users', HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+    // @Get('/fetchUsers')
+    // @UseGuards(AuthGuard()) // Guard to protect this endpoint
+    // async fetchUsers(): Promise<User[]> {
+    //     try {
+    //         return await this.authService.fetchUsers();
+    //     } catch (error) {
+    //         throw new HttpException('Failed to fetch users', HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
+    // }
 }

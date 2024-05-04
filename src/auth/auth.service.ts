@@ -10,7 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { UpdateProfileDto } from './dto/updateProfileDto.dto';
-
+import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class AuthService {
@@ -20,6 +20,19 @@ export class AuthService {
         private jwtService: JwtService,
         private readonly cloudinaryService: CloudinaryService
     ) { }
+
+    async verifyToken(token: string): Promise<boolean> {
+        try {
+            console.log("auth service roken ----",token)
+          const decodedToken = this.jwtService.verify(token);
+          // If the token is successfully verified, you can return true
+          console.log(decodedToken)
+          return !!decodedToken;
+        } catch (error) {
+          // If verification fails, you can handle the error here
+          throw new UnauthorizedException('Invalid token');
+        }
+      }
 
     async createUser(imagePath: string, userSignupDto: UserSignupDto): Promise<string> {
         try {

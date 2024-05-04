@@ -6,8 +6,6 @@ import { CreateQuickNoteDto } from './dto/quickNote.dto';
 import OpenAI from "openai";
 // import { OpenAIApi, Configuration } from "openai";
 
-
-
 @Injectable()
 export class QuickNoteService {
     constructor(
@@ -23,7 +21,7 @@ export class QuickNoteService {
         //     apiKey: process.env.OPENAI_API_KEY,
         //   }));
         const openAI = new OpenAI(({
-            apiKey: "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",
+            apiKey: "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",
           }));
         const completion = await openAI.chat.completions.create({
             model: "gpt-3.5-turbo",
@@ -40,4 +38,25 @@ export class QuickNoteService {
         return await createdNote.save();
     }
 
+    async generateResponse(userMessage: string) {
+        console.log("userMessage---", userMessage);
+        
+        const openAI = new OpenAI(({
+            apiKey: "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",
+          }));
+        const completion = await openAI.chat.completions.create({
+          messages: [
+            { role: 'system', content: 'You are a helpful assistant.' },
+            { role: 'user', content: userMessage },
+          ],
+          model: 'gpt-3.5-turbo',
+        });
+        const createdEmail = new this.quickNoteModel({
+            title : userMessage,
+            userId : "123456",
+            description : completion.choices[0].message.content
+        });
+        await createdEmail.save();
+        return completion.choices[0].message.content;
+      }
 }
