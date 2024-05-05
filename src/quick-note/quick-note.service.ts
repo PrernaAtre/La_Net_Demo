@@ -42,7 +42,7 @@ export class QuickNoteService {
         console.log("userMessage---", userMessage);
         
         const openAI = new OpenAI(({
-            apiKey: "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",
+            apiKey: process.env.OPEN_AI_KEY,
           }));
         const completion = await openAI.chat.completions.create({
           messages: [

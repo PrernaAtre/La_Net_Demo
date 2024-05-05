@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Res, Get, UseGuards, UseInterceptors, UploadedFile, HttpException, HttpStatus, NotFoundException, Query, Param, Put } from '@nestjs/common';
+import { Body, Controller, Post, Res, Get, UseGuards, UseInterceptors, UploadedFile, HttpException, HttpStatus, NotFoundException, Query, Param, Put, Patch } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UserSignupDto } from './dto/signupDto.dto';
 import { User } from './schema/user.schema';
@@ -11,6 +11,10 @@ import { extname } from 'path';
 import { UpdateProfileDto } from './dto/updateProfileDto.dto';
 import { ObjectId } from 'mongodb'; // Import ObjectId type
 import { AuthGuard } from './jwt-auth.guard';
+import { ForgotPasswordDto } from './dto/forgotPassword.dto';
+import { EmailService } from './email.service';
+import { ResetPassworddto, UpdatePasswordDto } from './dto/resertPassword.dto';
+import { error } from 'console';
 
 
 const storage = diskStorage({
@@ -23,7 +27,10 @@ const storage = diskStorage({
 
 @Controller('auth')
 export class AuthController {
-    constructor(private authService: AuthService, private readonly cloudinaryService: CloudinaryService) { }
+    constructor(
+        private authService: AuthService,
+        private readonly cloudinaryService: CloudinaryService,
+        private readonly emailService: EmailService) { }
 
     @Post('/signup')
     @UseInterceptors(FileInterceptor('file', { storage }))
@@ -44,13 +51,13 @@ export class AuthController {
     @Post('/login')
     async login(@Body() userLoginDto: UserLoginDto, @Res({ passthrough: true }) response: Response) {
         const jwt = await this.authService.loginUser(userLoginDto);
-        console.log("jwttttt---",jwt.token);
+        console.log("jwttttt---", jwt.token);
         response.cookie('token', jwt.token, {
             httpOnly: true,
-            secure:true,
+            secure: true,
             expires: new Date(Date.now() + 365 * 24 * 60 * 1000),
-            sameSite:"none"
-        }).send({jwt});
+            sameSite: "none"
+        }).send({ jwt });
         // response.send({ jwt });
     }
 
@@ -68,7 +75,7 @@ export class AuthController {
     @Put('/update/:userId')
     @UseInterceptors(FileInterceptor('file'))
     async updateProfile(
-        @Param('userId') userId :string,
+        @Param('userId') userId: string,
         @Body() updateProfileDto: UpdateProfileDto,
         @UploadedFile() file: Express.Multer.File,
     ): Promise<Object> {
@@ -76,7 +83,7 @@ export class AuthController {
             if (!file) {
                 throw new HttpException('No file uploaded', HttpStatus.BAD_REQUEST);
             }
-            return this.authService.updateProfile(file.path,userId, updateProfileDto);
+            return this.authService.updateProfile(file.path, userId, updateProfileDto);
         } catch (error) {
             console.error('Error in updating profile: ', error);
             throw new HttpException('Failed to update profile', HttpStatus.INTERNAL_SERVER_ERROR);
@@ -97,6 +104,66 @@ export class AuthController {
         }
     }
 
+
+    @Post('/forgotPassword')
+    async ForgotPass(
+        @Body() data: ForgotPasswordDto,
+    ): Promise<{ message: string } | { error: string }> {
+        try {
+            console.log("datttttttt", data);
+            
+            return await this.authService.sendForgotPasswordEmail(data);
+        } catch (error) {
+            throw new HttpException(
+                error.message || 'internal server error',
+                HttpStatus.BAD_REQUEST,
+            );
+        }
+    }
+
+    @Patch('/resetPassword/:id')
+    async resetPassword(@Body() resetData: ResetPassworddto,@Param('id') id:string) {
+        try
+        {
+            console.log("reset data", resetData);
+            return this.authService.resetPassword(resetData,id);
+        }
+        catch(err)
+        {
+            console.log(err);
+        }
+    }
+
+    @Patch('/updatePassword')
+    async updatePassword(@Body() updatepassworddto: UpdatePasswordDto) {
+      try {
+        console.log("updatepassworddto------", updatepassworddto);
+        
+        const result = await this.authService.updatePassword(updatepassworddto);
+        console.log(result);
+        return result;
+      } catch (error) {
+        throw new HttpException(
+          error.message || 'Internal server Error',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
+
+    @Post("/verifyToken/:userId/:token")
+    async verifyUser(@Param('userId') userId : string, @Param('token') token : string)
+    {
+        try
+        {
+            console.log(userId, token);
+            const result = await this.authService.verifyUser(userId, token);   
+            return result;
+        }
+        catch(err)
+        {
+            return new HttpException(err.message || 'Internal Server Error', HttpStatus.BAD_REQUEST)
+        }
+    }
     // @Get('/fetchUsers')
     // @UseGuards(AuthGuard()) // Guard to protect this endpoint
     // async fetchUsers(): Promise<User[]> {
@@ -106,4 +173,6 @@ export class AuthController {
     //         throw new HttpException('Failed to fetch users', HttpStatus.INTERNAL_SERVER_ERROR);
     //     }
     // }
+
+
 }

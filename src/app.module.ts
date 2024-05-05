@@ -15,6 +15,7 @@ import { DocumentController } from './document/document.controller';
 import { QuickNoteModule } from './quick-note/quick-note.module';
 import { ShareDocumentModule } from './share-document/share-document.module';
 import { StripeModule } from './stripe/stripe.module';
+import { EmailService } from './auth/email.service';
 
 
 // db connection
@@ -40,7 +41,7 @@ const DBURL: string = `mongodb+srv://${username}:${password}@cluster0.89cuca2.mo
     }),
     MongooseModule.forRoot(DBURL), AuthModule, CloudinaryModule, DocumentModule, ShareDocumentModule, QuickNoteModule, PageModule, StripeModule],
   controllers: [AppController, AuthController, DocumentController,],
-  providers: [AppService, CloudinaryService,],
+  providers: [AppService, CloudinaryService, EmailService,],
 })
 export class AppModule {
   // configure(consumer: MiddlewareConsumer) {
