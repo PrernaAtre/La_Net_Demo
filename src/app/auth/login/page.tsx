@@ -13,6 +13,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { login } from '@/redux_store/slices/authSlice';
 import apiService from './authapi_service';
 import { Logo } from '@/app/(marketing)/_components/logo';
+import { ForgotPasswordModal } from '../forgotPassword/ForgotPasswordModal';
 
 const LoginForm: React.FC = () => {
   const router = useRouter();
@@ -117,9 +118,7 @@ const LoginForm: React.FC = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <div className="text-sm">
-                    <a href="#" className="font-semibold text-black hover:text-indigo-500">
-                      Forgot password?
-                    </a>
+                     <ForgotPasswordModal />
                   </div>
                 </Grid>
                 <Grid item xs={12}>
