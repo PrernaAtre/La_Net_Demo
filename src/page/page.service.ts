@@ -68,7 +68,11 @@ export class PageService {
     async update(page: CreatePageDto) {
         try {
 
+            console.log("page", page)
+
             const updatedPage = await this.pageModel.findByIdAndUpdate(page._id, page, { new: true });
+
+            console.log("updatedPage", updatedPage)
 
             return updatedPage;
         } catch (error) {

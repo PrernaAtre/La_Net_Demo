@@ -5,8 +5,6 @@ import { Types } from 'mongoose';
     timestamps: true
 })
 
-<<<<<<<<< Temporary merge branch 1
-=========
 // export class Payment
 // {
 //     @Prop({required:true})

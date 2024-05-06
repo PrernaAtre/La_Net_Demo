@@ -14,4 +14,8 @@ export class CreatePageDto {
 
     @IsArray()
     document: Array<any>
+
+    @IsOptional()
+    @IsString()
+    coverImage: string;
 }
