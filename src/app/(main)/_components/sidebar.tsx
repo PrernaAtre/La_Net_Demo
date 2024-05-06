@@ -207,7 +207,7 @@ const Sidebar: React.FC = () => {
           </li>
           <li>
             <Link
-              href="/routes/quickNote"
+              href="/routes/aiFeature"
               className="flex flex-row items-center h-12 transform hover:translate-x-2 transition-transform ease-in duration-200 text-gray-500 hover:text-gray-800"
             >
               <AddCircleOutlineIcon className="ml-6" />
