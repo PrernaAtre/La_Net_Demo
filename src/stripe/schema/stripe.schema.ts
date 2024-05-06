@@ -5,6 +5,18 @@ import { Types } from 'mongoose';
     timestamps: true
 })
 
+// export class Payment
+// {
+//     @Prop({required:true})
+//     userId : string;
+
+//     @Prop({required: true})
+//     amount : number;
+
+//     @Prop({required : true})
+//     subscription : 
+// }
+
 export class Payment
 {
         @Prop({required: true})
@@ -20,3 +32,4 @@ export class Payment
         amount: string; 
 }
 export const PaymentSchema = SchemaFactory.createForClass(Payment);
+

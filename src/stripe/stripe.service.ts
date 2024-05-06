@@ -59,4 +59,29 @@ export class StripeService {
         });
         await payment.save();
     }
+
+
+  async createPayment(paymentData: Payment): Promise<Payment> {
+    try
+    {
+        const createdPayment = new this.paymentModel(paymentData);
+        return createdPayment.save();
+    }
+    catch(err)
+    {
+        console.log(err);
+        
+    }
+  }
+
+  async getAllPaymentsByUserId(userId: string): Promise<Payment[]> {
+    try
+    {
+        return this.paymentModel.find({ userId }).exec();
+    }
+    catch(err)
+    {
+        throw new Error('Error in fetching data');
+    }
+  }
 }

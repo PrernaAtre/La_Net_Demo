@@ -8,6 +8,7 @@ import { JwtStrategy } from './jwt.strategy';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { EmailService } from './email.service';
 
 
 @Module({
@@ -33,7 +34,7 @@ import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
   ],
 
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy,CloudinaryService],
-  exports: [JwtStrategy, PassportModule, AuthService]
+  providers: [AuthService, JwtStrategy,CloudinaryService,EmailService],
+  exports: [JwtStrategy, PassportModule, AuthService, EmailService]
 })
 export class AuthModule {}

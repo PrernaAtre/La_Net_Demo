@@ -1,24 +1,21 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { MongooseModule } from '@nestjs/mongoose';
+import { MulterModule } from '@nestjs/platform-express';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
-import { MongooseModule } from '@nestjs/mongoose';
-import { ConfigModule } from '@nestjs/config';
-import { MulterModule } from '@nestjs/platform-express';
 import { AuthController } from './auth/auth.controller';
-import { AuthService } from './auth/auth.service';
+import { AuthModule } from './auth/auth.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { CloudinaryService } from './cloudinary/cloudinary.service';
 import { DocumentModule } from './document/document.module';
 // import { CorsModule } from '@nestjs/platform-express'; // Import from @nestjs/platform-express
+import { PageModule } from './page/page.module';
 import { DocumentController } from './document/document.controller';
-import { NestModule, MiddlewareConsumer } from '@nestjs/common';
-import { ShareDocumentModule } from './share-document/share-document.module';
-import { ShareDocumentService } from './share-document/share-document.service';
-import { ShareDocumentController } from './share-document/share-document.controller';
 import { QuickNoteModule } from './quick-note/quick-note.module';
-import { BlockModule } from './block/block.module';
+import { ShareDocumentModule } from './share-document/share-document.module';
 import { StripeModule } from './stripe/stripe.module';
+import { EmailService } from './auth/email.service';
 
 
 // db connection
@@ -34,19 +31,19 @@ const DBURL: string = `mongodb+srv://${username}:${password}@cluster0.89cuca2.mo
     //   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Allow these HTTP methods
     //   allowedHeaders: 'Content-Type,Authorization', // Allow these headers
     // }),
-
+    // StripeModule,
     ConfigModule.forRoot({
-    envFilePath: '.env',
-    isGlobal: true,
-  }),
-  MulterModule.register({
-    dest : './images',
-  }),
-    MongooseModule.forRoot(DBURL), AuthModule, CloudinaryModule, DocumentModule, ShareDocumentModule, QuickNoteModule, BlockModule, StripeModule],
-  controllers: [AppController, AuthController, DocumentController, ],
-  providers: [AppService, CloudinaryService, ],
+      envFilePath: '.env',
+      isGlobal: true,
+    }),
+    MulterModule.register({
+      dest: './images',
+    }),
+    MongooseModule.forRoot(DBURL), AuthModule, CloudinaryModule, DocumentModule, ShareDocumentModule, QuickNoteModule, PageModule, StripeModule],
+  controllers: [AppController, AuthController, DocumentController,],
+  providers: [AppService, CloudinaryService, EmailService,],
 })
-export class AppModule{
+export class AppModule {
   // configure(consumer: MiddlewareConsumer) {
   //   consumer.apply(CorsMiddleware).forRoutes('*');
   // }
