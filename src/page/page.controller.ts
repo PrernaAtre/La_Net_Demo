@@ -93,9 +93,10 @@ export class PageController {
     @Delete('/:id')
     async delete(@Param('id') id: string): Promise<any> {
         try {
+            
             const page = await this.pageService.delete(id);
-
             return page;
+
         } catch (error) {
             throw new HttpException(error?.message, HttpStatus.INTERNAL_SERVER_ERROR);
         }

@@ -5,6 +5,8 @@ import { Types } from 'mongoose';
     timestamps: true
 })
 
+<<<<<<<<< Temporary merge branch 1
+=========
 // export class Payment
 // {
 //     @Prop({required:true})
@@ -16,7 +18,6 @@ import { Types } from 'mongoose';
 //     @Prop({required : true})
 //     subscription : 
 // }
-
 
 export class Payment
 {

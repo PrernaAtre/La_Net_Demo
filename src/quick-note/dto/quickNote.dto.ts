@@ -1,15 +1,19 @@
 // quick-note.dto.ts
 
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsArray, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateQuickNoteDto {
-    @IsNotEmpty()
     @IsString()
-    title: string;
+    @IsOptional()
+    _id: string;
 
-    @IsNotEmpty()
+    @IsString()
+    @IsOptional()
+    name : string;
+
     @IsString()
     userId: string;
 
-    description?: string; // Optional field
+    @IsArray()
+    document: Array<any>
 }
