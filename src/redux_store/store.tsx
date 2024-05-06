@@ -1,21 +1,12 @@
+
 import { configureStore } from "@reduxjs/toolkit";
+import { persistReducer, persistStore } from "redux-persist";
+import storage from "redux-persist/lib/storage";
 import authReducer from "./slices/authSlice";
 import notesReducer from "./slices/notesSlice";
-import {
-  persistStore,
-  persistReducer,
-  FLUSH,
-  REHYDRATE,
-  PAUSE,
-  PERSIST,
-  PURGE,
-  REGISTER,
-} from "redux-persist";
-import thunk from "redux-thunk";
-import storage from "redux-persist/lib/storage";
 // import { getDefaultMiddleware } from '@reduxjs/toolkit';
-import pageRrducer from "@/store/features/page/pageSlice";
 import { baseAPI } from "@/store/baseApi";
+import pageRrducer from "@/store/features/page/pageSlice";
 
 const persistConfig = {
   key: "user",

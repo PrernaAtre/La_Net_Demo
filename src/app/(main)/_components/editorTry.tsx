@@ -5,29 +5,26 @@ import { Block } from "@blocknote/core";
 import "@blocknote/core/fonts/inter.css";
 import { BlockNoteView, useCreateBlockNote } from "@blocknote/react";
 import "@blocknote/react/style.css";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { IconButton } from "@mui/material";
 import { Share } from "@mui/icons-material";
-import "./styles.css"
-import MainLayout from "../layout";
+import { Button, IconButton } from "@mui/material";
+import { useSearchParams } from "next/navigation";
+import { MouseEventHandler, useEffect, useState } from "react";
 import { Publish } from "./publish";
-import Image from "next/image";
-import { useCurrentUserPages } from "@/app/routes/editor/hooks/useCurrentUserPages";
-
+import "./styles.css";
+import { useCoverImage } from "@/hooks/use-cover-image";
+import { Cover } from "./cover";
 
 function EditorTry() {
-  const { pages } = useCurrentUserPages();
-  const [isEditing, setIsEditing] = useState(false);
   const searchParams = useSearchParams();
-  const [pageName, setPageName] = useState("");
-  const [url, setUrl] = useState("");
 
-  const { page, handleCreatePage, isPageLoading } = useUpdatePage(
-    searchParams.get("id") || ""
-  );
+  const coverImage = useCoverImage();
 
-  console.log("page------",page);
+  const pageId = searchParams.get("id");
+
+  const { page, handleUpdatePage, isPageLoading } = useUpdatePage(pageId || "");
+
+  const [pageName, setPageName] = useState(page?.name || "");
+
   async function uploadFile(file: File) {
     const body = new FormData();
     body.append("file", file);
@@ -36,17 +33,15 @@ function EditorTry() {
       method: "POST",
       body: body,
     });
+
     return (await ret.json()).data.url.replace(
       "tmpfiles.org/",
       "tmpfiles.org/dl/"
     );
-    // setUrl(await ret.json()).data.url.replace(
-    //     "tmpfiles.org/",
-    //     "tmpfiles.org/dl/")
   }
 
   const handleSubmit = async (payload: Block[]) => {
-    return handleCreatePage({
+    return handleUpdatePage({
       id: page?._id,
       name: pageName,
       document: JSON.stringify(payload),
@@ -65,17 +60,30 @@ function EditorTry() {
       initialContent: page?.document
         ? JSON.parse(page?.document)
         : [
-
-          {
-            id: "1",
-            type: "heading",
-            content: "",
-            props: { level: 1 },
-          },
-        ],
+            {
+              id: "1",
+              type: "heading",
+              content: "",
+              props: { level: 1 },
+            },
+          ],
     },
     [page]
   );
+
+  useEffect(() => {
+    if (page && pageName !== page.name) {
+      handleUpdatePage({
+        name: pageName,
+      });
+    }
+  }, [pageName]);
+
+  useEffect(() => {
+    if (!pageName && page?.name) {
+      setPageName(page.name);
+    }
+  }, [page?.name]);
 
   if (isPageLoading) {
     return "Loading content...";
@@ -89,7 +97,7 @@ function EditorTry() {
   //   throw new Error("Function not implemented.");
   // }
 
-  function handleShare(event: MouseEvent<HTMLButtonElement, MouseEvent>): void {
+  function handleShare(event: any): void {
     throw new Error("Function not implemented.");
   }
 
@@ -99,6 +107,7 @@ function EditorTry() {
         <div className="flex mb-4">
           <p>{pageName}</p>
         </div>
+        <Cover pageId={pageId!} preview url={page.coverImage} />
         <div>
           <input
             type="text"
@@ -107,6 +116,11 @@ function EditorTry() {
             placeholder="Untitled Page"
             className="w-10% p-2 rounded-md border-none focus:outline-none focus:border-blue-500"
           />
+        </div>
+        <div>
+          <Button type="button" variant="contained" onClick={coverImage.onOpen}>
+            add cover
+          </Button>
         </div>
         <div className="w-[40%] fixed">
           <BlockNoteView

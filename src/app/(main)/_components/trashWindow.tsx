@@ -1,48 +1,28 @@
 // components/TrashWindow.tsx
 "use client";
-import {
-  fetchDeletedDocuments,
-  fetchNotes,
-  selectAllDeletedDocuments,
-} from "@/redux_store/slices/notesSlice";
+import { useCurrentUserPages } from "@/app/routes/editor/hooks/useCurrentUserPages";
+import { useDeletePage } from "@/app/routes/editor/hooks/useDeletePage";
+import { useMakeTrashPage } from "@/app/routes/editor/hooks/useMakeTrashPage";
+import { getUser } from "@/redux_store/slices/authSlice";
+import { getPagesByUserId } from "@/store/features/page";
 import RestorePageIcon from "@mui/icons-material/RestorePage";
 import { Modal } from "antd";
-import axios from "axios";
-import React, { use, useEffect, useMemo, useState } from "react";
+import React, { useState } from "react";
 import { BsTrash } from "react-icons/bs";
-import { useDispatch, useSelector } from "react-redux";
-import ConfirmationDialog from "./confirmationDialog";
-import { useCurrentUserPages } from "@/app/routes/editor/hooks/useCurrentUserPages";
-import { useMakeTrashPage } from "@/app/routes/editor/hooks/useMakeTrashPage";
-import { useDeletePage } from "@/app/routes/editor/hooks/useDeletePage";
-
-interface DeletedDocument {
-  _id: string;
-  title: string;
-}
+import { useSelector } from "react-redux";
 
 const TrashWindow: React.FC = () => {
-  const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const deletedDocuments = useSelector(selectAllDeletedDocuments);
 
-  const { pages, isLoading } = useCurrentUserPages();
+  const user = useSelector(getUser);
+
+  const pagesStore = useSelector((state: any) => state);
+
+  const pages = getPagesByUserId(pagesStore, user?._id);
 
   const { handleTrashPage } = useMakeTrashPage();
 
   const { handleDeletePage } = useDeletePage();
-
-  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
-  const [documentIdToDelete, setDocumentIdToDelete] = useState("");
-
-  const handleDeleteDocument = async (documentId: any) => {
-    console.log("handleDeleteDocument called");
-    //setIsAvailable(false);
-
-    setDocumentIdToDelete(documentId);
-    setConfirmDialogOpen(true);
-    console.log(confirmDialogOpen);
-  };
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -55,9 +35,8 @@ const TrashWindow: React.FC = () => {
   const handleCancel = () => {
     setIsModalOpen(false);
   };
-  // const [deletedDocuments, setDeletedDocuments] = useState<DeletedDocument[]>([]);
-  const user = useSelector((state: any) => state.auth.user);
 
+  // const [deletedDocuments, setDeletedDocuments] = useState<DeletedDocument[]>([]);
   // useEffect(() => {
   //   dispatch(fetchDeletedDocuments(user._id));
   // }, [dispatch, user._id]);
@@ -89,7 +68,7 @@ const TrashWindow: React.FC = () => {
   //   }
   // };
 
-  const trashedPages = pages.filter((page: any) => page.isTrashed);
+  const trashedPages = pages?.filter((d: any) => d?.isTrashed) || [];
 
   return (
     <>
@@ -131,6 +110,7 @@ const TrashWindow: React.FC = () => {
                   className="border border-gray-300 rounded-lg p-3 flex justify-between items-center"
                 >
                   <span>{page.name}</span>
+                  <div>
                     <RestorePageIcon
                       className="cursor-pointer"
                       onClick={() => handleTrashPage(page._id, true)}
@@ -139,19 +119,20 @@ const TrashWindow: React.FC = () => {
                       className="ml-2 cursor-pointer"
                       onClick={() => handleDeletePage(page._id)}
                     />
+                  </div>
                 </li>
               )
             )
           ) : (
             <p>No deleted items</p>
           )}
-          {confirmDialogOpen && (
+          {/* {confirmDialogOpen && (
             <ConfirmationDialog
               open={confirmDialogOpen}
               handleClose={() => setConfirmDialogOpen(false)}
               handleConfirm={permenantDeleteDocument}
             />
-          )}
+          )} */}
         </ul>
       </Modal>
     </>
