@@ -54,22 +54,22 @@ export default function App() {
     //     fetchData();
     // }, [blocks]);
 
- useEffect(() => {
-    const jsonData = JSON.stringify(blocks, null, 0); // Convert blocks to JSON string
-    const parsedData = JSON.parse(jsonData); // Parse JSON string to array of objects
-    
-    const extractedTexts = parsedData.map(item => {
-        if (item.type === 'paragraph' && item.content && item.content[0] && item.content[0].type === 'text') {
-            return item.content[0].text;
-        }
-        return '';
-    });
+    useEffect(() => {
+        const jsonData = JSON.stringify(blocks, null, 0); // Convert blocks to JSON string
+        const parsedData = JSON.parse(jsonData); // Parse JSON string to array of objects
 
-    const text = extractedTexts.join('\n'); // Join text content with newlines
-    setEmailContent(text); // Set emailContent state with extracted text
-}, [blocks]);
-   // console.log("extractedTexts", extractedTexts);
-    
+        const extractedTexts = parsedData.map(item => {
+            if (item.type === 'paragraph' && item.content && item.content[0] && item.content[0].type === 'text') {
+                return item.content[0].text;
+            }
+            return '';
+        });
+
+        const text = extractedTexts.join('\n'); // Join text content with newlines
+        setEmailContent(text); // Set emailContent state with extracted text
+    }, [blocks]);
+    // console.log("extractedTexts", extractedTexts);
+
     const editor = useCreateBlockNote(
         // {
         //     initialContent: [
@@ -146,7 +146,6 @@ export default function App() {
                     getItems={async (query) =>
                         filterSuggestionItems(getCustomSlashMenuItems(editor), query)
                     }
-
                 />
             </BlockNoteView>
             <div className={"item bordered"}>
