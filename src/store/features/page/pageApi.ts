@@ -1,4 +1,3 @@
-
 import { baseAPI } from "@/store/baseApi";
 import { addPage, deletePage, setPages, updatePage } from "./pageSlice";
 
@@ -139,4 +138,5 @@ export const {
   useRecoverMutation,
   useLazyGetPagesQuery,
   useUpdatePageMutation,
+  useLazyGetPageQuery
 } = pageApi;

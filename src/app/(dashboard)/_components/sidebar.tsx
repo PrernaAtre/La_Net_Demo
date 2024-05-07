@@ -74,8 +74,7 @@ const Sidebar: React.FC = () => {
         document: "",
       },
       (createdPage: any) =>
-        createdPage?.data &&
-        router.push(`/routes/editor?id=${createdPage?.data?._id}`)
+        createdPage?.data && router.push(`/page?id=${createdPage?.data?._id}`)
     );
   };
 
@@ -129,7 +128,7 @@ const Sidebar: React.FC = () => {
                   className="flex flex-row items-center h-12 transform hover:translate-x-2 transition-transform ease-in duration-200 text-gray-500 hover:text-gray-800"
                 >
                   <NoteAddIcon className="ml-6" />
-                  <Link href={`/routes/editor?id=${page._id}`}>
+                  <Link href={`/page?id=${page._id}`}>
                     <span className="text-sm font-medium pl-4">
                       {page.name}
                     </span>
@@ -153,7 +152,7 @@ const Sidebar: React.FC = () => {
           </ul>
           <li>
             <button
-              // href="/routes/editor"
+              // href="/page"
               className="flex flex-row items-center h-12 transform hover:translate-x-2 transition-transform ease-in duration-200 text-gray-500 hover:text-gray-800"
               onClick={createPage}
               disabled={isLoading}

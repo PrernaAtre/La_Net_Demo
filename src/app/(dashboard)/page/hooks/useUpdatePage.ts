@@ -3,11 +3,7 @@ import { debounce } from "lodash";
 import { usePage } from "./usePage";
 
 export const useUpdatePage = (id?: string) => {
-
-  console.log("got id", id)
   const { page, isLoading: isPageLoading, error: isPageError } = usePage(id);
-
-  console.log("got page", page)
 
   const [updatePage, { data, isLoading, error }] = useUpdatePageMutation();
 

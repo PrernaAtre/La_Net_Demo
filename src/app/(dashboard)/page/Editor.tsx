@@ -1,6 +1,5 @@
 "use client";
 
-import { useUpdatePage } from "@/app/(dashboard)/page/hooks/useUpdatePage";
 import { useCoverImage } from "@/hooks/use-cover-image";
 import { Block } from "@blocknote/core";
 import "@blocknote/core/fonts/inter.css";
@@ -11,6 +10,7 @@ import { Button, IconButton } from "@mui/material";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Cover } from "../_components/cover";
+import { useUpdatePage } from "./hooks/useUpdatePage";
 // import "./styles.css";
 
 function Editor() {
@@ -20,7 +20,7 @@ function Editor() {
 
   const pageId = searchParams.get("id");
 
-  const { page, handleUpdatePage, isPageLoading } = useUpdatePage(pageId || "");
+  const { page, handleUpdatePage } = useUpdatePage(pageId || "");
 
   const [pageName, setPageName] = useState(page?.name || "");
 
@@ -83,10 +83,6 @@ function Editor() {
       setPageName(page.name);
     }
   }, [page?.name]);
-
-  if (isPageLoading) {
-    return "Loading content...";
-  }
 
   if (!page) {
     return "Page not found in your library. Please create a new page.";
