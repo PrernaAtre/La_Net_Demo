@@ -1,7 +1,7 @@
 // PageService.ts
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { User } from 'src/auth/schema/user.schema';
 import { Page } from './dto/Page.dto';
 import { CreatePageDto } from './dto/CreatePage.dto';
@@ -110,5 +110,29 @@ export class PageService {
         } catch (error) {
             throw new Error(`[Recover Page] [${id}]: Error while recovering the page`);
         }
+    }
+
+    async addSharedUsers(userIds:Array<string>,pageId:string):Promise<string>{
+        try {
+            if(!userIds.length){
+                throw new Error("Invalid user id");
+            }
+            const page = await this.pageModel.findById(pageId, { isTrashed: false }, { new: true });
+            
+            if(!page){
+                throw new Error("Page not found");
+            }
+            
+            const userObjectIds=userIds.map((userId)=>new Types.ObjectId(userId))
+
+            const users = await this.userModel.find({_id:{$in:userObjectIds}}, { isTrashed: false }, { new: true });
+            if(users.length!==userIds.length){
+                throw new Error("Some users were not found")
+            }
+            await this.pageModel.updateOne({_id:pageId},{$set:{sharedUsers:userObjectIds}})
+            return "success";
+        } catch (error) {
+            throw new Error(`Something went wrong, please try again`);
+        }   
     }
 }
