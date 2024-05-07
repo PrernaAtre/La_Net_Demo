@@ -2,8 +2,10 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Model } from 'mongoose';
 import Stripe from 'stripe';
-import { Payment } from './schema/stripe.schema';
+import { Payment } from '../models/stripe.schema';
 import { InjectModel } from '@nestjs/mongoose';
+import { CommonService } from 'src/common/common.service';
+import { User } from 'src/models/user.schema';
 
 @Injectable()
 export class StripeService {
@@ -11,33 +13,16 @@ export class StripeService {
 
     constructor(private configService: ConfigService,
         @InjectModel('Payment') private paymentModel: Model<Payment>,
-    ) {
-        this.stripe = new Stripe(this.configService.get('STRIPE_API_KEY'));
-    }
+        private readonly commonService: CommonService,
+        @InjectModel('User') private userModel: Model<User>
+    ) {}
 
-    async createCheckoutSession(amount: string): Promise<string> {
+    async createCheckoutSession(currentUser): Promise<string> {
         try {
-            const session = await this.stripe.checkout.sessions.create({
-                payment_method_types: ['card'],
-                line_items: [
-                    {
-                        price_data: {
-                            currency: 'usd',
-                            product_data: {
-                                name: 'Subscription',
-                            },
-                            unit_amount: parseInt(amount), // Convert amount to integer
-                        },
-                        quantity: 1,
-                    },
-                ],
-                mode: 'payment',
-                success_url: `http://localhost:3000/paymentSuccess?amount=${amount}`,
-                cancel_url: 'http://localhost:3000/',
-                billing_address_collection: 'auto',
-            });
-            console.log(session.url)
+            const user=await this.userModel.findOne({_id:currentUser.id})
 
+            //TODO check if user do not have existing plan
+            const session=  await this.commonService.createCheckoutSession({customerId:user.customerId,userId:user.id})
             return session.url;
 
         } catch (error) {
@@ -77,7 +62,7 @@ export class StripeService {
   async getAllPaymentsByUserId(userId: string): Promise<Payment[]> {
     try
     {
-        return this.paymentModel.find({ userId }).exec();
+        return this.paymentModel.find({ userId })
     }
     catch(err)
     {

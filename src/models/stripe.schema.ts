@@ -1,9 +1,9 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import { Types } from 'mongoose';
+// import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
+// import { Types } from 'mongoose';
 
-@Schema({
-    timestamps: true
-})
+// @Schema({
+//     timestamps: true
+// })
 
 // export class Payment
 // {
@@ -16,6 +16,14 @@ import { Types } from 'mongoose';
 //     @Prop({required : true})
 //     subscription : 
 // }
+
+
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
+import { Types } from 'mongoose';
+
+@Schema({
+    timestamps: true
+})
 
 export class Payment
 {
@@ -32,4 +40,3 @@ export class Payment
         amount: string; 
 }
 export const PaymentSchema = SchemaFactory.createForClass(Payment);
-

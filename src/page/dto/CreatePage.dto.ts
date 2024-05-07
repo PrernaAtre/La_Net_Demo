@@ -1,17 +1,23 @@
-import { IsArray, IsOptional, IsString } from "class-validator";
+import { IsArray, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class CreatePageDto {
     @IsString()
-    @IsOptional()
-    _id: string;
+    @IsNotEmpty()
+    name: string;
 
+    @IsArray()
+    @IsNotEmpty()
+    document: Array<any>
+
+    @IsNotEmpty()
+    coverImage: string;
+}
+export class UpdatePageDto {
     @IsString()
     @IsOptional()
     name: string;
 
-    @IsString()
-    userId: string;
-
+    @IsOptional()
     @IsArray()
     document: Array<any>
 

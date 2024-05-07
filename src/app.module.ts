@@ -8,14 +8,11 @@ import { AuthController } from './auth/auth.controller';
 import { AuthModule } from './auth/auth.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { CloudinaryService } from './cloudinary/cloudinary.service';
-import { DocumentModule } from './document/document.module';
-// import { CorsModule } from '@nestjs/platform-express'; // Import from @nestjs/platform-express
 import { PageModule } from './page/page.module';
-import { DocumentController } from './document/document.controller';
 import { QuickNoteModule } from './quick-note/quick-note.module';
-import { ShareDocumentModule } from './share-document/share-document.module';
-import { StripeModule } from './stripe/stripe.module';
-import { EmailService } from './auth/email.service';
+import { PaymentModule } from './payment/payment.module';
+import { UserModule } from './user/user.module';
+import { AuthGuard } from './auth/jwt-auth.guard';
 
 
 // db connection
@@ -31,7 +28,7 @@ const DBURL: string = `mongodb+srv://${username}:${password}@cluster0.89cuca2.mo
     //   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Allow these HTTP methods
     //   allowedHeaders: 'Content-Type,Authorization', // Allow these headers
     // }),
-    // StripeModule,
+    PaymentModule,
     ConfigModule.forRoot({
       envFilePath: '.env',
       isGlobal: true,
@@ -39,9 +36,9 @@ const DBURL: string = `mongodb+srv://${username}:${password}@cluster0.89cuca2.mo
     MulterModule.register({
       dest: './images',
     }),
-    MongooseModule.forRoot(DBURL), AuthModule, CloudinaryModule, DocumentModule, ShareDocumentModule, QuickNoteModule, PageModule, StripeModule],
-  controllers: [AppController, AuthController, DocumentController,],
-  providers: [AppService, CloudinaryService, EmailService,],
+    MongooseModule.forRoot(DBURL), AuthModule, CloudinaryModule, QuickNoteModule, PageModule, PaymentModule, UserModule],
+  controllers: [AppController, AuthController],
+  providers: [AppService, CloudinaryService,AuthGuard],
 })
 export class AppModule {
   // configure(consumer: MiddlewareConsumer) {

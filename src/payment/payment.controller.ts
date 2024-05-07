@@ -1,22 +1,23 @@
-import { Body, Controller, Get, HttpStatus, Param, Post, Res } from '@nestjs/common';
-import { StripeService } from './stripe.service';
+import { Body, Controller, Get, HttpStatus, Param, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { StripeService } from './payment.service';
 import { Response } from 'express';
 import Stripe from 'stripe';
-import { Payment } from './schema/stripe.schema';
+import { Payment } from '../models/stripe.schema';
+import { CommonService } from 'src/common/common.service';
+import { AuthGuard } from 'src/auth/jwt-auth.guard';
+import { AuthenticatedRequest } from 'src/auth/auth.controller';
 
 
-@Controller('stripe')
-export class StripeController {
+@Controller('payment')
+export class PaymentController {
     constructor(private readonly stripeService: StripeService) { }
 
-    @Post('/payment/')
-    async createCheckoutSession(@Body() body: any, @Res() res: Response) {
+    @Post()
+    @UseGuards(AuthGuard)
+    async createCheckoutSession(@Body() body: any, @Res() res: Response,@Req() { currentUser }: AuthenticatedRequest) {
         try {
-            const { amount } = body;
-            console.log(amount);
-            const sessionUrl = await this.stripeService.createCheckoutSession(amount);
-            console.log("sess--", sessionUrl)
-            res.status(HttpStatus.OK).json({ sessionUrl });
+
+            return this.stripeService.createCheckoutSession(currentUser)
         }
         catch (err) {
             console.log(err)
@@ -29,14 +30,41 @@ export class StripeController {
     @Post('/webhook') //not working
     async handleWebhookEvent(@Body() eventPayload: any, @Res() res: Response) {
         console.log("eventPayload---", eventPayload);
-        try {
-            const eventType = eventPayload.type;
-            const eventData = eventPayload.data.object;
+        const endpointSecret = "whsec_203431f7af31d28597c77aee8eeda1ffa6643a6bd3d33444b491af9125fea0de";
 
-            if (eventType === 'checkout.session.completed') {
-                const { userId, username, email, amount } = eventData.metadata;
-                await this.stripeService.storePayment(userId, username, email, amount);
-            }
+        try {
+            // const sig = req.headers['stripe-signature'];
+
+            // let event;
+          
+            // try {
+            //   event =.webhooks.constructEvent(req.body, sig, endpointSecret);
+            // } catch (err) {
+            //   response.status(400).send(`Webhook Error: ${err.message}`);
+            //   return;
+            // }
+          
+            // // Handle the event
+            // switch (event.type) {
+            //   case 'customer.subscription.deleted':
+            //     const customerSubscriptionDeleted = event.data.object;
+            //     // Then define and call a function to handle the event customer.subscription.deleted
+            //     break;
+            //   case 'invoice.paid':
+            //     const invoicePaid = event.data.object;
+            //     // Then define and call a function to handle the event invoice.paid
+            //     break;
+            //   // ... handle other event types
+            //   default:
+            //     console.log(`Unhandled event type ${event.type}`);
+            // }
+          
+            // // Return a 200 response to acknowledge receipt of the event
+            // res.send();
+            //           if (eventType === 'checkout.session.completed') {
+            //     const { userId, username, email, amount } = eventData.metadata;
+            //     await this.stripeService.storePayment(userId, username, email, amount);
+            // }
 
             res.sendStatus(HttpStatus.OK);
         } catch (error) {
@@ -91,6 +119,7 @@ export class StripeController {
         }
         catch(err)
         {
+            console.log('err', err)
             throw new Error('Error in fetching data');
         }
     }

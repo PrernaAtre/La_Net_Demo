@@ -1,10 +1,10 @@
 // PageService.ts
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { User } from 'src/auth/schema/user.schema';
-import { Page } from './dto/Page.dto';
-import { CreatePageDto } from './dto/CreatePage.dto';
+import { Model, Types } from 'mongoose';
+import { User } from 'src/models/user.schema';
+import { Page } from '../models/Page.schema';
+import { CreatePageDto, UpdatePageDto } from './dto/CreatePage.dto';
 
 @Injectable()
 export class PageService {
@@ -14,101 +14,151 @@ export class PageService {
         @InjectModel('User') private userModel: Model<User>
     ) { }
 
-    async addPage(pages: Array<{ id: string, type: string, content: string, children: Array<{ id: string, type: string, content: string }> }>, userId: string) {
+    async get(id: string,currentUser): Promise<Page>  {
         try {
-            const user = await this.userModel.findOne({ _id: userId });
-            if (!user) {
-                console.log("User not found");
-                return null; // Or throw an error, depending on your application logic
-            }
-
-            const newPage = new this.pageModel({ userId, data: pages });
-            await newPage.save();
-            return newPage;
-        } catch (error) {
-            console.error("Error adding pages:", error);
-            throw error; // Rethrow the error to be handled by NestJS error handling
-        }
-    }
-
-    async get(id: string) {
-        try {
-            const page = await this.pageModel.findById(id);
+            const page = await this.pageModel.findOne({ _id: id, $or: [
+                { userId: currentUser.id }, 
+                { sharedUsers: { $in: [currentUser.id] } } 
+            ]});
 
             if (!page) throw new Error("Page not found");
 
             return page;
         } catch (error) {
-            throw new Error(`[Get Page] [${id}]: Error fetching page`);
+            console.log('get::> error', error)
+            throw new Error(`Failed to fetch the page with ID ${id}`);
         }
     }
 
-    async pages(userId: string) {
+    async pages(currentUser): Promise<Page[]> {
         try {
-            const pages = await this.pageModel.find({ userId });
+            const pages = await this.pageModel.find({  $or: [
+                { userId: currentUser.id }, 
+                { sharedUsers: { $in: [currentUser.id] } } 
+            ] });
 
             if (!pages) throw new Error("Pages not found");
 
             return pages;
         } catch (error) {
-            throw new Error(`[Get Pages] [${userId}]: Error fetching pages`);
+            throw new Error(`Failed to fetch pages for user with ID ${currentUser.id}`);
         }
     }
 
-    async create(page: CreatePageDto) {
+    async create(page: CreatePageDto,currentUser) {
         try {
-            const createdPage = await new this.pageModel(page).save();
+            const createdPage = await this.pageModel.create(new this.pageModel({...page,userId:currentUser.id}));
 
             return createdPage;
         } catch (error) {
-            throw new Error(`[Create Page] [${page._id}] [${page.userId}]: Error creating page`);
+            throw new Error(`Failed to create a new page`);
         }
     }
 
-    async update(page: CreatePageDto) {
+    async update(id:string,page: UpdatePageDto,currentUser) {
         try {
+            const existingPage = await this.pageModel.findOne({ _id: id, userId: currentUser.id });
 
-            console.log("page", page)
-
-            const updatedPage = await this.pageModel.findByIdAndUpdate(page._id, page, { new: true });
-
-            console.log("updatedPage", updatedPage)
-
+            if (!existingPage) {
+                throw new Error(`Page with id ${id} not found for the current user`);
+            }
+    
+            const updatedPage = await this.pageModel.findOneAndUpdate({ _id: id }, { $set: {...page} }, { new: true });
+    
             return updatedPage;
         } catch (error) {
-            throw new Error(`[Update Page] [${page._id}] [${page.userId}]: Error updating page`);
+            throw new Error(`Failed to update the page with ID ${id}`);
         }
     }
 
-    async makeTrashed(id: string) {
+    async makeTrashed(id: string,currentUser) {
         try {
-            const page = await this.pageModel.findByIdAndUpdate(id, { isTrashed: true }, { new: true });
+            const existingPage = await this.pageModel.findOne({ _id: id, userId: currentUser.id });
 
+            if (!existingPage) {
+                throw new Error(`Page with ID ${id} not found for the current user`);
+            }
+    
+            const page = await this.pageModel.findOneAndUpdate({ _id: id },{$set: { isTrashed: true }}, { new: true });
+    
+            return page;
+            } catch (error) {
+                throw new Error(`Failed to move the page with ID ${id} to trash`);
+            }
+    }
+
+    async delete(id: string,currentUser) {
+        try {
+            const existingPage = await this.pageModel.findOne({ _id: id, userId: currentUser.id });
+
+            if (!existingPage) {
+                throw new Error(`Page with ID ${id} not found for the current user`);
+            }
+    
+            const deletedPage = await this.pageModel.findOneAndDelete({ _id: id });
+    
+            return deletedPage;
+            } catch (error) {
+                throw new Error(`Failed to delete the page with ID ${id}`);
+            }
+    }
+
+    async recover(id: string,currentUser) {
+        try {
+            const existingPage = await this.pageModel.findOne({ _id: id, userId: currentUser.id });
+
+            if (!existingPage) {
+                throw new Error(`Page with id ${id} not found for the current user`);
+            }
+    
+            const page = await this.pageModel.findOneAndUpdate({ _id: id },{$set: { isTrashed: false }}, { new: true });
+    
             return page;
         } catch (error) {
-            throw new Error(`[Make Trash Page] [${id}]: Error while deleting the page`);
+            throw new Error(`Failed to recover the page with ID ${id}`);
         }
     }
 
-    async delete(id: string) {
+    async addSharedUsers(userIds:Array<string>,pageId:string,currentUser):Promise<string>{
         try {
-            const page = await this.pageModel.findByIdAndDelete(id);
+            if(!userIds.length){
+                throw new Error("Invalid user id");
+            }
+            const page = await this.pageModel.findOne({_id:pageId,userId:currentUser.id}, { isTrashed: false }, { new: true });
+            
+            if(!page){
+                throw new Error("Page not found");
+            }
+            
+            const userObjectIds=userIds.map((userId)=>new Types.ObjectId(userId))
 
-            return page;
+            const users = await this.userModel.find({_id:{$in:userObjectIds}}, { isTrashed: false }, { new: true });
+            if(users.length!==userIds.length){
+                throw new Error("Some users were not found")
+            }
+            await this.pageModel.updateOne({_id:pageId},{$set:{sharedUsers:userObjectIds}})
+            return "success";
         } catch (error) {
-            throw new Error(`[Delete Page] [${id}]: Error while deleting the page`);
-        }
+            throw new Error(`Failed to add shared users to the page`);
+        }   
     }
 
-    async recover(id: string) {
+    async removeSharedUsers(userId:string,pageId:string,currentUser):Promise<string>{
         try {
-            const page = await this.pageModel.findByIdAndUpdate(id, { isTrashed: false }, { new: true });
-
-            console.log("page recovered", page);
-
-            return page;
+            const page = await this.pageModel.findOne({_id:pageId,userId:currentUser.id}, { isTrashed: false }, { new: true });
+            
+            if(!page){
+                throw new Error("Page not found");
+            }
+            
+            const user = await this.userModel.find({_id:new Types.ObjectId(userId)});
+            if(!user){
+                throw new Error("user were not found")
+            }
+            await this.pageModel.updateOne({_id:pageId},{$pull:{sharedUsers:new Types.ObjectId(userId)}})
+            return "success";
         } catch (error) {
-            throw new Error(`[Recover Page] [${id}]: Error while recovering the page`);
-        }
+            throw new Error(`Failed to remove shared user from the page`);
+        }   
     }
 }

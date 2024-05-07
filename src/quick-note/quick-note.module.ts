@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { QuickNoteController } from './quick-note.controller';
 import { QuickNoteService } from './quick-note.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { QuickNoteSchema } from './schema/quickNote.schema';
+import { QuickNoteSchema } from '../models/quickNote.schema';
 
 @Module({
   imports : [

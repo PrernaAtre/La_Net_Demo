@@ -9,15 +9,6 @@ export class UpdateProfileDto {
     email?: string;
 
     @IsString()
-    @MinLength(9)
-    @IsOptional()
-    password?: string;
-
-    @IsString()
-    @IsOptional()
-    confirm_password?: string;
-
-    @IsString()
     @IsOptional()
     profile_image?: string;
 }
