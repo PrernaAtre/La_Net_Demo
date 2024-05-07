@@ -26,22 +26,22 @@ export class AuthService {
         private readonly bcryptService: BcryptService
     ) { }
 
-   verifyToken(token: string): string|object  {
+    verifyToken(token: string): string | object {
         try {
-          const decoded = jwt.verify(token, process.env.JWT_SECRET) as jwt.JwtPayload;
+            const decoded = jwt.verify(token, process.env.JWT_SECRET) as jwt.JwtPayload;
 
-          if (!decoded || !decoded.id) {
-            throw new Error('Invalid token');
-          }
-    
-         return decoded;
+            if (!decoded || !decoded.id) {
+                throw new Error('Invalid token');
+            }
 
-              } catch (error) {
-          // Handle invalid token or other errors
-          throw new UnauthorizedException('Invalid token');
+            return decoded;
+
+        } catch (error) {
+            // Handle invalid token or other errors
+            throw new UnauthorizedException('Invalid token');
         }
-      }
-    
+    }
+
     async createUser(imagePath: string, userSignupDto: UserSignupDto): Promise<string> {
         try {
             const { username, email, password, profile_image } = userSignupDto;
@@ -49,20 +49,20 @@ export class AuthService {
             if (checkEmail) {
                 return "Email is duplicate..";
             }
-            
+
             const hashedPassword = await this.bcryptService.hash(password);
 
             const image_url = await this.cloudinaryService.uploadProfileImage(imagePath)
 
-            const user= await this.userModel.create({
+            const user = await this.userModel.create({
                 username,
                 email,
                 password: hashedPassword,
                 profile_image: image_url?.url,
             });
 
-            const stripeCustomer=await this.commonService.createCustomer({email,name:username})
-            await this.userModel.updateOne({_id:user._id},{$set:{customerId:stripeCustomer.id}})
+            const stripeCustomer = await this.commonService.createCustomer({ email, name: username })
+            await this.userModel.updateOne({ _id: user._id }, { $set: { customerId: stripeCustomer.id } })
             return "user register succesfully";
         } catch (error) {
             console.log('error', error)
@@ -93,26 +93,26 @@ export class AuthService {
         }
     }
 
-    async resetPassword(resetPasswordDto: ResetPasswordDto,currentUser): Promise<string> {
+    async resetPassword(resetPasswordDto: ResetPasswordDto, currentUser): Promise<string> {
         try {
             const user = await this.userModel.findOne({ _id: currentUser.id });
 
             const isMatch = await this.bcryptService.compare(resetPasswordDto.oldPassword, user.password);
             if (!isMatch) {
-              throw new Error('Old password is incorrect');
+                throw new Error('Old password is incorrect');
             }
-        
+
             if (!user)
                 throw new Error("Invalid link: User not found");
 
             const hashedPassword = await this.bcryptService.hash(resetPasswordDto.newPassword);
             user.password = hashedPassword;
             await user.save();
-                return "User password updated successfully.";
+            return "User password updated successfully.";
         } catch (error) {
             throw new Error(`Failed to reset password: ${error.message}`);
         }
     }
 
-    
+
 }

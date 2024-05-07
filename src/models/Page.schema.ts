@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import  { Types } from 'mongoose';
+import { Types } from 'mongoose';
 import * as mongoose from 'mongoose';
 import { User } from 'src/models/user.schema';
 
@@ -14,7 +14,7 @@ export class Page {
   @Prop({ default: 'Untitled Page' })
   name: string;
 
-  @Prop({    type: String  })
+  @Prop({ type: String })
   document: string;
 
   @Prop({ type: String, default: '' })
@@ -22,7 +22,7 @@ export class Page {
 
   @Prop({ type: Boolean, default: false })
   isTrashed: boolean;
-  
+
   @Prop({ type: Boolean, default: false })
   isPublish: boolean;
 
@@ -32,9 +32,11 @@ export class Page {
   @Prop({ type: Date, default: Date.now })
   updatedAt: Date;
 
-  @Prop({type:Array,default:[]})
-  sharedUsers:[{ type: Types.ObjectId,
-    ref: 'User'}]
+  @Prop({ type: Array, default: [] })
+  sharedUsers: [{
+    type: Types.ObjectId,
+    ref: 'User'
+  }]
 }
 
 export const PageSchema = SchemaFactory.createForClass(Page);
