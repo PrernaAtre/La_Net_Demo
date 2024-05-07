@@ -5,8 +5,8 @@ import { ArrowRight } from "lucide-react"
 import { useState } from "react";
 import Link from "next/link";
 import { useSelector } from "react-redux";
-import { useAuthenticated } from "@/app/routes/editor/hooks/useIsauthenticate";
-import { useCurrentUser } from "@/app/routes/editor/hooks/useCurrentUser";
+import { useAuthenticated } from "@/app/(dashboard)/page/hooks/useIsauthenticate";
+import { useCurrentUser } from "@/app/(dashboard)/page/hooks/useCurrentUser";
 
 export const Heading = () => {
     const [loading, setLoading] = useState(false);

@@ -1,5 +1,5 @@
-import { useCurrentUser } from "@/app/routes/editor/hooks/useCurrentUser";
-import { useAuthenticated } from "@/app/routes/editor/hooks/useIsauthenticate";
+import { useCurrentUser } from "@/app/(dashboard)/page/hooks/useCurrentUser";
+import { useAuthenticated } from "@/app/(dashboard)/page/hooks/useIsauthenticate";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Spinner } from "@/components/spinner";
 import { Button } from "@/components/ui/button";

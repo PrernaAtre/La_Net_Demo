@@ -1,10 +1,9 @@
-
 "use client";
 
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
-import { useUpdatePage } from "@/app/routes/editor/hooks/useUpdatePage";
+import { useUpdatePage } from "@/app/(dashboard)/page/hooks/useUpdatePage";
 import { SingleImageDropzone } from "@/components/single-image-dropzone";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import { useCoverImage } from "@/hooks/use-cover-image";

@@ -1,5 +1,5 @@
-import { EmptyDocument } from '@/app/(main)/_components/empty_document'
-import MainLayout from '@/app/(main)/layout';
+import { EmptyDocument } from '@/app/(dashboard)/_components/empty_document'
+import MainLayout from '@/app/(dashboard)/layout';
 import React from 'react'
 
 function Profile() {

@@ -1,4 +1,4 @@
-import NoteForm from "@/app/(main)/_components/note";
+import NoteForm from "@/app/(dashboard)/_components/note";
 import React from "react";
 
 function AddPage() {

@@ -1,5 +1,5 @@
-import QuickNote from '@/app/(main)/_components/quickNote/QuickNote';
-import MainLayout from '@/app/(main)/layout'
+import {QuickNote} from '@/app/(dashboard)/_components/quickNote/QuickNote';
+import MainLayout from '@/app/(dashboard)/layout'
 import React from 'react'
 
 function QuickNotePage (){
