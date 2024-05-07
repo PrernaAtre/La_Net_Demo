@@ -1,4 +1,3 @@
-
 import { baseAPI } from "@/store/baseApi";
 import { addPage, deletePage, setPages, updatePage } from "./pageSlice";
 
@@ -6,6 +5,15 @@ export const pageApi = baseAPI.injectEndpoints({
   endpoints: (builder) => ({
     getPage: builder.query({
       query: (id: string) => `page/${id}`,
+      onQueryStarted: async (id, { dispatch, queryFulfilled }) => {
+        try {
+          const { data } = await queryFulfilled;
+
+          return data;
+        } catch (e) {
+          console.log("error while fetching page", e);
+        }
+      }
     }),
     createPage: builder.mutation({
       query: (payload: any) => ({
@@ -139,4 +147,5 @@ export const {
   useRecoverMutation,
   useLazyGetPagesQuery,
   useUpdatePageMutation,
+  useLazyGetPageQuery
 } = pageApi;

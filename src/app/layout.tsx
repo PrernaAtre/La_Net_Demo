@@ -5,10 +5,11 @@ import { Inter } from "next/font/google";
 import { Provider } from "react-redux";
 import "./globals.css";
 
-import { persistor, store } from "@/redux_store/store";
+import { persistor, store } from "@/store/store";
 import React from "react";
 import { PersistGate } from "redux-persist/integration/react";
-// import { persistor, store } from "@/redux_store/store";
+import { ModalProvider } from "@/components/providers/modal-provider";
+import { Navbar } from "@/modules/home/Navbar";
 const inter = Inter({ subsets: ["latin"] });
 
 export default function RootLayout({
@@ -30,6 +31,7 @@ export default function RootLayout({
             <PersistGate loading={null} persistor={persistor}>
               {children}
             </PersistGate>
+            <ModalProvider />
           </Provider>
         </ThemeProvider>
       </body>

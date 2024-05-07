@@ -3,7 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
-import { useUpdatePage } from "@/app/(dashboard)/page/hooks/useUpdatePage";
+import { useUpdatePage } from "@/modules/editor/hooks/useUpdatePage";
 import { SingleImageDropzone } from "@/components/single-image-dropzone";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import { useCoverImage } from "@/hooks/use-cover-image";
@@ -12,9 +12,9 @@ import { debounce } from "lodash";
 export const CoverImageModal = () => {
   const searchParams = useSearchParams();
   const pageId = searchParams.get("id");
-
-  const { handleUpdatePage, page } = useUpdatePage(pageId || "");
   const coverImage = useCoverImage();
+
+  const { handleUpdatePage, page } = useUpdatePage(coverImage.id || "");
 
   const [file, setFile] = useState<File>();
   const [isSubmitting, setIsSubmitting] = useState(false);

@@ -1,0 +1,30 @@
+.hello-world-block {
+  border-radius: 4px;
+  padding: 2px;
+  margin: 2px;
+}
+
+.bn-container[data-changing-font-demo] .bn-editor * {
+  font-family: "Comic Sans MS", sans-serif;
+}
+
+.editor-container {
+  padding: 20px;
+}
+
+.flex-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* Additional styling can be applied as needed */
