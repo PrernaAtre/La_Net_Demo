@@ -27,7 +27,7 @@ export class AuthController {
 
     @Post('/signup')
     @UseInterceptors(FileInterceptor('profile_image', { storage }))
-    async signUp(@Body() userSignupDto: UserSignupDto, @UploadedFile() profile_image: Express.Multer.File): Promise<string> {
+    async signUp(@Body() userSignupDto: UserSignupDto, @UploadedFile() profile_image: Express.Multer.File) {
         try {
             if (!profile_image) {
                 throw new HttpException('No file uploaded', HttpStatus.BAD_REQUEST);

@@ -39,12 +39,13 @@ export class AuthService {
         }
     }
 
-    async createUser(imagePath: string, userSignupDto: UserSignupDto): Promise<string> {
+    async createUser(imagePath: string, userSignupDto: UserSignupDto): Promise<{ message: string }> {
         try {
-            const { username, email, password, profile_image } = userSignupDto;
+            const { username, email, password } = userSignupDto;
             const checkEmail = await this.userModel.findOne({ email })
+
             if (checkEmail) {
-                return "Email is duplicate..";
+                throw new Error("Account with same email already exists. Please sign in.");
             }
 
             const hashedPassword = await this.bcryptService.hash(password);
@@ -58,16 +59,17 @@ export class AuthService {
                 profile_image: image_url?.url,
             });
 
-            const stripeCustomer = await this.commonService.createCustomer({ email, name: username })
+            const stripeCustomer = await this.commonService.createCustomer({ email, name: username });
+
             await this.userModel.updateOne({ _id: user._id }, { $set: { customerId: stripeCustomer.id } })
-            return "user register succesfully";
+            return { message: "user register succesfully" };
         } catch (error) {
             console.log('error', error)
             if (error.code == '11000') {
                 throw new ConflictException('Duplicate data input')
             }
             else {
-                throw new InternalServerErrorException();
+                throw new InternalServerErrorException(error.message);
             }
         }
     }
