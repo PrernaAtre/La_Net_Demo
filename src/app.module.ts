@@ -19,7 +19,7 @@ import { AuthGuard } from './auth/jwt-auth.guard';
 const username = "prernaatre";
 const password = "Shinchan";
 const databaseName = 'user_auth';
-const DBURL: string = `mongodb+srv://${username}:${password}@cluster0.89cuca2.mongodb.net/${databaseName}?retryWrites=true&w=majority&appName=Cluster0`;
+const DBURL: string = `mongodb+srv://root:root@cluster0.mrsluyn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 @Module({
   imports: [
@@ -38,7 +38,7 @@ const DBURL: string = `mongodb+srv://${username}:${password}@cluster0.89cuca2.mo
     }),
     MongooseModule.forRoot(DBURL), AuthModule, CloudinaryModule, QuickNoteModule, PageModule, PaymentModule, UserModule],
   controllers: [AppController, AuthController],
-  providers: [AppService, CloudinaryService,AuthGuard],
+  providers: [AppService, CloudinaryService, AuthGuard],
 })
 export class AppModule {
   // configure(consumer: MiddlewareConsumer) {

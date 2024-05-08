@@ -5,11 +5,11 @@ export class CreatePageDto {
     @IsNotEmpty()
     name: string;
 
-    @IsArray()
+    @IsString()
     @IsNotEmpty()
-    document: Array<any>
+    document: string
 
-    @IsNotEmpty()
+    @IsOptional()
     coverImage: string;
 }
 export class UpdatePageDto {
@@ -18,8 +18,8 @@ export class UpdatePageDto {
     name: string;
 
     @IsOptional()
-    @IsArray()
-    document: Array<any>
+    @IsString()
+    document: string
 
     @IsOptional()
     @IsString()

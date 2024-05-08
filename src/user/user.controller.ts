@@ -8,6 +8,17 @@ import { UpdateProfileDto } from "../auth/dto/updateProfileDto.dto";
 import { User } from '../models/user.schema';
 import { UserService } from './user.service';
 import { GetUserByEmailDto, SearchUserDto } from './dto/user.dto';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
+
+
+const storage = diskStorage({
+  destination: './uploads',
+  filename: (req, file, cb) => {
+    const uniqueFilename = Date.now() + extname(file.originalname);
+    cb(null, uniqueFilename);
+  },
+});
 
 @Controller("user")
 export class UserController {
@@ -19,18 +30,23 @@ export class UserController {
 
   @Put()
   @UseGuards(AuthGuard)
-  @UseInterceptors(FileInterceptor("file"))
+  @UseInterceptors(FileInterceptor("profile_image", { storage }))
   async updateProfile(
     @Body() updateProfileDto: UpdateProfileDto,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() profile_image: Express.Multer.File,
     @Req() { currentUser }: AuthenticatedRequest
   ): Promise<Object> {
     try {
-      if (!file) {
+      if (!profile_image) {
         throw new HttpException("No file uploaded", HttpStatus.BAD_REQUEST);
       }
+
+      console.log("updateProfileDto: ", updateProfileDto);
+
+      console.log("profile_image: ", profile_image);
+
       return this.userService.updateProfile(
-        file.path,
+        profile_image.path,
         updateProfileDto,
         currentUser
       );

@@ -32,6 +32,7 @@ export class AuthController {
             if (!profile_image) {
                 throw new HttpException('No file uploaded', HttpStatus.BAD_REQUEST);
             }
+            console.log("profile_image: ", profile_image, "userSignupDto: ", userSignupDto)
             return this.authService.createUser(profile_image.path, userSignupDto);
         }
         catch (error) {
@@ -46,10 +47,10 @@ export class AuthController {
 
         console.log("token: ", token, "user: ", user)
 
-        // response.cookie('token', token, {
-        //   httpOnly: true, secure: true,
-        //   sameSite: 'none',
-        // });
+        response.cookie('token', token, {
+            httpOnly: true, secure: true,
+            sameSite: 'none',
+        });
 
         return response.status(HttpStatus.OK).json({ token, user });
     }

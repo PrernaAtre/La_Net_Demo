@@ -10,9 +10,9 @@ export class PageController {
 
   @Post('/')
   @UseGuards(AuthGuard)
-  async create(@Body() page: CreatePageDto,@Req() { currentUser }: AuthenticatedRequest): Promise<any> {
+  async create(@Body() page: CreatePageDto, @Req() { currentUser }: AuthenticatedRequest): Promise<any> {
     try {
-      const newPage = await this.pageService.create(page,currentUser);
+      const newPage = await this.pageService.create(page, currentUser);
 
       return newPage;
     } catch (error) {
@@ -23,9 +23,9 @@ export class PageController {
 
   @Put('/:id')
   @UseGuards(AuthGuard)
-  async update(@Param('id') id: string, @Body() page: UpdatePageDto,@Req() { currentUser }: AuthenticatedRequest): Promise<any> {
+  async update(@Param('id') id: string, @Body() page: UpdatePageDto, @Req() { currentUser }: AuthenticatedRequest): Promise<any> {
     try {
-      const updatedPage = await this.pageService.update(id,page,currentUser);
+      const updatedPage = await this.pageService.update(id, page, currentUser);
 
       return updatedPage;
     } catch (error) {
@@ -35,9 +35,9 @@ export class PageController {
 
   @Get('/:id')
   @UseGuards(AuthGuard)
-  async get(@Param('id') id: string,@Req() { currentUser }: AuthenticatedRequest): Promise<any> {
+  async get(@Param('id') id: string, @Req() { currentUser }: AuthenticatedRequest): Promise<any> {
     try {
-      const page = await this.pageService.get(id,currentUser);
+      const page = await this.pageService.get(id, currentUser);
 
       return page;
     } catch (error) {
@@ -47,13 +47,11 @@ export class PageController {
 
   @Get('/user/:userId')
   @UseGuards(AuthGuard)
-  async pages(@Req() req:Request,@Req() { currentUser }: AuthenticatedRequest): Promise<any> {
+  async pages(@Req() req: Request, @Req() { currentUser }: AuthenticatedRequest): Promise<any> {
     try {
 
       const pages = await this.pageService.pages(currentUser);
 
-
-      console.log("pages", pages)
       return pages;
     } catch (error) {
       throw new HttpException(error?.message, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -61,9 +59,11 @@ export class PageController {
   }
 
   @Put('/trash/:id')
-  async makeTrash(@Param('id') id: string,@Req() { currentUser }: AuthenticatedRequest): Promise<any> {
+  @UseGuards(AuthGuard)
+  async makeTrash(@Param('id') id: string, @Req() { currentUser }: AuthenticatedRequest): Promise<any> {
     try {
-      const page = await this.pageService.makeTrashed(id,currentUser);
+
+      const page = await this.pageService.makeTrashed(id, currentUser);
 
       return page;
     } catch (error) {
@@ -72,9 +72,10 @@ export class PageController {
   }
 
   @Put('/recover/:id')
-  async recover(@Param('id') id: string,@Req() { currentUser }: AuthenticatedRequest): Promise<any> {
+  @UseGuards(AuthGuard)
+  async recover(@Param('id') id: string, @Req() { currentUser }: AuthenticatedRequest): Promise<any> {
     try {
-      const page = await this.pageService.recover(id,currentUser);
+      const page = await this.pageService.recover(id, currentUser);
 
       return page;
     } catch (error) {
@@ -83,9 +84,10 @@ export class PageController {
   }
 
   @Delete('/:id')
-  async delete(@Param('id') id: string,@Req() { currentUser }: AuthenticatedRequest): Promise<any> {
+  @UseGuards(AuthGuard)
+  async delete(@Param('id') id: string, @Req() { currentUser }: AuthenticatedRequest): Promise<any> {
     try {
-      const page = await this.pageService.delete(id,currentUser);
+      const page = await this.pageService.delete(id, currentUser);
 
       return page;
     } catch (error) {

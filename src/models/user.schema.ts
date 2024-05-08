@@ -21,6 +21,9 @@ export class User {
     @Prop()
     customerId: string
 
+    @Prop({ default: false })
+    IsSubscribed: boolean
+
     // @Prop()
     // subscriptionInfo:{
     //     startDate:Date,

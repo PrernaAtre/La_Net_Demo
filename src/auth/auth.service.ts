@@ -1,18 +1,15 @@
-import { ConflictException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { UserSignupDto } from "../auth/dto/signupDto.dto";
-import { UserLoginDto } from 'src/auth/dto/loginDto.dto';
-import { User } from '../models/user.schema';
-import * as bcrypt from 'bcryptjs';
-import { Model, ObjectId } from 'mongoose';
+import { ConflictException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
-import { UpdateProfileDto } from './dto/updateProfileDto.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
-import { CommonService } from 'src/common/common.service';
+import { Model } from 'mongoose';
+import { UserLoginDto } from 'src/auth/dto/loginDto.dto';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { BcryptService } from 'src/common/bcrypt.service';
+import { CommonService } from 'src/common/common.service';
+import { UserSignupDto } from "../auth/dto/signupDto.dto";
+import { User } from '../models/user.schema';
 import { ResetPasswordDto } from './dto/resetpassword.dto';
 
 @Injectable()
