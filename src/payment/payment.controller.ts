@@ -2,7 +2,6 @@ import { Body, Controller, Get, HttpStatus, Param, Post, Req, Res, UseGuards } f
 import { StripeService } from './payment.service';
 import { Response } from 'express';
 import Stripe from 'stripe';
-import { Payment } from '../models/stripe.schema';
 import { CommonService } from 'src/common/common.service';
 import { AuthGuard } from 'src/auth/jwt-auth.guard';
 import { AuthenticatedRequest } from 'src/auth/auth.controller';
@@ -16,12 +15,9 @@ export class PaymentController {
 
   @Post()
   @UseGuards(AuthGuard)
-  async createCheckoutSession(@Body() body: any, @Res() res: Response, @Req() { currentUser }: AuthenticatedRequest) {
+  async createCheckoutSession(@Req() { currentUser }: AuthenticatedRequest,@Res() res: Response) {
     try {
-
-      const sessionUrl = await this.stripeService.createCheckoutSession(currentUser)
-
-      res.status(HttpStatus.OK as number).json({ url: sessionUrl });
+      return await this.stripeService.createCheckoutSession(currentUser)
     }
     catch (err) {
       console.log(err)
@@ -58,29 +54,4 @@ export class PaymentController {
   //   }
   // }
 
-  @Post('/storePayment')
-  async storePayment(
-    @Body() paymentData: { userId: string, username: string, email: string, amount: string }
-  ): Promise<void> {
-    try {
-      // Extract data from paymentData object
-      const { userId, username, email, amount } = paymentData;
-
-      // Call the storePayment method of the StripeService
-      await this.stripeService.storePayment(userId, username, email, amount);
-    } catch (error) {
-      throw new Error('Error storing payment');
-    }
-  }
-
-  @Get(':userId')
-  async getAllPaymentsByUserId(@Param('userId') userId: string): Promise<Payment[]> {
-    try {
-      return this.stripeService.getAllPaymentsByUserId(userId);
-    }
-    catch (err) {
-      console.log('err', err)
-      throw new Error('Error in fetching data');
-    }
-  }
 }

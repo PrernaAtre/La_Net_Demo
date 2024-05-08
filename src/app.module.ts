@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MulterModule } from '@nestjs/platform-express';
 import { AppController } from './app.controller';
@@ -13,13 +13,8 @@ import { QuickNoteModule } from './quick-note/quick-note.module';
 import { PaymentModule } from './payment/payment.module';
 import { UserModule } from './user/user.module';
 import { AuthGuard } from './auth/jwt-auth.guard';
-
-
-// db connection
-const username = "prernaatre";
-const password = "Shinchan";
-const databaseName = 'user_auth';
-const DBURL: string = `mongodb+srv://root:root@cluster0.mrsluyn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+import { APP_FILTER } from '@nestjs/core';
+import { GlobalExceptionFilter } from './common/utils/errorHadler';
 
 @Module({
   imports: [
@@ -36,9 +31,25 @@ const DBURL: string = `mongodb+srv://root:root@cluster0.mrsluyn.mongodb.net/?ret
     MulterModule.register({
       dest: './images',
     }),
-    MongooseModule.forRoot(DBURL), AuthModule, CloudinaryModule, QuickNoteModule, PageModule, PaymentModule, UserModule],
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get<string>('DB_URL'),
+      }),
+    }),
+
+     AuthModule, CloudinaryModule, QuickNoteModule, PageModule, PaymentModule, UserModule],
   controllers: [AppController, AuthController],
   providers: [AppService, CloudinaryService, AuthGuard],
+})
+@Module({
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: GlobalExceptionFilter,
+    },
+  ],
 })
 export class AppModule {
   // configure(consumer: MiddlewareConsumer) {

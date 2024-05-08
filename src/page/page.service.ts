@@ -1,17 +1,19 @@
 // PageService.ts
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { User } from 'src/models/user.schema';
 import { Page } from '../models/Page.schema';
 import { CreatePageDto, UpdatePageDto } from './dto/CreatePage.dto';
+import { CommonService } from 'src/common/common.service';
 
 @Injectable()
 export class PageService {
 	constructor(
 		@InjectModel("Page")
 		private pageModel: Model<Page>,
-		@InjectModel('User') private userModel: Model<User>
+		@InjectModel('User') private userModel: Model<User>,
+		public commonService:CommonService
 	) { }
 
 	async get(id: string, currentUser): Promise<Page> {
@@ -128,7 +130,7 @@ export class PageService {
 			if (!userIds.length) {
 				throw new Error("Invalid user id");
 			}
-			const page = await this.pageModel.findOne({ _id: pageId, userId: currentUser.id }, { isTrashed: false }, { new: true });
+			const page = await this.pageModel.findOne({ _id: pageId, userId: currentUser.id ,isTrashed: false});
 
 			if (!page) {
 				throw new Error("Page not found");
@@ -136,20 +138,20 @@ export class PageService {
 
 			const userObjectIds = userIds.map((userId) => new Types.ObjectId(userId))
 
-			const users = await this.userModel.find({ _id: { $in: userObjectIds } }, { isTrashed: false }, { new: true });
+			const users = await this.userModel.find({ _id: { $in: userObjectIds }});
 			if (users.length !== userIds.length) {
 				throw new Error("Some users were not found")
 			}
 			await this.pageModel.updateOne({ _id: pageId }, { $set: { sharedUsers: userObjectIds } })
-			return "success";
+			return "User ";
 		} catch (error) {
-			throw new Error(`Failed to add shared users to the page`);
+			throw new InternalServerErrorException(error)
 		}
 	}
 
-	async removeSharedUsers(userId: string, pageId: string, currentUser): Promise<string> {
+	async removeSharedUsers(userId: string, pageId: string, currentUser) {
 		try {
-			const page = await this.pageModel.findOne({ _id: pageId, userId: currentUser.id }, { isTrashed: false }, { new: true });
+			const page = await this.pageModel.findOne({ _id: pageId, userId: currentUser.id ,isTrashed: false});
 
 			if (!page) {
 				throw new Error("Page not found");
@@ -157,12 +159,22 @@ export class PageService {
 
 			const user = await this.userModel.find({ _id: new Types.ObjectId(userId) });
 			if (!user) {
-				throw new Error("user were not found")
+				throw new Error("User were not found")
 			}
 			await this.pageModel.updateOne({ _id: pageId }, { $pull: { sharedUsers: new Types.ObjectId(userId) } })
-			return "success";
+			return {message:"User removed successfully"};
 		} catch (error) {
-			throw new Error(`Failed to remove shared user from the page`);
+			throw new InternalServerErrorException(error)
+		}
+	}
+
+	async publishPage(pageId:string,currentUser){
+		try {
+ 
+			await this.pageModel.updateOne({ _id: pageId,userId:currentUser.id }, { $set: { publishId: new Types.ObjectId() } })
+			return {message:"Page published successfully"};
+		} catch (error) {
+			throw new InternalServerErrorException(error)
 		}
 	}
 }

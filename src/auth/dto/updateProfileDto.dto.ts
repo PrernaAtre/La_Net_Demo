@@ -4,10 +4,6 @@ export class UpdateProfileDto {
     @IsOptional()
     username?: string;
 
-    @IsEmail()
-    @IsOptional()
-    email?: string;
-
     @IsString()
     @IsOptional()
     profile_image?: string;

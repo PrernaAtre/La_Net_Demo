@@ -19,7 +19,7 @@ export class UserService {
 
   async updateProfile(imagePath: string, updateProfileDto: UpdateProfileDto, currentUser): Promise<Object> {
     try {
-      const { username, email, profile_image } = updateProfileDto;
+      const { username, profile_image } = updateProfileDto;
 
       const user = await this.userModel.findById(currentUser.id);
       if (!user) {
@@ -32,7 +32,6 @@ export class UserService {
 
       const updated_user = await this.userModel.findByIdAndUpdate(currentUser.id, { // Use findByIdAndUpdate to update existing user
         username,
-        email,
         profile_image: image_url?.url,
       }, { new: true });
 
@@ -43,8 +42,10 @@ export class UserService {
     }
   }
 
-  async searchUserByName(name: string, currentUser): Promise<User[]> {
-    const users = await this.userModel.find({ username: { $regex: new RegExp(`^${name}`) }, _id: { $ne: currentUser.id } }, { username: 1 });
+  async searchUserByName(name: string,limit: number, currentUser: { id: any; }): Promise<User[]> {
+    const users = await this.userModel.find({ $or:[{username: { $regex: new RegExp(`^${name}`) }},{email: { $regex: new RegExp(`^${name}`)}}]
+      , _id: { $ne: currentUser.id }
+     }, { username: 1,email:1 }).limit(Number(limit));
     if (!users || users.length === 0) {
       throw new NotFoundException('No users found with the provided name.');
     }

@@ -9,7 +9,7 @@ export class CommonService {
   constructor(private readonly configService: ConfigService) { }
 
   private stripeClient = new Stripe(this.configService.get<string>('STRIPE_API_KEY'));
-
+  public publishablePostCount:number=5
   createCustomer({ email, name }) {
     return this.stripeClient.customers.create({
       name,
@@ -45,6 +45,9 @@ export class CommonService {
 
 
 
+  convertUnixTimestampToDate (timestamp){
+    return new Date(timestamp * 1000);
+  };
 
 
 }

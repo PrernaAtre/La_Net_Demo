@@ -66,8 +66,9 @@ export class UserController {
     @Req() { currentUser }: AuthenticatedRequest
   ): Promise<User[]> {
     try {
-      const { name } = searchUserDto;
-      const users = await this.userService.searchUserByName(name, currentUser);
+      const name = searchUserDto.name??"";
+      const limit = Number(searchUserDto.limit)??10;
+      const users = await this.userService.searchUserByName(name,limit, currentUser);
       return users;
     } catch (error) {
       if (error instanceof NotFoundException) {

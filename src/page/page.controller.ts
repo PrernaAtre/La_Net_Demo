@@ -3,6 +3,7 @@ import { PageService } from './page.service';
 import { CreatePageDto, UpdatePageDto } from './dto/CreatePage.dto';
 import { AuthGuard } from 'src/auth/jwt-auth.guard';
 import { AuthenticatedRequest } from 'src/auth/auth.controller';
+import { CheckPublishLimitMiddleware } from 'src/middleware/page.middleware';
 
 @Controller('page')
 export class PageController {
@@ -94,4 +95,15 @@ export class PageController {
       throw new HttpException(error?.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+
+  @Post("/publish")
+  @UseGuards(AuthGuard)
+  async publish(@Param('id') id: string, @Req() { currentUser }: AuthenticatedRequest): Promise<any> {
+    try {
+      return await this.pageService.publishPage(id, currentUser);
+    } catch (error) {
+      throw new HttpException(error?.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
 }

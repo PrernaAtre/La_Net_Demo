@@ -1,124 +1,82 @@
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { CommonService } from 'src/common/common.service';
-import { User } from 'src/models/user.schema';
-import Stripe from 'stripe';
-import { Payment } from '../models/stripe.schema';
-import { StripeWebhookEvent } from './dto/stripe-webhook-event.dto';
+import { Injectable } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model } from "mongoose";
+import { CommonService } from "src/common/common.service";
+import { User } from "src/models/user.schema";
+import Stripe from "stripe";
+import { StripeWebhookEvent } from "./dto/stripe-webhook-event.dto";
+import { ServerError } from "src/common/utils/serverError";
 
 @Injectable()
 export class StripeService {
   private stripe: Stripe;
 
-  constructor(private configService: ConfigService,
-    @InjectModel('Payment') private paymentModel: Model<Payment>,
+  constructor(
+    private configService: ConfigService,
     private readonly commonService: CommonService,
-    @InjectModel('User') private userModel: Model<User>
-  ) { }
+    @InjectModel("User") private userModel: Model<User>
+  ) {}
 
-  async createCheckoutSession(currentUser): Promise<string> {
+  async createCheckoutSession(currentUser) {
     try {
-      const user = await this.userModel.findOne({ _id: currentUser.id })
+      const user = await this.userModel.findOne({ _id: currentUser.id });
 
-      //TODO check if user do not have existing plan
-      if (user.IsSubscribed) throw new Error('User already have a plan');
+      if (user.IsSubscribed)
+        throw new ServerError({
+          message: "User already have a plan.",
+          code: 400,
+        });
 
-      const session = await this.commonService.createCheckoutSession({ customerId: user.customerId, userId: user.id })
-
-      if (session.url) {
-        await this.userModel.updateOne({ _id: user._id }, { $set: { IsSubscribed: true } });
+      if (!user.customerId) {
+        const stripeCustomer = await this.commonService.createCustomer({
+          email: user.email,
+          name: user.username,
+        });
+        user.customerId = stripeCustomer.id;
+        await user.save();
       }
-
-      return session.url;
-
+      const session = await this.commonService.createCheckoutSession({
+        customerId: user.customerId,
+        userId: user.id,
+      });
+console.log('session.url', session.url)
+      return { url: session.url };
     } catch (error) {
-      console.log('error', error)
-      throw new Error('Error creating checkout session');
+      console.log("error", error);
+      throw new Error("Error creating checkout session");
     }
   }
 
-  async storePayment(userId: string, username: string, email: string, amount: string): Promise<void> {
-    console.log(userId,
-      username,
-      email,
-      amount);
-
-    const payment = new this.paymentModel({
-      userId,
-      username,
-      email,
-      amount
-    });
-    await payment.save();
-  }
-
-
-  async createPayment(paymentData: Payment): Promise<Payment> {
-    try {
-      const createdPayment = new this.paymentModel(paymentData);
-
-      await this.userModel.updateOne({ _id: paymentData.userId }, { $set: { IsSubscribed: true } });
-
-      return createdPayment.save();
-    }
-    catch (err) {
-      console.log(err);
-
-    }
-  }
-
-  async updatePayment(paymentData: Partial<Payment>): Promise<void> {
-    try {
-
-      await this.paymentModel.findOneAndUpdate({ stripeSubscriptionId: paymentData.stripeSubscriptionId },
-        { $set: { stripePriceId: paymentData.stripePriceId, stripeCurrentPeriodEnd: paymentData.stripeCurrentPeriodEnd } },
-        { new: true }
-      );
-
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  async getAllPaymentsByUserId(userId: string): Promise<Payment[]> {
-    try {
-      return this.paymentModel.find({ userId })
-    }
-    catch (err) {
-      throw new Error('Error in fetching data');
-    }
-  }
-
-  async handleWebhookEvent(event: StripeWebhookEvent): Promise<void> {
+  async handleWebhookEvent(event: StripeWebhookEvent): Promise<any> {
     switch (event.type) {
-      case 'checkout.session.completed':
-        const session = event.data.object as Stripe.Checkout.Session;
+      case "invoice.paid":
+        const invoicePaid = event.data.object;
+          const accountId = invoicePaid.subscription_details.metadata.accountId;
+          const data = await this.userModel
+            .findOne({ _id: accountId }, { _id: 1 })
+            .lean();
 
-        const subscription = await this.stripe.subscriptions.retrieve(session.subscription.toString());
+          if (!data) {
+            return false;
+          }
 
-        const paymentData: Payment = {
-          userId: session.customer ? session.customer.toString() : '', // convert customer to string
-          username: session.customer_details?.name,
-          email: session.customer_email,
-          stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
-          stripeCustomerId: session.customer.toString(),
-          stripePriceId: subscription.items.data[0].price.id,
-          stripeSubscriptionId: subscription.id,
-        };
-        const createdPayment = this.createPayment(paymentData);
+          await this.userModel.findOneAndUpdate(
+            { _id: accountId },
+            { IsSubscribed: true }
+          );       
+
         break;
 
-      case 'invoice.payment_succeeded':
-        const invoice = event.data.object as Stripe.Invoice;
-
-        const paymentData1: Partial<Payment> = {
-          stripePriceId: invoice.lines.data[0].price.id,
-          stripeSubscriptionId: subscription.id,
-          stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
-        };
-        const createdPayment1 = this.updatePayment(paymentData1);
+      case "subscription_schedule.canceled":
+        const subscriptionScheduleCanceled = event.data.object;
+        await this.userModel.updateOne(
+          { userId: subscriptionScheduleCanceled.metadata.accountId },
+          {
+            $set: {IsSubscribed:false },
+          }
+        );
+  
         break;
       default:
         console.log(`Unhandled event type ${event.type}`);

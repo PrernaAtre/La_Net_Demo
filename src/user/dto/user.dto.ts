@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class GetUserByEmailDto{
     @IsString()
@@ -8,7 +8,10 @@ export class GetUserByEmailDto{
 
 export class SearchUserDto {
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     name: string;
+    @IsNumber()
+    @IsOptional()
+    limit: number;
   }
   

@@ -10,7 +10,8 @@ import { ResetPasswordDto } from './dto/resetpassword.dto';
 import { UserSignupDto } from './dto/signupDto.dto';
 import { AuthGuard } from './jwt-auth.guard'; // aa barabar chhe?
 export interface AuthenticatedRequest extends Request {
-    currentUser: any; // Update this with the type of currentUser
+    params: any;
+    currentUser: any;
 }
 
 const storage = diskStorage({
@@ -43,27 +44,7 @@ export class AuthController {
 
     @Post('/login')
     async login(@Body() userLoginDto: UserLoginDto, @Res({ passthrough: true }) response: Response) {
-        const { token, user } = await this.authService.loginUser(userLoginDto);
-
-        console.log("token: ", token, "user: ", user)
-
-        response.cookie('token', token, {
-            httpOnly: true, secure: true,
-            sameSite: 'none',
-        });
-
-        return response.status(HttpStatus.OK).json({ token, user });
-    }
-
-    @Get('/test')
-    @UseGuards(AuthGuard)
-    test(@Res() response: Response): void {
-        try {
-            response.status(200).send("Hello from Home");
-        }
-        catch (err) {
-            response.status(200).send("wrong");
-        }
+        return  await this.authService.loginUser(userLoginDto);
     }
 
     @Post('/reset-password')

@@ -21,8 +21,8 @@ export class Page {
   @Prop({ type: Boolean, default: false })
   isTrashed: boolean;
 
-  @Prop({ type: Boolean, default: false })
-  isPublish: boolean;
+  @Prop({ type: Types.ObjectId})
+  publishId: Types.ObjectId;
 
   @Prop({ type: Date, default: Date.now })
   createdAt: Date;
