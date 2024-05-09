@@ -1,5 +1,6 @@
 import { useMakeTrashMutation, useRecoverMutation } from "@/store/features/page";
 import { useLazyCurrentUserPages } from "./useLazyPages";
+import { toast } from "sonner";
 
 export const useMakeTrashPage = () => {
   const { handleFetchPages } = useLazyCurrentUserPages();
@@ -15,13 +16,16 @@ export const useMakeTrashPage = () => {
     try {
       if (isTrashed) {
         await recoverPage(id);
+        toast.success("Page recovered successfully");
       } else {
         await trashPage(id);
+        toast.success("Page trashed successfully");
       }
 
       await handleFetchPages();
-    } catch (e) {
+    } catch (e: any) {
       console.log("error while trashing page", e);
+      toast.error(e.message);
     }
   }
 

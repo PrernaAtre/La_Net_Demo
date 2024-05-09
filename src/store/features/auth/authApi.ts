@@ -3,10 +3,10 @@ import { baseAPI } from "@/store/baseApi";
 export const authApi = baseAPI.injectEndpoints({
   endpoints: (builder) => ({
     signUp: builder.mutation({
-      query: (payload: any) => ({
+      query: (formData: any) => ({
         url: `auth/signup`,
         method: "POST",
-        body: payload,
+        body: formData,
       }),
       onQueryStarted: async (_payload, { queryFulfilled }) => {
         try {

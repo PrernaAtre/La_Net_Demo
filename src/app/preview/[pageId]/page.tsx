@@ -5,6 +5,8 @@ import { Cover } from "@/modules/note";
 import "@blocknote/core/fonts/inter.css";
 import { BlockNoteView, useCreateBlockNote } from "@blocknote/react";
 import "@blocknote/react/style.css";
+import { useTheme } from "next-themes";
+import Image from "next/image";
 import React from "react";
 
 interface PageProps {
@@ -15,6 +17,7 @@ interface PageProps {
 
 const page: React.FC<PageProps> = ({ params }) => {
   const { pageId } = params;
+  const { resolvedTheme } = useTheme();
 
   const { page } = usePage(pageId || "");
 
@@ -42,19 +45,44 @@ const page: React.FC<PageProps> = ({ params }) => {
 
   return (
     <>
-      <div className="editor-container w-full h-screen">
-        <Cover pageId={pageId!} preview url={page?.coverImage} />
+      {page?.isPublish ? (
+        <div className="editor-container w-full h-screen">
+          <Cover pageId={pageId!} preview url={page?.coverImage} />
 
-        <div className="h-screen">
-          <Toolbar preview name={page?.name} coverImageUrl={page?.coverImage} />
-          <BlockNoteView
-            className="h-screen"
-            editor={editor}
-            editable={false}
-            data-changing-font-demo
-          />
+          <div className="h-screen">
+            <Toolbar
+              preview
+              name={page?.name}
+              coverImageUrl={page?.coverImage}
+            />
+            <BlockNoteView
+              className="h-screen"
+              editor={editor}
+              editable={false}
+              theme={resolvedTheme === "dark" ? "dark" : "light"}
+              data-changing-font-demo
+            />
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center h-screen">
+          <Image
+            src="/error.png"
+            className="dark:hidden block"
+            height="300"
+            width="300"
+            alt="error"
+          />
+          <Image
+            src="/error-dark.png"
+            className="hidden dark:block"
+            height="300"
+            width="300"
+            alt="error"
+          />
+          <h2 className="text-lg font-medium">Page not found</h2>
+        </div>
+      )}
     </>
   );
 };

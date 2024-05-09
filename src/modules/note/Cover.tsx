@@ -3,19 +3,19 @@
 import { ImageIcon, X } from "lucide-react";
 import Image from "next/image";
 
-import { useUpdatePage } from "@/modules/editor/hooks/useUpdatePage";
 import { Button } from "@/components/ui/button";
-import { useCoverImage } from "@/hooks/use-cover-image";
 import { cn } from "@/lib/utils";
+import { useUpdatePage } from "@/modules/editor/hooks/useUpdatePage";
 
 interface CoverImageProps {
   url?: string;
   preview?: boolean;
   pageId?: string;
+  setId: (args?: any) => void;
+  setOpen: (open: boolean) => void;
 }
 
-export const Cover = ({ url, preview, pageId }: CoverImageProps) => {
-  const coverImage = useCoverImage();
+const Cover = ({ url, preview, pageId, setId, setOpen }: CoverImageProps) => {
   const { handleUpdatePage } = useUpdatePage(pageId);
 
   const onRemove = async () => {
@@ -36,7 +36,10 @@ export const Cover = ({ url, preview, pageId }: CoverImageProps) => {
       {url && !preview && (
         <div className="opacity-0 group-hover:opacity-100 absolute bottom-5 right-5 flex items-center gap-x-2">
           <Button
-            onClick={() => coverImage.onReplace(url!)}
+            onClick={() => {
+              setId(url);
+              setOpen(true);
+            }}
             className="text-muted-foreground text-xs"
             variant="outline"
             size="sm"
@@ -59,10 +62,4 @@ export const Cover = ({ url, preview, pageId }: CoverImageProps) => {
   );
 };
 
-Cover.Skeleton = function CoverSkeleton() {
-  return (
-    <div className="w-full h-[35vh] bg-gray-200 animate-pulse">
-      <div className="w-full h-full bg-gray-300" />
-    </div>
-  );
-};
+export default Cover;

@@ -1,6 +1,5 @@
 "use client";
 
-import { useUpdatePage } from "@/modules/editor/hooks/useUpdatePage";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -8,29 +7,48 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useOrigin } from "@/hooks/use-origin";
+import { useUpdatePage } from "@/modules/editor/hooks/useUpdatePage";
 import { Check, Copy, Globe } from "lucide-react";
 import { useState } from "react";
+import { useCurrentUser } from "../hooks";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { useCreateSubscription } from "../user/hooks/useCreateSubsciption";
 
-export const Publish = ({ id }: { id: string }) => {
-  const [isPublished, setIsPublished] = useState(false);
+const Publish = ({ id }: { id: string }) => {
+  const { user } = useCurrentUser();
 
-  const { page } = useUpdatePage(id);
+  const { page, handleUpdatePage, isLoading } = useUpdatePage(id);
 
+  const { handleClick } = useCreateSubscription();
+
+  const [isPublished, setIsPublished] = useState(page?.isPublish);
   const origin = useOrigin();
 
   const [copied, setCopied] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const url = `${origin}/preview/${page?._id}`;
 
-  const onPublish = () => {
-    setIsSubmitting(true);
+  const onPublish = async () => {
     setIsPublished(true);
+    await handleUpdatePage({
+      id: page?._id,
+      isPublish: true,
+    });
   };
 
-  const onUnpublish = () => {
-    setIsSubmitting(true);
+  const onUnpublish = async () => {
     setIsPublished(false);
+    await handleUpdatePage({
+      id: page?._id,
+      isPublish: false,
+    });
   };
 
   const onCopy = () => {
@@ -42,12 +60,12 @@ export const Publish = ({ id }: { id: string }) => {
     }, 1000);
   };
 
-  return (
+  return user.IsSubscribed ? (
     <Popover>
       <PopoverTrigger asChild>
-        <Button size="sm" variant="ghost">
+        <Button size="sm" variant="default">
           Publish
-          {page?.isPublished && <Globe className="text-sky-500 w-4 h-4 ml-2" />}
+          {isPublished && <Globe className="text-sky-500 w-4 h-4 ml-2" />}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-72" align="end" alignOffset={8} forceMount>
@@ -80,7 +98,7 @@ export const Publish = ({ id }: { id: string }) => {
             <Button
               size="sm"
               className="w-full text-xs"
-              disabled={isSubmitting}
+              disabled={isLoading}
               onClick={onUnpublish}
             >
               Unpublish
@@ -94,7 +112,7 @@ export const Publish = ({ id }: { id: string }) => {
               Share your work with others.
             </span>
             <Button
-              disabled={isSubmitting}
+              disabled={isLoading}
               onClick={onPublish}
               className="w-full text-xs"
               size="sm"
@@ -105,5 +123,28 @@ export const Publish = ({ id }: { id: string }) => {
         )}
       </PopoverContent>
     </Popover>
+  ) : (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button size="sm" variant="default">
+          Publish
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Upgrade to publish</DialogTitle>
+          <DialogDescription>
+            You need to upgrade to publish your notes.
+          </DialogDescription>
+        </DialogHeader>
+        <div>
+          <Button size="sm" onClick={handleClick}>
+            Upgrade
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };
+
+export default Publish;

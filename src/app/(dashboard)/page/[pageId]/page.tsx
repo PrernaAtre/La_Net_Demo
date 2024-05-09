@@ -1,4 +1,4 @@
-import Editor from "@/modules/editor/Editor";
+import { Editor } from "@/modules/editor";
 
 interface PageProps {
   params: {

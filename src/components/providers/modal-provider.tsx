@@ -1,17 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
 import { CoverImageModal } from "@/components/modals/cover-image-modal";
+import { useIsMounted } from "@/hooks/use-is-mounted";
 
 export const ModalProvider = () => {
-  const [isMounted, setIsMounted] = useState(false);
+  const isMounted = useIsMounted();
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  if (!isMounted) {
+  if (!isMounted()) {
     return null;
   }
 

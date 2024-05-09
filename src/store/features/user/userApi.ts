@@ -1,13 +1,12 @@
 import { baseAPI } from "@/store/baseApi";
 import { updateCurrentUser } from "../auth";
 
-export const authApi = baseAPI.injectEndpoints({
+export const userApi = baseAPI.injectEndpoints({
   endpoints: (builder) => ({
     users: builder.query({
-      query: (payload: any) => ({
-        url: `user/search`,
+      query: (payload: { name?: string }) => ({
+        url: `user/search?name=${payload.name}`,
         method: "GET",
-        body: payload,
       }),
       onQueryStarted: async (_payload, { queryFulfilled }) => {
         try {
@@ -20,16 +19,16 @@ export const authApi = baseAPI.injectEndpoints({
       },
     }),
     updateUser: builder.mutation({
-      query: (payload: any) => ({
-        url: `auth/update`,
-        method: "POST",
-        body: payload,
+      query: (formData: any) => ({
+        url: `user`,
+        method: "PUT",
+        body: formData,
       }),
       onQueryStarted: async (_payload, { queryFulfilled, dispatch }) => {
         try {
           const { data } = await queryFulfilled;
 
-          if(data) dispatch(updateCurrentUser(data))
+          if (data) dispatch(updateCurrentUser(data))
 
           return data;
         } catch (e) {
@@ -37,7 +36,22 @@ export const authApi = baseAPI.injectEndpoints({
         }
       },
     }),
+    getAllUsers: builder.query({
+      query: () => ({
+        url: `user/fetchUsers`,
+        method: "GET",
+      }),
+      onQueryStarted: async (_payload, { queryFulfilled }) => {
+        try {
+          const { data } = await queryFulfilled;
+
+          return data || [];
+        } catch (e) {
+          console.log("Error while fetching all users", e);
+        }
+      },
+    }),
   }),
 });
 
-export const { useUsersQuery, useUpdateUserMutation } = authApi;
+export const { useUsersQuery, useUpdateUserMutation, useGetAllUsersQuery, useLazyUsersQuery } = userApi;

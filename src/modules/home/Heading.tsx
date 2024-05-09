@@ -4,7 +4,7 @@ import { useCurrentUser } from "@/modules/hooks";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
-export const Heading = () => {
+const Heading = () => {
   const { user } = useCurrentUser();
 
   console.log("auth on heading : ", user);
@@ -41,3 +41,5 @@ export const Heading = () => {
     </div>
   );
 };
+
+export default Heading;

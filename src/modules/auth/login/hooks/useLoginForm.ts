@@ -3,6 +3,7 @@ import { loginSchema } from "../schema";
 import AuthToken from "@/lib/AuthToken";
 import { useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export const useLogin = () => {
   const [login, { isLoading, error }] = useLoginMutation({});
@@ -25,10 +26,15 @@ export const useLogin = () => {
 
         dispatch(setCurrentUser(response?.data?.user));
 
+        toast.success("Login successful");
+
         router.push("/page");
       }
 
     } catch (error: any) {
+
+      toast.error("Login failed");
+
       console.log(`[Login User] [Error]: ${error?.message}`);
     }
   };

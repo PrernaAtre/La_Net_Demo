@@ -1,8 +1,10 @@
-import { setCurrentUser, useSignUpMutation } from "@/store/features/auth";
-import { signUpSchema } from "../schema/signUpSchema";
 import AuthToken from "@/lib/AuthToken";
-import { useDispatch } from "react-redux";
+import { setCurrentUser, useSignUpMutation } from "@/store/features/auth";
+import { map } from "lodash";
 import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { toast } from "sonner";
+import { signUpSchema } from "../schema/signUpSchema";
 
 export const useSignUp = () => {
 
@@ -18,22 +20,26 @@ export const useSignUp = () => {
         stripUnknown: false,
       });
 
-      console.log("[SignUp User] [Input]:", sanitizeInput)
+      const formData = new FormData();
 
-      const response: any = await signUp(sanitizeInput);
+      map(sanitizeInput, (value: string | File, key: string) => formData.append(key, value))
+
+      const response: any = await signUp(formData);
+
+      if (response?.error) throw new Error(response?.error?.data);
 
       if (response?.data) {
         AuthToken.set(response?.data?.token);
 
         dispatch(setCurrentUser(response?.data?.user));
 
+        toast.success("Sign up successful");
+
         rourter.push("/page");
-
       }
-
-      console.log("[SignUp User] [Response]:", response);
     } catch (error: any) {
-      console.log(`[SignUp User] [Error]: ${error?.message}`);
+
+      toast.error(error?.message);
     }
   };
 

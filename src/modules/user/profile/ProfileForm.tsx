@@ -1,22 +1,19 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import { useCurrentUser } from "@/modules/hooks";
 import { useUpdateUser } from "@/modules/user/hooks";
 import { Grid, TextField } from "@mui/material";
 import { useFormik } from "formik";
 import { useState } from "react";
 import { updateFormSchema } from "./schema/updateFormSchema";
-import Modal from "@/components/modals/Modal";
-import { Button } from "@/components/ui/button";
+import { ReloadIcon } from "@radix-ui/react-icons";
 
-interface ProfileModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
+interface ProfileFormProps {}
 
-const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
+const ProfileForm: React.FC<ProfileFormProps> = ({}) => {
   const { user } = useCurrentUser();
 
-  const { handleUpdateUser, initialValues } = useUpdateUser();
+  const { handleUpdateUser, initialValues, isLoading } = useUpdateUser();
 
   const [previewImage, setPreviewImage] = useState<string | null>(
     user?.profile_image || null
@@ -34,21 +31,27 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
   const formik = useFormik({
     initialValues: initialValues,
     validationSchema: updateFormSchema,
-    onSubmit: () => {
-      console.log("formik.values", formik.values);
-      handleUpdateUser({ id: user?.id, user: formik.values });
-      onClose();
-    },
+    onSubmit: handleUpdateUser,
   });
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <Grid container direction="column" alignItems="center" spacing={0}>
-        <form encType="multipart/form-data" onSubmit={formik.handleSubmit}>
+    <div className="w-80">
+      <Grid
+        container
+        className="w-full"
+        direction="column"
+        alignItems="center"
+        spacing={0}
+      >
+        <form
+          encType="multipart/form-data"
+          className="w-full"
+          onSubmit={formik.handleSubmit}
+        >
           <Grid item>
             <label htmlFor="profile_image">
               <img
-                className="w-[42%] h-24 rounded-full mb-4 cursor-pointer mx-auto"
+                className="h-24 rounded-full mb-4 cursor-pointer mx-auto"
                 src={previewImage || user?.profile_image}
                 alt="Profile"
               />
@@ -69,41 +72,8 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
                   label="Username"
                   variant="outlined"
                   name="username"
+                  className="w-full"
                   value={formik.values.username}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                />
-              </Grid>
-              <Grid item>
-                <TextField
-                  type="email"
-                  label="Email"
-                  name="email"
-                  variant="outlined"
-                  value={formik.values.email}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  autoComplete="email"
-                />
-              </Grid>
-              <Grid item>
-                <TextField
-                  type="password"
-                  label="Password"
-                  variant="outlined"
-                  name="password"
-                  value={formik.values.password}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                />
-              </Grid>
-              <Grid item>
-                <TextField
-                  type="password"
-                  label="Confirm Password"
-                  name="confirm_password"
-                  variant="outlined"
-                  value={formik.values.confirm_password}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                 />
@@ -111,20 +81,22 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
               <Grid item>
                 <Button
                   type="submit"
+                  disabled={isLoading}
                   className="flex w-full justify-center rounded-md bg-indigo-500 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                  variant="ghost"
-                  size="lg"
-                  onClick={() => formik.handleSubmit()}
                 >
-                  Save Changes
+                  {isLoading ? (
+                    <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    "Save Changes"
+                  )}
                 </Button>
               </Grid>
             </Grid>
           </Grid>
         </form>
       </Grid>
-    </Modal>
+    </div>
   );
 };
 
-export default ProfileModal;
+export default ProfileForm;

@@ -39,7 +39,7 @@ export const pageApi = baseAPI.injectEndpoints({
       query: (payload: any) => ({
         url: `page/${payload.id}`,
         method: "PUT",
-        body: payload,
+        body: payload
       }),
       onQueryStarted: async (payload, { dispatch, queryFulfilled }) => {
         try {
@@ -147,5 +147,5 @@ export const {
   useRecoverMutation,
   useLazyGetPagesQuery,
   useUpdatePageMutation,
-  useLazyGetPageQuery
+  useLazyGetPageQuery,
 } = pageApi;

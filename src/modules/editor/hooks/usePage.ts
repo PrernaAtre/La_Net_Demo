@@ -1,3 +1,4 @@
+"use client";
 import { useLazyGetPageQuery } from "@/store/features/page";
 import { useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";

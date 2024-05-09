@@ -5,7 +5,6 @@ import React, { ElementRef, useEffect, useRef, useState } from "react";
 import TextareaAutosize from "react-textarea-autosize";
 
 import { Button } from "@/components/ui/button";
-import { useCoverImage } from "@/hooks/use-cover-image";
 import { Page } from "@/store/features/page";
 
 interface ToolbarProps {
@@ -13,15 +12,20 @@ interface ToolbarProps {
   coverImageUrl: string;
   preview?: boolean;
   onUpdate?: (page: Partial<Page>) => void;
+  onOpen?: (args?: any) => void;
 }
 
-const Toolbar = ({ name, coverImageUrl, preview, onUpdate }: ToolbarProps) => {
+const Toolbar = ({
+  name,
+  coverImageUrl,
+  preview,
+  onUpdate,
+  onOpen,
+}: ToolbarProps) => {
   const inputRef = useRef<ElementRef<"textarea">>(null);
   const [isEditing, setIsEditing] = useState(false);
 
   const [pageName, setPageName] = useState(name);
-
-  const coverImage = useCoverImage();
 
   const enableInput = () => {
     if (preview) return;
@@ -60,7 +64,7 @@ const Toolbar = ({ name, coverImageUrl, preview, onUpdate }: ToolbarProps) => {
       <div className="opacity-0 group-hover:opacity-100 flex items-center gap-x-1 py-4">
         {!coverImageUrl && !preview && (
           <Button
-            onClick={coverImage.onOpen}
+            onClick={onOpen}
             className="text-muted-foreground text-xs"
             variant="outline"
             size="sm"

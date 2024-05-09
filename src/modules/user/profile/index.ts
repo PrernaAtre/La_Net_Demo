@@ -1,1 +1,1 @@
-export * from './ProfileModal'
+export { default as ProfileForm } from './ProfileForm'

@@ -6,6 +6,7 @@ export interface Page {
   name: string;
   document: any[];
   isTrashed: boolean;
+  isPublish: boolean;
   createdAt: string;
   coverImage?: string;
 }

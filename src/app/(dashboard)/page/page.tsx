@@ -6,6 +6,7 @@ import { useCurrentUser } from "@/modules/hooks";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const page = () => {
   const { user } = useCurrentUser();
@@ -18,10 +19,23 @@ const page = () => {
     await handleCreatePage(
       {
         name: "Untitled",
-        document: "",
+        document: [
+          {
+            id: "1",
+            type: "heading",
+            content: "",
+            props: { level: 1 },
+          },
+        ],
       },
-      (createdPage: any) =>
-        createdPage?.data && router.push(`/page/${createdPage?.data?._id}`)
+      (createdPage: any) => {
+        if (createdPage.data) {
+          toast.success("Page created successfully");
+          router.push(`/page/${createdPage?.data?._id}`);
+          return;
+        }
+        toast.error("Page creation failed");
+      }
     );
   };
 

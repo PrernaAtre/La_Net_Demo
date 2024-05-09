@@ -1,12 +1,23 @@
 import AuthToken from "@/lib/AuthToken";
+import { removeCurrentUser } from "@/store/features/auth";
+import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { toast } from "sonner";
 
 export const useLogout = () => {
+  const router = useRouter();
+
+  const dispatch = useDispatch();
+
   const logout = async () => {
+
     AuthToken.remove();
 
-    // TODO: Redirect to home page
+    dispatch(removeCurrentUser())
 
-    // TODO: Reset redux store if needed
+    router.push("/");
+
+    toast.success("Logout successful");
   };
 
   return {

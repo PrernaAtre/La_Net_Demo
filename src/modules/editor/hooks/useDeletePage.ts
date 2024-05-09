@@ -1,4 +1,4 @@
-import { useDeletePageMutation, useMakeTrashMutation } from "@/store/features/page";
+import { useDeletePageMutation } from "@/store/features/page";
 import { useLazyCurrentUserPages } from "./useLazyPages";
 
 export const useDeletePage = () => {

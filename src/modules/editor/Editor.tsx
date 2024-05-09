@@ -1,8 +1,9 @@
 "use client";
 
+import { CoverImageModal } from "@/components/modals/cover-image-modal";
 import Modal from "@/components/modals/Modal";
+import { Spinner } from "@/components/spinner";
 import Toolbar from "@/components/Toolbar";
-import { useCoverImage } from "@/hooks/use-cover-image";
 import { Page } from "@/store/features/page";
 import "@blocknote/core/fonts/inter.css";
 import { BlockNoteView, useCreateBlockNote } from "@blocknote/react";
@@ -10,10 +11,10 @@ import "@blocknote/react/style.css";
 import { Share } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
 import { omit } from "lodash";
-import { useCallback, useEffect, useState } from "react";
-import { SharePage } from "../note";
-import { Cover } from "../note/Cover";
-import { Publish } from "../note/Publish";
+import { useTheme } from "next-themes";
+import dynamic from "next/dynamic";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Publish, SharePage } from "../note";
 import { useUpdatePage } from "./hooks/useUpdatePage";
 
 interface EditorProps {
@@ -21,15 +22,24 @@ interface EditorProps {
 }
 
 const Editor: React.FC<EditorProps> = ({ pageId }) => {
-  const coverImage = useCoverImage();
+  const { page, handleUpdatePage, updatedPage, isLoading } = useUpdatePage(
+    pageId || ""
+  );
+
+  const Cover = useMemo(
+    () => dynamic(() => import("../note/Cover")),
+    [updatedPage]
+  );
+
+  const { resolvedTheme } = useTheme();
 
   useEffect(() => {
-    coverImage.setPageId(pageId);
+    setcoverImagePageId(pageId);
   }, [pageId]);
 
-  const { page, handleUpdatePage, updatedPage } = useUpdatePage(pageId || "");
-
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [isCoverImageOpen, setIsCoverImageOpen] = useState(false);
+  const [coverImagePageId, setcoverImagePageId] = useState(pageId);
 
   async function uploadFile(file: File) {
     const body = new FormData();
@@ -67,7 +77,7 @@ const Editor: React.FC<EditorProps> = ({ pageId }) => {
         },
       },
       initialContent: page?.document
-        ? page?.document
+        ? JSON.parse(page?.document)
         : [
             {
               id: "1",
@@ -80,52 +90,64 @@ const Editor: React.FC<EditorProps> = ({ pageId }) => {
     [page?.document]
   );
 
-  if (!page) {
-    return "Page not found in your library. Please create a new page.";
-  }
-
   function handleShare(event: any): void {
     event.preventDefault();
     setIsShareModalOpen(true);
   }
 
-  return (
-    <>
-      <div className="w-full h-screen">
-        <div className="flex flex-row justify-between items-center sticky w-full h-14 border border-b-gray-400">
-          <div className="flex text-center content-center self-center">
-            <p className="align-middle text-justify p-2">
-              {updatedPage?.name || page?.name}
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Publish id={page._id} />
-            <IconButton onClick={handleShare}>
-              <Share className="text-white" />
-            </IconButton>
-          </div>
+  return !isLoading ? (
+    <div className="w-full h-screen">
+      <div className="flex flex-row justify-between items-center sticky w-full h-14 border border-b-gray-400">
+        <div className="flex text-center content-center self-center">
+          <p className="align-middle text-justify p-2">
+            {updatedPage?.name || page?.name}
+          </p>
         </div>
-        <Cover pageId={page?._id} url={page?.coverImage} />
-        <Toolbar
-          name={updatedPage?.name || page.name}
-          coverImageUrl={updatedPage?.coverImage || page.coverImage}
-          onUpdate={handleSubmit}
-        />
-        <div className="">
-          <BlockNoteView
-            editor={editor}
-            onChange={() => handleSubmit({ document: editor.document })}
-            data-changing-font-demo
-          />
+        <div className="flex gap-2">
+          <Publish id={page?._id} />
+          <IconButton onClick={handleShare}>
+            <Share className="text-muted-foreground" />
+          </IconButton>
         </div>
-        <Modal
-          isOpen={isShareModalOpen}
-          onClose={() => setIsShareModalOpen(false)}
-        >
-          <SharePage />
-        </Modal>
       </div>
-    </>
+      <Cover
+        pageId={page?._id}
+        url={updatedPage?.coverImage || page?.coverImage}
+        setId={setcoverImagePageId}
+        setOpen={setIsCoverImageOpen}
+      />
+      <Toolbar
+        name={updatedPage?.name || page?.name}
+        coverImageUrl={updatedPage?.coverImage || page?.coverImage}
+        onUpdate={handleSubmit}
+        onOpen={setIsCoverImageOpen}
+      />
+      <div className="">
+        <BlockNoteView
+          editor={editor}
+          onChange={() => handleSubmit({ document: editor.document })}
+          data-changing-font-demo
+          theme={resolvedTheme === "dark" ? "dark" : "light"}
+        />
+      </div>
+
+      <Modal
+        className="text-muted-foreground dark:bg-primary bg-white"
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+      >
+        <SharePage />
+      </Modal>
+      <CoverImageModal
+        isOpen={isCoverImageOpen}
+        onClose={setIsCoverImageOpen}
+        pageId={coverImagePageId}
+      />
+    </div>
+  ) : (
+    <div className="h-screen flex justify-center items-center">
+      <Spinner />
+    </div>
   );
 };
 

@@ -13,9 +13,10 @@ export const useCreatePage = () => {
       onComplete?: Function
     ) => {
       const { name, document } = input;
+
       const createdPage: any = await createPage({
         name,
-        document,
+        document: JSON.stringify(document),
         userId: user._id,
       });
 

@@ -1,25 +1,29 @@
 "use client";
 
 import { ThemeProvider } from "@/components/providers/theme-provider";
-import { Inter } from "next/font/google";
 import { Provider } from "react-redux";
+import { Toaster } from "sonner";
 import "./globals.css";
 
+import { ModalProvider } from "@/components/providers/modal-provider";
+import { fontHandwriting, fontHeading, fontMono, fontSans } from "@/lib/fonts";
+import { cn } from "@/lib/utils";
 import { persistor, store } from "@/store/store";
 import React from "react";
 import { PersistGate } from "redux-persist/integration/react";
-import { ModalProvider } from "@/components/providers/modal-provider";
-import { Navbar } from "@/modules/home/Navbar";
-const inter = Inter({ subsets: ["latin"] });
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: React.PropsWithChildren) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body
+        className={cn(
+          fontSans.variable,
+          fontMono.variable,
+          fontHeading.variable,
+          fontHandwriting.variable,
+          "min-h-screen scroll-smooth font-sans antialiased selection:bg-foreground selection:text-background"
+        )}
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -28,6 +32,7 @@ export default function RootLayout({
           storageKey="jotion-theme-2"
         >
           <Provider store={store}>
+            <Toaster position="bottom-center" />
             <PersistGate loading={null} persistor={persistor}>
               {children}
             </PersistGate>

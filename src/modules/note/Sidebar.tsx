@@ -1,9 +1,20 @@
 "use client";
+import Modal from "@/components/modals/Modal";
+import { SettingsModal } from "@/components/modals/settings-modal";
+import { SearchCommand } from "@/components/search-command";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { useCreatePage } from "@/modules/editor/hooks/useCreatePage";
 import { useCurrentUserPages } from "@/modules/editor/hooks/useCurrentUserPages";
 import { useMakeTrashPage } from "@/modules/editor/hooks/useMakeTrashPage";
 import { useCurrentUser } from "@/modules/hooks";
-import { removeCurrentUser } from "@/store/features/auth";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -11,19 +22,23 @@ import NoteAddIcon from "@mui/icons-material/NoteAdd";
 import UserIcon from "@mui/icons-material/Person";
 import SearchIcon from "@mui/icons-material/Search";
 import SettingsIcon from "@mui/icons-material/Settings";
+import StarIcon from "@mui/icons-material/Star";
 import Avatar from "@mui/material/Avatar";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { BsTrash } from "react-icons/bs";
-import { useDispatch } from "react-redux";
 import { ToastContainer } from "react-toastify";
-import UserProfileModal from "../user/profile/ProfileModal";
+import { toast } from "sonner";
+import { useLogout } from "../auth/logout/hooks";
+import { useCreateSubscription } from "../user/hooks/useCreateSubsciption";
+import { ProfileForm } from "../user/profile";
 import TrashWindow from "./TrashWindow";
 
-export const Sidebar: React.FC = () => {
+const Sidebar: React.FC = () => {
   const router = useRouter();
-  const dispatch = useDispatch();
+
+  const pathName = usePathname();
 
   const { pages } = useCurrentUserPages();
 
@@ -33,7 +48,13 @@ export const Sidebar: React.FC = () => {
 
   const { handleCreatePage, isLoading } = useCreatePage();
 
+  const { handleClick } = useCreateSubscription();
+
+  const { logout } = useLogout();
+
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
   const unTrashedPages = useMemo(() => {
     return pages?.filter((d: any) => !d?.isTrashed) || [];
@@ -52,50 +73,57 @@ export const Sidebar: React.FC = () => {
           },
         ],
       },
-      (createdPage: any) =>
-        createdPage?.data && router.push(`/page/${createdPage?.data?._id}`)
+      (createdPage: any) => {
+        if (createdPage.data) {
+          toast.success("Page created successfully");
+          router.push(`/page/${createdPage?.data?._id}`);
+        }
+      }
     );
   };
 
-  function handleLogout() {
-    dispatch(removeCurrentUser());
-    router.push("/");
-  }
-
   return (
-    <div className="flex flex-row bg-secondary">
-      <div className="flex flex-col w-56">
+    <div className="flex flex-row bg-secondary w-52">
+      <div className="flex flex-col">
         <div className="flex items-center justify-start ml-4 bg-secondary h-14">
           <Avatar sx={{ width: 24, height: 24 }} src={user?.profile_image} />
-          <span className="text-sm font-medium pl-2 text-white/80">
+          <span className="text-lg font-medium pl-2 text-gray-800 dark:text-white/80">
             {!user?.username ? "User" : user?.username}
           </span>
         </div>
 
         <ul className="flex flex-col px-2">
           <li>
-            <a
-              href="#"
-              className="flex flex-row items-center h-10 rounded-lg text-muted-foreground hover:bg-primary/5"
+            <div
+              className="flex flex-row items-center h-10 rounded-lg text-muted-foreground hover:bg-primary/5 cursor-pointer"
+              onClick={() => setIsSearchModalOpen(true)}
             >
               <SearchIcon className="ml-2" fontSize="small" />
               <span className="text-sm font-medium w-28 text-left pl-2">
                 Search
               </span>
-            </a>
+            </div>
+            <SearchCommand
+              isOpen={isSearchModalOpen}
+              onClose={setIsSearchModalOpen}
+            />
           </li>
           <li>
-            <a
-              href="#"
-              className="flex flex-row items-center h-10 rounded-lg text-muted-foreground hover:bg-primary/5"
+            <div
+              className="flex flex-row items-center h-10 rounded-lg text-muted-foreground hover:bg-primary/5 cursor-pointer"
+              onClick={() => setIsSettingsModalOpen(true)}
             >
               <SettingsIcon className="ml-2" fontSize="small" />
               <span className="text-sm font-medium pl-2">Settings</span>
-            </a>
+            </div>
+            <SettingsModal
+              isOpen={isSettingsModalOpen}
+              onClose={setIsSettingsModalOpen}
+            />
           </li>
-          <ul className="flex flex-col my-2 w-full">
-            {unTrashedPages &&
-              unTrashedPages.map((page: any) => (
+          {unTrashedPages?.length > 0 && (
+            <ul className="flex flex-col w-full">
+              {unTrashedPages.map((page: any) => (
                 <li
                   key={page._id}
                   className="flex flex-row items-center h-10 rounded-lg text-muted-foreground"
@@ -109,11 +137,21 @@ export const Sidebar: React.FC = () => {
                     </Link>
                   </div>
                   <div className="mr-4 cursor-pointer hover:bg-primary/5 p-2 rounded-lg">
-                    <BsTrash onClick={() => handleTrashPage(page._id)} />
+                    <BsTrash
+                      onClick={() => {
+                        if (pathName.split("/")[1] === "page") {
+                          if (page._id === pathName.split("/")[2]) {
+                            router.push("/page");
+                          }
+                          return handleTrashPage(page._id);
+                        }
+                      }}
+                    />
                   </div>
                 </li>
               ))}
-          </ul>
+            </ul>
+          )}
           <li>
             <button
               // href="/page"
@@ -136,6 +174,7 @@ export const Sidebar: React.FC = () => {
           </li>
           <li className="flex flex-row items-center h-10 rounded-lg text-muted-foreground hover:bg-primary/5">
             <DeleteOutlineIcon className="ml-2" />
+            &nbsp;
             <TrashWindow />
             <ToastContainer />
           </li>
@@ -149,26 +188,70 @@ export const Sidebar: React.FC = () => {
               <span className="text-sm font-medium pl-2">Profile</span>
             </div>
           </li>
-          {/* <li>
-            <a
-              href="#"
-              className="flex flex-row items-center h-10 rounded-lg text-muted-foreground hover:bg-primary/5"
-            >
-              <span className="inline-flex items-center justify-center h-12 w-12 text-lg text-gray-400">
-                <i className="bx bx-bell"></i>
-              </span>
-              <span className="text-sm font-medium">Notifications</span>
-              <span className="ml-auto mr-6 text-sm bg-red-100 rounded-full px-3 py-px text-red-500">
-                5
-              </span>
-            </a>
-          </li> */}
+          <li className="">
+            {!user?.IsSubscribed ? (
+              <Dialog>
+                <DialogTrigger className="" asChild>
+                  <div className="flex flex-row items-center h-10 rounded-lg hover:bg-primary/5">
+                    <Button
+                      size="sm"
+                      className="px-0 ml-2 text-muted-foreground hover:bg-transparent hover:text-muted-foreground"
+                      variant="ghost"
+                    >
+                      <StarIcon />
+                      &nbsp; Upgrade Plan
+                    </Button>
+                  </div>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Upgrade to publish</DialogTitle>
+                    <DialogDescription>
+                      You can upgrade to publish your notes.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div>
+                    <Button size="sm" onClick={handleClick}>
+                      Upgrade
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            ) : (
+              <Dialog>
+                <DialogTrigger className="" asChild>
+                  <div className="flex flex-row items-center h-10 rounded-lg hover:bg-primary/5">
+                    <Button
+                      size="sm"
+                      className="px-0 ml-2 text-muted-foreground hover:bg-transparent hover:text-muted-foreground"
+                      variant="ghost"
+                    >
+                      <StarIcon />
+                      &nbsp; Premium Plan
+                    </Button>
+                  </div>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Premium Plan</DialogTitle>
+                    <DialogDescription>
+                      You have a premium plan.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div>
+                    <Button size="sm" onClick={() => {}}>
+                      Manage Plan
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            )}
+          </li>
+          <hr className="border-t border-gray-300 my-2" />
           <li>
             <div
               className="w-full flex flex-row items-center text h-10 rounded-lg text-muted-foreground hover:bg-primary/5 cursor-pointer"
-              onClick={() => {
-                handleLogout();
-              }}
+              onClick={logout}
             >
               <LogoutIcon className="ml-2" fontSize="small" />
               <span className="text-sm font-medium pl-2">Logout</span>
@@ -176,11 +259,15 @@ export const Sidebar: React.FC = () => {
           </li>
         </ul>
 
-        <UserProfileModal
+        <Modal
           isOpen={isProfileModalOpen}
           onClose={() => setIsProfileModalOpen(false)}
-        />
+        >
+          <ProfileForm />
+        </Modal>
       </div>
     </div>
   );
 };
+
+export default Sidebar;

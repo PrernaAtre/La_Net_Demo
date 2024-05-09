@@ -1,1 +1,1 @@
-export * from './QuickNote';
+export { default as QuickNote } from './QuickNote';

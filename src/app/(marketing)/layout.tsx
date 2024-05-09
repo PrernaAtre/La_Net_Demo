@@ -1,14 +1,15 @@
 "use client";
 
-import { Navbar } from "@/modules/home";
+import { Footer, Navbar } from "@/modules/home";
 import React from "react";
 
 const MarketingLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="h-full dark:bg-[#1F1F1F]">
+    <>
       <Navbar />
-      <main className="h-full pt-40">{children}</main>
-    </div>
+      <main className="container space-y-10">{children}</main>
+      <Footer />
+    </>
   );
 };
 export default MarketingLayout;

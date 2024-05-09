@@ -1,129 +1,78 @@
 "use client";
-import { ModeToggle } from "@/components/mode-toggle";
-import { Spinner } from "@/components/spinner";
-import { Button } from "@/components/ui/button";
-import { useScrollTop } from "@/hooks/use-scroll-top";
+import Modal from "@/components/modals/Modal";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useCurrentUser } from "@/modules/hooks/useCurrentUser";
-import { removeCurrentUser } from "@/store/features/auth";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import EditIcon from "@mui/icons-material/Edit";
 import Avatar from "@mui/material/Avatar";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
-import { ToastContainer } from "react-toastify";
+import { useState } from "react";
 import "react-toastify/dist/ReactToastify.css";
-import UserProfileModal from "../user/profile/ProfileModal";
-import { Logo } from "./Logo";
+import { useLogout } from "../auth/logout/hooks";
+import { ProfileForm } from "../user/profile";
+import Logo from "./Logo";
 
-export const Navbar = () => {
-  const dispatch = useDispatch();
+const Navbar = () => {
   const { user } = useCurrentUser();
+  const { logout } = useLogout();
 
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null);
-
-  const handleProfileClick = () => {
-    setIsDropdownOpen(!isDropdownOpen);
-  };
-
-  const [loading, setLoading] = useState(false);
-
-  const handleGetNotionFree = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-  };
-
-  const scrolled = useScrollTop();
-
-  useEffect(() => {
-    const handleClickOutside = (event: any) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
 
   return (
-    <div
-      className={cn(
-        "z-50 bg-background dark:bg-[#1F1F1F] top-0 flex items-center w-full p-4 sticky",
-        scrolled && "border-b shadow-sm"
-      )}
-    >
-      <Logo />
-      <div className="md:ml-auto md:justify-end justify-between w-full flex items-center gap-x-2">
-        <Button
-          className="text-white"
-          style={{ backgroundColor: loading ? "transparent" : "#4D5257" }}
-          variant="ghost"
-          size="sm"
-          onClick={handleGetNotionFree}
+    <header className="mt-3 h-14">
+      <nav className="container flex h-full items-center justify-between">
+        <Link
+          href="/"
+          className="flex gap-2 px-4 font-handwriting text-xl lowercase [text-shadow:_0_2px_0_#e1e1e1] dark:[text-shadow:none]"
         >
-          {loading ? <Spinner /> : <span>Get Notion Free</span>}
-        </Button>
+          <Logo />
+          JetBrain
+        </Link>
 
-        <ModeToggle />
-        <ToastContainer />
-        {
-          <div className="dropdown dropdown-end" ref={dropdownRef}>
-            <div
-              tabIndex={0}
-              role="button"
-              className="btn btn-ghost btn-circle avatar"
-              onClick={handleProfileClick}
+        {user ? (
+          <div className="flex items-center gap-2">
+            <button
+              className="flex items-center gap-2"
+              onClick={() => setIsProfileModalOpen(true)}
             >
-              <div className="w-10 rounded-full">
-                {user && <Avatar alt="Remy Sharp" src={user?.profile_image} />}
-                {!user && <AccountCircleIcon />}
-              </div>
-            </div>
-            {isDropdownOpen && (
-              <ul
-                tabIndex={0}
-                className="mt-3 z-[1] p-2 absolute ml-[-30px] shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52"
-              >
-                <Link href={`/routes/`}>
-                  <span>{document.title}</span>
-                </Link>
-
-                {!user && <Link href={"/auth/login"}> Login </Link>}
-                {user && (
-                  <button
-                    onClick={() => {
-                      dispatch(removeCurrentUser());
-                    }}
-                  >
-                    Logout
-                  </button>
-                )}
-                {user && (
-                  <li>
-                    <EditIcon className="w-10" />
-                    <button onClick={() => setIsProfileModalOpen(true)}>
-                      Edit
-                    </button>
-                  </li>
-                )}
-              </ul>
-            )}
+              <Avatar alt="Remy Sharp" src={user?.profile_image} />
+              <span className="hidden md:inline-block">{user?.name}</span>
+            </button>
+            <Modal
+              isOpen={isProfileModalOpen}
+              onClose={() => setIsProfileModalOpen(false)}
+            >
+              <ProfileForm />
+            </Modal>
+            <Button variant="ghost" onClick={logout}>
+              Logout
+            </Button>
           </div>
-        }
+        ) : (
+          <div className="flex flex-1 justify-end gap-2">
+            <Link
+              href="/auth/login"
+              className={cn(
+                buttonVariants({ variant: "outline" }),
+                "hidden h-8 rounded-full px-5 font-semibold transition-all duration-200 hover:ring-2 hover:ring-border hover:ring-offset-2 hover:ring-offset-background sm:inline-flex"
+              )}
+            >
+              Login
+            </Link>
 
-        <UserProfileModal
-          isOpen={isProfileModalOpen}
-          onClose={() => setIsProfileModalOpen(false)}
-        />
-      </div>
-    </div>
+            <Link
+              href="/auth/signup"
+              className={cn(
+                buttonVariants(),
+                "h-8 rounded-full px-3 font-semibold transition-all duration-200 hover:ring-2 hover:ring-foreground hover:ring-offset-2 hover:ring-offset-background"
+              )}
+            >
+              Sign Up
+            </Link>
+          </div>
+        )}
+      </nav>
+    </header>
   );
 };
+
+export default Navbar;

@@ -3,7 +3,7 @@ import "@blocknote/core/fonts/inter.css";
 import "@blocknote/react/style.css";
 import { useState } from "react";
 
-export const QuickNote = () => {
+const QuickNote = () => {
   const [textInput, setTextInput] = useState("");
   const [buttonDisabled, setButtonDisabled] = useState(true);
 
@@ -32,3 +32,5 @@ export const QuickNote = () => {
     </>
   );
 };
+
+export default QuickNote;

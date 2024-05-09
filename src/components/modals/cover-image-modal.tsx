@@ -1,28 +1,32 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
-import { useUpdatePage } from "@/modules/editor/hooks/useUpdatePage";
 import { SingleImageDropzone } from "@/components/single-image-dropzone";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
-import { useCoverImage } from "@/hooks/use-cover-image";
+import { useUpdatePage } from "@/modules/editor/hooks/useUpdatePage";
 import { debounce } from "lodash";
 
-export const CoverImageModal = () => {
-  const searchParams = useSearchParams();
-  const pageId = searchParams.get("id");
-  const coverImage = useCoverImage();
+interface CoverImageModalProps {
+  isOpen: boolean;
+  onClose: (args?: any) => void;
+  pageId: string;
+}
 
-  const { handleUpdatePage, page } = useUpdatePage(coverImage.id || "");
+export const CoverImageModal: React.FC<CoverImageModalProps> = ({
+  isOpen,
+  onClose,
+  pageId,
+}) => {
+  const { handleUpdatePage, page } = useUpdatePage(pageId || "");
 
   const [file, setFile] = useState<File>();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const onClose = () => {
+  const handleOnClose = () => {
     setFile(undefined);
     setIsSubmitting(false);
-    coverImage.onClose();
+    onClose();
   };
 
   const onChange = debounce(async (file?: File) => {
@@ -38,8 +42,6 @@ export const CoverImageModal = () => {
         body: body,
       });
 
-      console.log("pageId", pageId);
-
       if (page._id) {
         handleUpdatePage({
           id: page._id,
@@ -49,12 +51,12 @@ export const CoverImageModal = () => {
           ),
         });
       }
-      onClose();
+      handleOnClose();
     }
   }, 500);
 
   return (
-    <Dialog open={coverImage.isOpen} onOpenChange={coverImage.onClose}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
           <h2 className="text-center text-lg font-semibold">Cover Image</h2>
