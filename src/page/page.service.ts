@@ -6,15 +6,14 @@ import {
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import mongoose, { Model, Types } from "mongoose";
+import { CommonService } from "src/common/common.service";
+import { ServerError } from "src/common/utils/serverError";
 import { User } from "src/models/user.schema";
 import { Page } from "../models/Page.schema";
 import {
-  AddSharedUsersDto,
   CreatePageDto,
-  UpdatePageDto,
+  UpdatePageDto
 } from "./dto/CreatePage.dto";
-import { CommonService } from "src/common/common.service";
-import { ServerError } from "src/common/utils/serverError";
 
 @Injectable()
 export class PageService {
@@ -55,7 +54,10 @@ export class PageService {
 
   async pages(currentUser): Promise<Page[]> {
     try {
-      const userId = new mongoose.Schema.ObjectId(currentUser.id);
+      const userId = mongoose.Types.ObjectId.createFromHexString(
+        currentUser.id
+      );
+
       const pages = await this.pageModel.find({
         $or: [{ userId: userId }, { sharedUsers: { $in: [userId] } }],
       });
