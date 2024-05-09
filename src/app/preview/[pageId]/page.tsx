@@ -47,7 +47,7 @@ const page: React.FC<PageProps> = ({ params }) => {
     <>
       {page?.publishId ? (
         <div className="editor-container w-full h-screen">
-          <Cover pageId={pageId!} preview url={page?.coverImage} />
+          <Cover pageId={pageId!} preview url={page?.coverImage} setOpen={(d: boolean) => {}} setId={(d) => {}}/>
 
           <div className="h-screen">
             <Toolbar

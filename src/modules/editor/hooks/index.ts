@@ -5,3 +5,5 @@ export * from './useCreatePage';
 export * from './useUpdatePage';
 export * from './useDeletePage';
 export * from './useMakeTrashPage';
+export * from "./usePublishPage";
+export * from "./useSharePage";

@@ -1,6 +1,6 @@
-import { useGetPageQuery, useUpdatePageMutation } from "@/store/features/page";
 import { debounce } from "lodash";
 import { usePage } from "./usePage";
+import { useUpdatePageMutation } from "@/store/features/page";
 
 export const useUpdatePage = (id?: string) => {
   const { page, isLoading: isPageLoading, error: isPageError } = usePage(id!);

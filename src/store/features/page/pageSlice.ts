@@ -8,6 +8,7 @@ export interface Page {
   isTrashed: boolean;
   publishId: string;
   createdAt: string;
+  sharedUsers: string[]
   coverImage?: string;
 }
 

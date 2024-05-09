@@ -1,34 +1,42 @@
-import { useUsers } from "@/modules/user/hooks/useUsers";
+import { useSharePage } from "@/modules/editor";
+import { useState } from "react";
 import AsyncSelect from "react-select/async";
+import { Button } from "../ui/button";
+import { Label } from "../ui/label";
 
-const SharePage = () => {
-  const { users } = useUsers();
+const SharePage: React.FC<{ id: string, onClose: Function }> = ({id, onClose}) => {
+  const {
+    defaultOptions,
+    initialValues,
+    loadOptions,
+    handleSharePage,
+    isLoading,
+  } = useSharePage(id);
 
-  const filterUsers = (inputValue: string) => {
-    return (users || [])
-      .filter((user: any) => user.username != inputValue)
-      .map((user: any) => ({
-        value: user._id,
-        label: `${user.username} (${user.email})`,
-      }));
+  const [selectedUsers, setSelectedUsers] = useState(initialValues);
+
+  const handleOnSelect = (inputs: any) => {
+    setSelectedUsers(inputs);
   };
 
-  const promiseOptions = (inputValue: string) => {
-    return new Promise<any[]>((resolve) => {
-      setTimeout(() => {
-        resolve(filterUsers(inputValue));
-      }, 1000);
-    });
+  const handleOnSubmit = () => {
+    handleSharePage(selectedUsers.map((d) => d.value), onClose);
   };
 
   return (
-    <div className="w-96">
+    <div className="w-96 flex flex-col gap-4 justify-center">
+      <Label>Share Page</Label>
       <AsyncSelect
         isMulti
         cacheOptions
-        defaultOptions
-        loadOptions={promiseOptions}
+        defaultValue={selectedUsers}
+        onChange={handleOnSelect}
+        defaultOptions={defaultOptions}
+        loadOptions={loadOptions}
       />
+      <Button onClick={handleOnSubmit} disabled={isLoading}>
+        Share
+      </Button>
     </div>
   );
 };

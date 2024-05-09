@@ -1,6 +1,7 @@
 "use client";
 
 import Toolbar from "@/components/Toolbar";
+import { Publish, SharePage } from "@/components/dashboard";
 import Modal from "@/components/modals/Modal";
 import { CoverImageModal } from "@/components/modals/cover-image-modal";
 import { Spinner } from "@/components/spinner";
@@ -15,7 +16,6 @@ import { useTheme } from "next-themes";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useUpdatePage } from "./hooks/useUpdatePage";
-import { Publish, SharePage } from "@/components/dashboard";
 
 interface EditorProps {
   pageId: string;
@@ -104,7 +104,7 @@ const Editor: React.FC<EditorProps> = ({ pageId }) => {
           </p>
         </div>
         <div className="flex gap-2">
-          <Publish id={page?._id} />
+          <Publish />
           <IconButton onClick={handleShare}>
             <Share className="text-muted-foreground" />
           </IconButton>
@@ -136,7 +136,7 @@ const Editor: React.FC<EditorProps> = ({ pageId }) => {
         isOpen={isShareModalOpen}
         onClose={() => setIsShareModalOpen(false)}
       >
-        <SharePage />
+        <SharePage id={page?._id} onClose={() => setIsShareModalOpen(false)}/>
       </Modal>
       <CoverImageModal
         isOpen={isCoverImageOpen}
