@@ -25,6 +25,7 @@ export class CommonService {
       currency: "USD",
       client_reference_id: customerId,
       customer: customerId,
+      billing_address_collection:"required",
       subscription_data: {
         metadata: {
           userId,
@@ -33,21 +34,8 @@ export class CommonService {
     });
   };
 
-  // webhookHandler(payload: any, sig: string) {
-  //   try {
-  //     const event = this.stripeClient.webhooks.constructEvent(payload, sig, endpointSecret);
-  //     return event;
-  //   } catch (err) {
-  //     throw new Error(`Webhook Error: ${err.message}`);
-  //   }
-
-  // }
-
-
 
   convertUnixTimestampToDate (timestamp){
     return new Date(timestamp * 1000);
   };
-
-
 }

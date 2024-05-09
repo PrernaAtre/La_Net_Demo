@@ -80,7 +80,7 @@ export class AuthService {
         if (error instanceof HttpException) throw error;
 
         throw new InternalServerErrorException(
-          "Something went wrong while trying to log in user."
+          "Something went wrong while trying to sign up."
         );
       }
   }
@@ -142,7 +142,7 @@ export class AuthService {
         if (error instanceof HttpException) throw error;
 
         throw new InternalServerErrorException(
-          "Something went wrong while trying to log in user."
+          "Something went wrong while trying to reset password."
         );
       }
   }

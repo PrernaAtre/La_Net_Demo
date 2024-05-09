@@ -1,57 +1,47 @@
-import { Body, Controller, Get, HttpStatus, Param, Post, Req, Res, UseGuards } from '@nestjs/common';
-import { StripeService } from './payment.service';
-import { Response } from 'express';
-import Stripe from 'stripe';
-import { CommonService } from 'src/common/common.service';
-import { AuthGuard } from 'src/auth/jwt-auth.guard';
-import { AuthenticatedRequest } from 'src/auth/auth.controller';
-import { StripeWebhookEvent } from './dto/stripe-webhook-event.dto';
-import { StripeWebhookGuard } from './stripe-webhook.guard';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Param,
+  Post,
+  Put,
+  RawBodyRequest,
+  Req,
+  Res,
+  UseGuards,
+} from "@nestjs/common";
+import { StripeService } from "./payment.service";
+import Stripe from "stripe";
+import { CommonService } from "src/common/common.service";
+import { AuthGuard } from "src/auth/jwt-auth.guard";
+import { AuthenticatedRequest } from "src/auth/auth.controller";
+import { Request, Response } from "express";
 
-
-@Controller('payment')
+@Controller("payment")
 export class PaymentController {
-  constructor(private readonly stripeService: StripeService) { }
+  constructor(
+    private readonly stripeService: StripeService,
+    private readonly commonService: CommonService
+  ) {}
 
   @Post()
   @UseGuards(AuthGuard)
-  async createCheckoutSession(@Req() { currentUser }: AuthenticatedRequest,@Res() res: Response) {
-    try {
-      return await this.stripeService.createCheckoutSession(currentUser)
-    }
-    catch (err) {
-      console.log(err)
-      //return err;
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR as number).json({ error: 'An error occurred' });
-    }
+  async createCheckoutSession(
+    @Req() { currentUser }: AuthenticatedRequest
+  ): Promise<any> {
+    return await this.stripeService.createCheckoutSession(currentUser);
+  }
+  
+  @Post("webhook")
+  webhook(@Req() req: RawBodyRequest<Request>, @Res() res: Response) {
+    return this.stripeService.webhook(req, res);
+  }
+  @Put("manage")
+  @UseGuards(AuthGuard)
+  managePlan(@Req() { currentUser }: AuthenticatedRequest) {
+    return this.stripeService.managePlan(currentUser);
   }
 
-
-  @Post('/webhook') //not working
-  @UseGuards(StripeWebhookGuard)
-  async handleWebhookEvent(@Body() event: StripeWebhookEvent): Promise<void> {
-    await this.stripeService.handleWebhookEvent(event);
-  }
-
-  // @Post() // not working
-  // async handlePaymentWebhook(@Body() payload: Stripe.Event) {
-  //   try {
-  //     console.log("payload------", payload);
-
-  //     if (payload.type === 'checkout.session.completed') {
-  //       const session = payload.data.object as Stripe.Checkout.Session;
-  //       const paymentData: Payment = {
-  //         userId: session.customer ? session.customer.toString() : '', // convert customer to string
-  //         username: session.customer_details?.name,
-  //         email: session.customer_email,
-  //         amount: String(session.amount_total / 100), // Convert to decimal
-  //       };
-  //       const createdPayment = this.stripeService.createPayment(paymentData);
-  //     }
-  //   }
-  //   catch (err) {
-  //     console.log("err----", err);
-  //   }
-  // }
-
+  
 }

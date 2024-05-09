@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, InternalServerErrorException, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { diskStorage } from 'multer';
@@ -9,6 +9,7 @@ import { UserLoginDto } from './dto/loginDto.dto';
 import { ResetPasswordDto } from './dto/resetpassword.dto';
 import { UserSignupDto } from './dto/signupDto.dto';
 import { AuthGuard } from './jwt-auth.guard'; // aa barabar chhe?
+import { ServerError } from 'src/common/utils/serverError';
 export interface AuthenticatedRequest extends Request {
     params: any;
     currentUser: any;
@@ -24,26 +25,28 @@ const storage = diskStorage({
 
 @Controller('auth')
 export class AuthController {
-    constructor(private authService: AuthService, private readonly cloudinaryService: CloudinaryService) { }
+    constructor(private authService: AuthService) { }
 
     @Post('/signup')
     @UseInterceptors(FileInterceptor('profile_image', { storage }))
     async signUp(@Body() userSignupDto: UserSignupDto, @UploadedFile() profile_image: Express.Multer.File) {
         try {
-            if (!profile_image) {
-                throw new HttpException('No file uploaded', HttpStatus.BAD_REQUEST);
-            }
-            console.log("profile_image: ", profile_image, "userSignupDto: ", userSignupDto)
+        if (!profile_image) {
+            throw new  ServerError({message:'No file uploaded',code:400});
+        }
             return this.authService.createUser(profile_image.path, userSignupDto);
         }
         catch (error) {
-            console.log("error in uploading image : ", error);
-            throw new HttpException('Failed to upload image', HttpStatus.INTERNAL_SERVER_ERROR);
+            if (error instanceof HttpException) throw error;
+
+            throw new InternalServerErrorException(
+              "Something went wrong while trying to sign up."
+            );
         }
     }
 
     @Post('/login')
-    async login(@Body() userLoginDto: UserLoginDto, @Res({ passthrough: true }) response: Response) {
+    async login(@Body() userLoginDto: UserLoginDto) {
         return  await this.authService.loginUser(userLoginDto);
     }
 
