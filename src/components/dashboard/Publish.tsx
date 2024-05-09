@@ -2,16 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { useOrigin } from "@/hooks/use-origin";
-import { useUpdatePage } from "@/modules/editor/hooks/useUpdatePage";
-import { Check, Copy, Globe } from "lucide-react";
-import { useState } from "react";
-import { useCurrentUser } from "../hooks";
-import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -19,36 +9,33 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useCreateSubscription } from "../user/hooks/useCreateSubsciption";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { useOrigin } from "@/hooks/use-origin";
+import { usePublishPage } from "@/modules/editor/hooks/usePublishPage";
+import { useCurrentUser } from "@/modules/hooks";
+import { useCreateSubscription } from "@/modules/user/hooks/useCreateSubsciption";
+import { Check, Copy, Globe } from "lucide-react";
+import { useState } from "react";
 
-const Publish = ({ id }: { id: string }) => {
+const Publish = () => {
   const { user } = useCurrentUser();
 
-  const { page, handleUpdatePage, isLoading } = useUpdatePage(id);
+  const { page, handlePublishPage, isLoading } = usePublishPage();
 
   const { handleClick } = useCreateSubscription();
 
-  const [isPublished, setIsPublished] = useState(page?.isPublish);
   const origin = useOrigin();
 
   const [copied, setCopied] = useState(false);
 
-  const url = `${origin}/preview/${page?._id}`;
+  const url = `${origin}/preview/${page?.publishId}`;
 
-  const onPublish = async () => {
-    setIsPublished(true);
-    await handleUpdatePage({
-      id: page?._id,
-      isPublish: true,
-    });
-  };
-
-  const onUnpublish = async () => {
-    setIsPublished(false);
-    await handleUpdatePage({
-      id: page?._id,
-      isPublish: false,
-    });
+  const handlePublishChange = async (isPublished = false) => {
+    await handlePublishPage(page?._id, isPublished);
   };
 
   const onCopy = () => {
@@ -65,11 +52,11 @@ const Publish = ({ id }: { id: string }) => {
       <PopoverTrigger asChild>
         <Button size="sm" variant="default">
           Publish
-          {isPublished && <Globe className="text-sky-500 w-4 h-4 ml-2" />}
+          {!!page?.publishId && <Globe className="text-sky-500 w-4 h-4 ml-2" />}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-72" align="end" alignOffset={8} forceMount>
-        {isPublished ? (
+        {!!page?.publishId ? (
           <div className="space-y-4">
             <div className="flex items-center gap-x-2">
               <Globe className="text-sky-500 animate-pulse h-4 w-4" />
@@ -99,7 +86,7 @@ const Publish = ({ id }: { id: string }) => {
               size="sm"
               className="w-full text-xs"
               disabled={isLoading}
-              onClick={onUnpublish}
+              onClick={() => handlePublishChange(true)}
             >
               Unpublish
             </Button>
@@ -113,7 +100,7 @@ const Publish = ({ id }: { id: string }) => {
             </span>
             <Button
               disabled={isLoading}
-              onClick={onPublish}
+              onClick={() => handlePublishChange()}
               className="w-full text-xs"
               size="sm"
             >

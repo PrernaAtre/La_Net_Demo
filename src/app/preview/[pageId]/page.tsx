@@ -1,7 +1,7 @@
 "use client";
 import Toolbar from "@/components/Toolbar";
+import { Cover } from "@/components/dashboard";
 import { usePage } from "@/modules/editor";
-import { Cover } from "@/modules/note";
 import "@blocknote/core/fonts/inter.css";
 import { BlockNoteView, useCreateBlockNote } from "@blocknote/react";
 import "@blocknote/react/style.css";
@@ -45,7 +45,7 @@ const page: React.FC<PageProps> = ({ params }) => {
 
   return (
     <>
-      {page?.isPublish ? (
+      {page?.publishId ? (
         <div className="editor-container w-full h-screen">
           <Cover pageId={pageId!} preview url={page?.coverImage} />
 

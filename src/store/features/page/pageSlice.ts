@@ -6,15 +6,17 @@ export interface Page {
   name: string;
   document: any[];
   isTrashed: boolean;
-  isPublish: boolean;
+  publishId: string;
   createdAt: string;
   coverImage?: string;
 }
 
 const initialState: {
   pages: Page[];
+  currentPage: Page | undefined;
 } = {
   pages: [],
+  currentPage: undefined,
 };
 
 export const pageSlice = createSlice({
@@ -25,23 +27,30 @@ export const pageSlice = createSlice({
       state.pages = action.payload;
     },
     addPage: (state, action) => {
+      if (!state.currentPage) {
+        state.currentPage = action.payload;
+      }
+
       state.pages = [action.payload, ...state.pages];
     },
     updatePage: (state, action) => {
-      const { _id, ...patch } = action.payload;
+      if (!state.currentPage || state.currentPage?._id === action.payload._id) {
+        state.currentPage = action.payload;
+      }
 
       state.pages = state.pages.map((d) => {
-        if (d._id === _id) {
-          return {
-            ...d,
-            ...patch,
-          };
+        if (d._id === action.payload._id) {
+          return action.payload;
         }
+
         return d;
       });
     },
     deletePage: (state, action) => {
-      console.log("action.payload", action.payload);
+      if (state.currentPage?._id === action.payload._id) {
+        state.currentPage = undefined;
+      }
+
       state.pages = state.pages.filter((d) => d._id !== action.payload._id);
     },
   },

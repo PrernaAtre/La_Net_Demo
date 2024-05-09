@@ -1,5 +1,4 @@
 import { baseAPI } from "@/store/baseApi";
-import { updateCurrentUser } from "../auth";
 
 export const subscriptionApi = baseAPI.injectEndpoints({
   endpoints: (builder) => ({
@@ -8,21 +7,38 @@ export const subscriptionApi = baseAPI.injectEndpoints({
         url: `payment`,
         method: "POST",
       }),
-      onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
+      onQueryStarted: async (_, { queryFulfilled }) => {
         try {
           const { data } = await queryFulfilled;
 
-          console.log("data", data);
-
-          // dispatch(updateCurrentUser(data));
+          return data;
+        } catch (error: any) {
+          console.log("Error while checkout for premium plan.", error.message);
+        }
+      },
+    }),
+    manageSubscriptions: builder.query({
+      query: () => ({
+        url: `payment/manage`,
+        method: "GET",
+      }),
+      onQueryStarted: async (_, { queryFulfilled }) => {
+        try {
+          const { data } = await queryFulfilled;
 
           return data;
-        } catch (e) {
-          console.log("error while creating subscription", e);
+        } catch (error: any) {
+          console.log(
+            "Error while trying to create subscription management session.",
+            error.message
+          );
         }
       },
     }),
   }),
 });
 
-export const { useCreateSubscriptionMutation } = subscriptionApi;
+export const {
+  useCreateSubscriptionMutation,
+  useLazyManageSubscriptionsQuery,
+} = subscriptionApi;

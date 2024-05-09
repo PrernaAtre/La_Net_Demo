@@ -1,8 +1,8 @@
+import { useUsers } from "@/modules/user/hooks/useUsers";
 import AsyncSelect from "react-select/async";
-import { useUsers } from "../user/hooks/useUsers";
 
 const SharePage = () => {
-  const { users, loadUserOptions } = useUsers();
+  const { users } = useUsers();
 
   const filterUsers = (inputValue: string) => {
     return (users || [])

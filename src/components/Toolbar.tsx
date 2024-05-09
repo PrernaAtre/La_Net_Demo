@@ -27,6 +27,12 @@ const Toolbar = ({
 
   const [pageName, setPageName] = useState(name);
 
+  useEffect(() => {
+    if (name !== pageName) {
+      setPageName(name);
+    }
+  }, [name]);
+
   const enableInput = () => {
     if (preview) return;
 

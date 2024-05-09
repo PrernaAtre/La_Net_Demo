@@ -30,10 +30,11 @@ import { useMemo, useState } from "react";
 import { BsTrash } from "react-icons/bs";
 import { ToastContainer } from "react-toastify";
 import { toast } from "sonner";
-import { useLogout } from "../auth/logout/hooks";
-import { useCreateSubscription } from "../user/hooks/useCreateSubsciption";
-import { ProfileForm } from "../user/profile";
 import TrashWindow from "./TrashWindow";
+import { useManageSubscription } from "@/modules/subscription/hooks";
+import { useLogout } from "@/modules/auth/logout/hooks";
+import { useCreateSubscription } from "@/modules/user/hooks/useCreateSubsciption";
+import { ProfileForm } from "@/modules/user/profile";
 
 const Sidebar: React.FC = () => {
   const router = useRouter();
@@ -51,6 +52,9 @@ const Sidebar: React.FC = () => {
   const { handleClick } = useCreateSubscription();
 
   const { logout } = useLogout();
+
+  const { handleManageSubscription, isLoading: manageSubscriptionLoading } =
+    useManageSubscription();
 
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
@@ -239,7 +243,11 @@ const Sidebar: React.FC = () => {
                     </DialogDescription>
                   </DialogHeader>
                   <div>
-                    <Button size="sm" onClick={() => {}}>
+                    <Button
+                      size="sm"
+                      onClick={handleManageSubscription}
+                      disabled={manageSubscriptionLoading}
+                    >
                       Manage Plan
                     </Button>
                   </div>

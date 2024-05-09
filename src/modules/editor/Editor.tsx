@@ -1,9 +1,9 @@
 "use client";
 
-import { CoverImageModal } from "@/components/modals/cover-image-modal";
-import Modal from "@/components/modals/Modal";
-import { Spinner } from "@/components/spinner";
 import Toolbar from "@/components/Toolbar";
+import Modal from "@/components/modals/Modal";
+import { CoverImageModal } from "@/components/modals/cover-image-modal";
+import { Spinner } from "@/components/spinner";
 import { Page } from "@/store/features/page";
 import "@blocknote/core/fonts/inter.css";
 import { BlockNoteView, useCreateBlockNote } from "@blocknote/react";
@@ -14,32 +14,32 @@ import { omit } from "lodash";
 import { useTheme } from "next-themes";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Publish, SharePage } from "../note";
 import { useUpdatePage } from "./hooks/useUpdatePage";
+import { Publish, SharePage } from "@/components/dashboard";
 
 interface EditorProps {
   pageId: string;
 }
 
 const Editor: React.FC<EditorProps> = ({ pageId }) => {
-  const { page, handleUpdatePage, updatedPage, isLoading } = useUpdatePage(
+  const { page, handleUpdatePage, updatedPage, isPageLoading } = useUpdatePage(
     pageId || ""
   );
 
   const Cover = useMemo(
-    () => dynamic(() => import("../note/Cover")),
+    () => dynamic(() => import("@components/dashboard/Cover")),
     [updatedPage]
   );
 
   const { resolvedTheme } = useTheme();
 
   useEffect(() => {
-    setcoverImagePageId(pageId);
+    setCoverImagePageId(pageId);
   }, [pageId]);
 
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isCoverImageOpen, setIsCoverImageOpen] = useState(false);
-  const [coverImagePageId, setcoverImagePageId] = useState(pageId);
+  const [coverImagePageId, setCoverImagePageId] = useState(pageId);
 
   async function uploadFile(file: File) {
     const body = new FormData();
@@ -95,7 +95,7 @@ const Editor: React.FC<EditorProps> = ({ pageId }) => {
     setIsShareModalOpen(true);
   }
 
-  return !isLoading ? (
+  return !isPageLoading ? (
     <div className="w-full h-screen">
       <div className="flex flex-row justify-between items-center sticky w-full h-14 border border-b-gray-400">
         <div className="flex text-center content-center self-center">
@@ -113,7 +113,7 @@ const Editor: React.FC<EditorProps> = ({ pageId }) => {
       <Cover
         pageId={page?._id}
         url={updatedPage?.coverImage || page?.coverImage}
-        setId={setcoverImagePageId}
+        setId={setCoverImagePageId}
         setOpen={setIsCoverImageOpen}
       />
       <Toolbar

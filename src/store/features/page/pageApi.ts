@@ -9,11 +9,13 @@ export const pageApi = baseAPI.injectEndpoints({
         try {
           const { data } = await queryFulfilled;
 
+          dispatch(updatePage(data))
+
           return data;
         } catch (e) {
           console.log("error while fetching page", e);
         }
-      }
+      },
     }),
     createPage: builder.mutation({
       query: (payload: any) => ({
@@ -39,7 +41,7 @@ export const pageApi = baseAPI.injectEndpoints({
       query: (payload: any) => ({
         url: `page/${payload.id}`,
         method: "PUT",
-        body: payload
+        body: payload,
       }),
       onQueryStarted: async (payload, { dispatch, queryFulfilled }) => {
         try {
@@ -99,9 +101,6 @@ export const pageApi = baseAPI.injectEndpoints({
         try {
           const { data } = await queryFulfilled;
 
-          console.log("trash data", data)
-
-          //TODO add data to the store
           if (data) {
             dispatch(updatePage(data));
           }
@@ -121,10 +120,6 @@ export const pageApi = baseAPI.injectEndpoints({
         try {
           const { data } = await queryFulfilled;
 
-          //TODO add data to the store
-
-          console.log("data", data)
-
           if (data) {
             dispatch(updatePage(data));
           }
@@ -132,6 +127,44 @@ export const pageApi = baseAPI.injectEndpoints({
           return data;
         } catch (e) {
           console.log("error while recovering page", e);
+        }
+      },
+    }),
+    publish: builder.mutation({
+      query: (id: string) => ({
+        url: `page/publish/${id}`,
+        method: "PUT",
+      }),
+      onQueryStarted: async (id, { dispatch, queryFulfilled }) => {
+        try {
+          const { data } = await queryFulfilled;
+
+          if (data?.data) {
+            dispatch(updatePage(data?.data));
+          }
+
+          return data;
+        } catch (e) {
+          console.log("Error while publishing page", e);
+        }
+      },
+    }),
+    unpublish: builder.mutation({
+      query: (id: string) => ({
+        url: `page/unpublish/${id}`,
+        method: "PUT",
+      }),
+      onQueryStarted: async (id, { dispatch, queryFulfilled }) => {
+        try {
+          const { data } = await queryFulfilled;
+
+          if (data?.data) {
+            dispatch(updatePage(data?.data));
+          }
+
+          return data;
+        } catch (e) {
+          console.log("Error while unpublishing page", e);
         }
       },
     }),
@@ -148,4 +181,6 @@ export const {
   useLazyGetPagesQuery,
   useUpdatePageMutation,
   useLazyGetPageQuery,
+  usePublishMutation,
+  useUnpublishMutation,
 } = pageApi;

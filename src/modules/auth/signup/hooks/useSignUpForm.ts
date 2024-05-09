@@ -9,7 +9,7 @@ import { signUpSchema } from "../schema/signUpSchema";
 export const useSignUp = () => {
 
   const dispatch = useDispatch();
-  const rourter = useRouter();
+  const router = useRouter();
 
   const [signUp, { isLoading, error }] = useSignUpMutation({});
 
@@ -35,7 +35,7 @@ export const useSignUp = () => {
 
         toast.success("Sign up successful");
 
-        rourter.push("/page");
+        router.push("/page");
       }
     } catch (error: any) {
 

@@ -151,10 +151,7 @@ const SignUpForm: React.FC = () => {
                     const files = event.currentTarget.files;
 
                     if (files && files.length > 0) {
-                      console.log("data---", files);
-
                       const fileName = files?.[0];
-                      console.log("fileName", fileName);
 
                       formik.setFieldValue("profile_image", fileName);
                     } else {
