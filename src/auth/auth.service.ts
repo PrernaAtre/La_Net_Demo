@@ -39,7 +39,7 @@ export class AuthService {
       ) as jwt.JwtPayload;
 
       if (!decoded || !decoded.id) {
-        throw new Error("Invalid token");
+        throw new ServerError({code:400,message:'Invalid token'})
       }
 
       return decoded;
@@ -54,8 +54,8 @@ export class AuthService {
     userSignupDto: UserSignupDto
   ) {
     try {
-      const { username, email, password, profile_image } = userSignupDto;
-      const checkEmail = await this.userModel.findOne({ email });
+      const { username, email, password } = userSignupDto;
+      const checkEmail = await this.userModel.findOne({ email }).lean();
       if (checkEmail) {
         throw new ServerError({
             message: "Account with same email already exists. Please sign in.",
@@ -87,13 +87,14 @@ export class AuthService {
 
   async loginUser(
     userLoginDto: UserLoginDto
-  ): Promise<{ token: string; user: UserLoginDto }> {
+  ): Promise<{ token: string; user: Omit<User, 'password'> }> {
     try {
       const { email, password } = userLoginDto;
-      const user = await this.userModel.findOne({ email: email });
+      const user = await this.userModel.findOne({ email: email },{_id:1,username:1,email:1,profile_image:1,password:1}).lean();
       if (user && (await bcrypt.compare(password, user.password))) {
         const token = this.jwtService.sign({ id: user._id });
-        return { token, user };
+        const { password, ...userWithoutPassword } = user; 
+        return { token, user:userWithoutPassword };
       }
       throw new ServerError({
         message: "Invalid email or password.",
@@ -112,7 +113,7 @@ export class AuthService {
   async resetPassword(
     resetPasswordDto: ResetPasswordDto,
     currentUser
-  ) {
+  ){
     try {
       const user = await this.userModel.findOne({ _id: currentUser.id });
 

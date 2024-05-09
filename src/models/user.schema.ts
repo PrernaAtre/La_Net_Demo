@@ -24,12 +24,6 @@ export class User {
     @Prop({ default: false })
     IsSubscribed: boolean
 
-    // @Prop()
-    // subscriptionInfo:{
-    //     startDate:Date,
-    //     endDate:Date,
-    //     planType:string,
-    // }
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -1,14 +1,17 @@
-import { Injectable, NestMiddleware, HttpException, HttpStatus } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, InternalServerErrorException, NestMiddleware } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Request, Response, NextFunction } from 'express';
-import { Model } from 'mongoose';
+import { NextFunction, Response } from 'express';
+import mongoose, { Model } from 'mongoose';
 import { AuthenticatedRequest } from 'src/auth/auth.controller';
 import { CommonService } from 'src/common/common.service';
+import { ServerError } from 'src/common/utils/serverError';
 import { Page } from 'src/models/Page.schema';
+import { User } from 'src/models/user.schema';
  
 @Injectable()
 export class CheckPublishLimitMiddleware implements NestMiddleware {
   constructor(@InjectModel("Page")  private pageModel: Model<Page>,
+  @InjectModel(User.name) private userModel: Model<User>,
    private readonly commonService: CommonService) {}
 
   async use(req: AuthenticatedRequest, res: Response, next: NextFunction) {
@@ -16,24 +19,31 @@ export class CheckPublishLimitMiddleware implements NestMiddleware {
 
     try {
       const currentUser = req.currentUser; 
+      const userId= mongoose.Types.ObjectId.createFromHexString(currentUser.id);
 
-      const page = await this.pageModel.findOne({ _id: pageId, userId: currentUser.id, isTrashed: false });
-
-      if (!page) {
-        throw new Error("Page not found");
+      const user =await this.userModel.findOne({_id:userId}).lean()
+      if(user.IsSubscribed){
+        return next()
       }
+      const page = await this.pageModel.findOne({ _id: pageId, userId, isTrashed: false }).lean();
 
-      const publishedPageCount = await this.pageModel.countDocuments({ userId: currentUser.id, publishId: { $ne: null }, isTrashed: false });
+      if (!page) throw new ServerError({ message: "Page not found", code: 404 });
+
+      const publishedPageCount = await this.pageModel.countDocuments({ userId, publishId: { $ne: null }, isTrashed: false });
 
       const publishablePostCount = this.commonService.publishablePostCount; 
 
       if (publishedPageCount >= publishablePostCount) {
-        throw new Error("You exceeded the free publish limit.");
+        throw new ServerError({ message: "You exceeded the free publish limit.", code: 400 });
       }
 
       next();
     } catch (error) {
-      throw new HttpException(error?.message || 'Unauthorized', HttpStatus.UNAUTHORIZED);
+      if (error instanceof HttpException) throw error;
+      console.log("error", error);
+      throw new InternalServerErrorException(
+        "Something went wrong while trying to trash page."
+      );
     }
   }
 }

@@ -66,18 +66,27 @@ export class StripeService {
       }
 
       if (!user.customerId) {
-        const stripeCustomer = await this.commonService.createCustomer({
+        const stripeCustomer = await this.stripe.customers.create({
           email: user.email,
           name: user.username,
         });
         user.customerId = stripeCustomer.id;
         await user.save();
       }
-      const session = await this.commonService.createCheckoutSession({
-        customerId: user.customerId,
-        userId: user.id,
+      const session = await  this.stripe.checkout.sessions.create({
+        success_url: this.configService.get<string>('FRONTEND_URL'),
+        line_items: [{ price: this.configService.get<string>('PRICE_ID'), quantity: 1 }],
+        mode: "subscription",
+        currency: "USD",
+        client_reference_id: user.customerId,
+        customer: user.customerId,
+        billing_address_collection:"required",
+        subscription_data: {
+          metadata: {
+            userId: user.id,
+          },
+        },
       });
-      console.log("session.url", session.url);
       return { url: session.url };
     } catch (error) {
       console.log('error', error)
@@ -126,7 +135,7 @@ export class StripeService {
 
   async managePlan(currentUser){
     try {
-      const user = await this.userModel.findOne({ _id: currentUser.id });
+      const user = await this.userModel.findOne({ _id: currentUser.id }).lean();
 
       if (!user.IsSubscribed){
         throw new ServerError({

@@ -1,109 +1,149 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
-import { PageService } from './page.service';
-import { CreatePageDto, UpdatePageDto } from './dto/CreatePage.dto';
-import { AuthGuard } from 'src/auth/jwt-auth.guard';
-import { AuthenticatedRequest } from 'src/auth/auth.controller';
-import { CheckPublishLimitMiddleware } from 'src/middleware/page.middleware';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpException,
+  HttpStatus,
+  InternalServerErrorException,
+  Param,
+  Post,
+  Put,
+  Req,
+  UseGuards,
+  UsePipes,
+} from "@nestjs/common";
+import { PageService } from "./page.service";
+import {
+  AddSharedUsersDto,
+  CreatePageDto,
+  RemoveSharedUsersDto,
+  UpdatePageDto,
+} from "./dto/CreatePage.dto";
+import { AuthGuard } from "src/auth/jwt-auth.guard";
+import { AuthenticatedRequest } from "src/auth/auth.controller";
+import { CheckPublishLimitMiddleware } from "src/middleware/page.middleware";
+import { ObjectIdValidationPipe } from "src/common/utils/objectidvalidation.middleware";
 
-@Controller('page')
+@Controller("page")
 export class PageController {
-  constructor(private pageService: PageService) { }
+  constructor(private pageService: PageService) {}
 
-  @Post('/')
+  @Put("/shared-users/:id")
   @UseGuards(AuthGuard)
-  async create(@Body() page: CreatePageDto, @Req() { currentUser }: AuthenticatedRequest): Promise<any> {
-    try {
-      const newPage = await this.pageService.create(page, currentUser);
-
-      return newPage;
-    } catch (error) {
-      throw new HttpException(error?.message, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+  // @UsePipes(new ObjectIdValidationPipe())
+  async addSharedUsers(
+    @Param("id") id: string,
+    @Req() { currentUser }: AuthenticatedRequest,
+    @Body() addSharedUsersDto: AddSharedUsersDto
+  ): Promise<any> {
+    return await this.pageService.addSharedUsers(
+      id,
+      addSharedUsersDto.userIds,
+      currentUser
+    );
   }
 
-
-  @Put('/:id')
+  @Delete("/shared-users/:id")
   @UseGuards(AuthGuard)
-  async update(@Param('id') id: string, @Body() page: UpdatePageDto, @Req() { currentUser }: AuthenticatedRequest): Promise<any> {
-    try {
-      const updatedPage = await this.pageService.update(id, page, currentUser);
-
-      return updatedPage;
-    } catch (error) {
-      throw new HttpException(error?.message, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+  // @UsePipes(new ObjectIdValidationPipe())
+  async removeSharedUsers(
+    @Param("id") id: string,
+    @Req() { currentUser }: AuthenticatedRequest,
+    @Body() removeSharedUsersDto: RemoveSharedUsersDto
+  ): Promise<any> {
+    return await this.pageService.removeSharedUsers(
+      id,
+      removeSharedUsersDto.userId,
+      currentUser
+    );
+  }
+  @Post("/")
+  @UseGuards(AuthGuard)
+  async create(
+    @Body() page: CreatePageDto,
+    @Req() { currentUser }: AuthenticatedRequest
+  ): Promise<any> {
+    return await this.pageService.create(page, currentUser);
   }
 
-  @Get('/:id')
+  @Put("/:id")
   @UseGuards(AuthGuard)
-  async get(@Param('id') id: string, @Req() { currentUser }: AuthenticatedRequest): Promise<any> {
-    try {
-      const page = await this.pageService.get(id, currentUser);
-
-      return page;
-    } catch (error) {
-      throw new HttpException(error?.message, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+  @UsePipes(new ObjectIdValidationPipe())
+  async update(
+    @Param("id") id: string,
+    @Body() page: UpdatePageDto,
+    @Req() { currentUser }: AuthenticatedRequest
+  ): Promise<any> {
+    return await this.pageService.update(id, page, currentUser);
   }
 
-  @Get('/user/:userId')
+  @Get("/:id")
   @UseGuards(AuthGuard)
-  async pages(@Req() req: Request, @Req() { currentUser }: AuthenticatedRequest): Promise<any> {
-    try {
-
-      const pages = await this.pageService.pages(currentUser);
-
-      return pages;
-    } catch (error) {
-      throw new HttpException(error?.message, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+  @UsePipes(new ObjectIdValidationPipe())
+  async get(
+    @Param("id") id: string,
+    @Req() { currentUser }: AuthenticatedRequest
+  ): Promise<any> {
+    return await this.pageService.get(id, currentUser);
   }
 
-  @Put('/trash/:id')
+  @Get("/user/:userId")
   @UseGuards(AuthGuard)
-  async makeTrash(@Param('id') id: string, @Req() { currentUser }: AuthenticatedRequest): Promise<any> {
-    try {
-
-      const page = await this.pageService.makeTrashed(id, currentUser);
-
-      return page;
-    } catch (error) {
-      throw new HttpException(error?.message, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+  async pages(
+    @Req() req: Request,
+    @Req() { currentUser }: AuthenticatedRequest
+  ): Promise<any> {
+    return await this.pageService.pages(currentUser);
   }
 
-  @Put('/recover/:id')
+  @Put("/trash/:id")
   @UseGuards(AuthGuard)
-  async recover(@Param('id') id: string, @Req() { currentUser }: AuthenticatedRequest): Promise<any> {
-    try {
-      const page = await this.pageService.recover(id, currentUser);
-
-      return page;
-    } catch (error) {
-      throw new HttpException(error?.message, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+  @UsePipes(new ObjectIdValidationPipe())
+  async makeTrash(
+    @Param("id") id: string,
+    @Req() { currentUser }: AuthenticatedRequest
+  ): Promise<any> {
+    return await this.pageService.makeTrashed(id, currentUser);
   }
 
-  @Delete('/:id')
+  @Put("/recover/:id")
   @UseGuards(AuthGuard)
-  async delete(@Param('id') id: string, @Req() { currentUser }: AuthenticatedRequest): Promise<any> {
-    try {
-      const page = await this.pageService.delete(id, currentUser);
-
-      return page;
-    } catch (error) {
-      throw new HttpException(error?.message, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+  @UsePipes(new ObjectIdValidationPipe())
+  async recover(
+    @Param("id") id: string,
+    @Req() { currentUser }: AuthenticatedRequest
+  ): Promise<any> {
+    return await this.pageService.recover(id, currentUser);
   }
 
-  @Post("/publish")
+  @Delete("/:id")
   @UseGuards(AuthGuard)
-  async publish(@Param('id') id: string, @Req() { currentUser }: AuthenticatedRequest): Promise<any> {
-    try {
-      return await this.pageService.publishPage(id, currentUser);
-    } catch (error) {
-      throw new HttpException(error?.message, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+  @UsePipes(new ObjectIdValidationPipe())
+  async delete(
+    @Param("id") id: string,
+    @Req() { currentUser }: AuthenticatedRequest
+  ): Promise<any> {
+    return await this.pageService.delete(id, currentUser);
   }
 
+  @Put("/publish/:id")
+  @UseGuards(AuthGuard)
+  @UsePipes(new ObjectIdValidationPipe())
+  async publish(
+    @Param("id") id: string,
+    @Req() { currentUser }: AuthenticatedRequest
+  ): Promise<any> {
+    return await this.pageService.publishPage(id, currentUser);
+  }
+
+  @Put("/unpublish/:id")
+  @UseGuards(AuthGuard)
+  @UsePipes(new ObjectIdValidationPipe())
+  async unpublish(
+    @Param("id") id: string,
+    @Req() { currentUser }: AuthenticatedRequest
+  ): Promise<any> {
+    return await this.pageService.unpublish(id, currentUser);
+  }
 }

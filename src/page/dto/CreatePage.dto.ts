@@ -1,4 +1,4 @@
-import { IsArray, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { ArrayMinSize, IsArray, IsMongoId, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class CreatePageDto {
     @IsString()
@@ -25,3 +25,17 @@ export class UpdatePageDto {
     @IsString()
     coverImage: string;
 }
+
+export class AddSharedUsersDto {
+    @IsArray()
+    @ArrayMinSize(1, { message: 'At least one user ID must be provided' })
+    @IsString({ each: true, message: 'Each user ID must be a string' })
+    userIds: string[];
+  }
+
+export class RemoveSharedUsersDto {
+    @IsString()
+    @IsNotEmpty()
+    userId: string;
+  }
+  

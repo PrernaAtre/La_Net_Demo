@@ -1,15 +1,16 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { UploadApiErrorResponse, UploadApiResponse, v2 as cloudinary } from 'cloudinary';
 
 
 @Injectable()
 export class CloudinaryService {
-    constructor()
+    constructor(private readonly configService:ConfigService)
     {
         cloudinary.config({
-            cloud_name:"dpo09oacb",
-            api_key:"786639935253757",
-            api_secret:"Kb_g4pC0NoI3dFwIwK3PXcqR7iM"
+            cloud_name:this.configService.get<string>('CLOUDINARY_CLOUD_NAME'),
+            api_key:this.configService.get<string>('CLOUDINARY_API_KEY'),
+            api_secret:this.configService.get<string>('CLOUDINARY_API_SEARCH'),
         })
     }
 
@@ -20,29 +21,6 @@ export class CloudinaryService {
               if (error) return reject(error);
               resolve(result);
             });
-        //   streamifier.createReadStream(file.buffer).pipe(uploadStream);
-        });
-      }
-
-      async uploadIconImage(filePath: string): Promise<UploadApiResponse | UploadApiErrorResponse> {
-        return new Promise((resolve, reject) => {
-            cloudinary.uploader.upload(filePath,{folder : 'iconImage'},
-            (error, result) => {
-              if (error) return reject(error);
-              resolve(result);
-            });
-        //   streamifier.createReadStream(file.buffer).pipe(uploadStream);
-        });
-      }
-
-      async uploadCoverImage(filePath: string): Promise<UploadApiResponse | UploadApiErrorResponse> {
-        return new Promise((resolve, reject) => {
-            cloudinary.uploader.upload(filePath,{folder : 'coverImage'},
-            (error, result) => {
-              if (error) return reject(error);
-              resolve(result);
-            });
-        //   streamifier.createReadStream(file.buffer).pipe(uploadStream);
         });
       }
 }

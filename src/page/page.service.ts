@@ -1,180 +1,313 @@
 // PageService.ts
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
-import { User } from 'src/models/user.schema';
-import { Page } from '../models/Page.schema';
-import { CreatePageDto, UpdatePageDto } from './dto/CreatePage.dto';
-import { CommonService } from 'src/common/common.service';
+import {
+  HttpException,
+  Injectable,
+  InternalServerErrorException,
+} from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import mongoose, { Model, Types } from "mongoose";
+import { User } from "src/models/user.schema";
+import { Page } from "../models/Page.schema";
+import {
+  AddSharedUsersDto,
+  CreatePageDto,
+  UpdatePageDto,
+} from "./dto/CreatePage.dto";
+import { CommonService } from "src/common/common.service";
+import { ServerError } from "src/common/utils/serverError";
 
 @Injectable()
 export class PageService {
-	constructor(
-		@InjectModel("Page")
-		private pageModel: Model<Page>,
-		@InjectModel('User') private userModel: Model<User>,
-		public commonService:CommonService
-	) { }
+  constructor(
+    @InjectModel("Page")
+    private pageModel: Model<Page>,
+    @InjectModel("User") private userModel: Model<User>,
+    public commonService: CommonService
+  ) {}
 
-	async get(id: string, currentUser): Promise<Page> {
-		try {
-			const page = await this.pageModel.findOne({
-				_id: id, $or: [
-					{ userId: currentUser.id },
-					{ sharedUsers: { $in: [currentUser.id] } }
-				]
-			});
+  async get(id: string, currentUser): Promise<Page> {
+    try {
+      const userId = mongoose.Types.ObjectId.createFromHexString(
+        currentUser.id
+      );
+      const page = await this.pageModel
+        .findOne({
+          $or: [
+            { _id: id, userId: userId },
+            { _id: id, sharedUsers: { $in: [userId] } },
+            { publishId: mongoose.Types.ObjectId.createFromHexString(id) },
+          ],
+        })
+        .lean();
 
-			if (!page) throw new Error("Page not found");
+      if (!page)
+        throw new ServerError({ message: "Page not found", code: 404 });
 
-			return page;
-		} catch (error) {
-			console.log('get::> error', error)
-			throw new Error(`Failed to fetch the page with ID ${id}`);
-		}
-	}
+      return page;
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      console.log("error", error);
+      throw new InternalServerErrorException(
+        "Something went wrong while trying to fetch page."
+      );
+    }
+  }
 
-	async pages(currentUser): Promise<Page[]> {
-		try {
-			const pages = await this.pageModel.find({
-				$or: [
-					{ userId: currentUser.id },
-					{ sharedUsers: { $in: [currentUser.id] } }
-				]
-			});
+  async pages(currentUser): Promise<Page[]> {
+    try {
+      const userId = new mongoose.Schema.ObjectId(currentUser.id);
+      const pages = await this.pageModel.find({
+        $or: [{ userId: userId }, { sharedUsers: { $in: [userId] } }],
+      });
 
-			if (!pages) throw new Error("Pages not found");
+      if (!pages)
+        throw new ServerError({ message: "Pages not found", code: 404 });
 
-			return pages;
-		} catch (error) {
-			throw new Error(`Failed to fetch pages for user with ID ${currentUser.id}`);
-		}
-	}
+      return pages;
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      console.log("error", error);
+      throw new InternalServerErrorException(
+        "Something went wrong while trying to fetch pages."
+      );
+    }
+  }
 
-	async create(page: CreatePageDto, currentUser) {
-		try {
-			const createdPage = await this.pageModel.create(new this.pageModel({ ...page, userId: currentUser.id }));
+  async create(page: CreatePageDto, currentUser) {
+    try {
+      return await this.pageModel.create(
+        new this.pageModel({
+          ...page,
+          userId: mongoose.Types.ObjectId.createFromHexString(currentUser.id),
+        })
+      );
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      console.log("error", error);
+      throw new InternalServerErrorException(
+        "Something went wrong while trying to create page."
+      );
+    }
+  }
 
-			return createdPage;
-		} catch (error) {
-			throw new Error(`Failed to create a new page`);
-		}
-	}
+  async update(id: string, page: UpdatePageDto, currentUser) {
+    try {
+      const existingPage = await this.pageModel
+        .findOne({
+          _id: id,
+          userId: mongoose.Types.ObjectId.createFromHexString(currentUser.id),
+        })
+        .lean();
 
-	async update(id: string, page: UpdatePageDto, currentUser) {
-		try {
-			const existingPage = await this.pageModel.findOne({ _id: id, userId: currentUser.id });
+      if (!existingPage)
+        throw new ServerError({ message: "Page not found", code: 404 });
 
-			if (!existingPage) {
-				throw new Error(`Page with id ${id} not found for the current user`);
-			}
+      const updatedPage = await this.pageModel.findOneAndUpdate(
+        { _id: id },
+        { $set: { ...page } },
+        { new: true }
+      );
 
-			const updatedPage = await this.pageModel.findOneAndUpdate({ _id: id }, { $set: { ...page } }, { new: true });
+      return updatedPage;
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      console.log("error", error);
+      throw new InternalServerErrorException(
+        "Something went wrong while trying to update page."
+      );
+    }
+  }
 
-			return updatedPage;
-		} catch (error) {
-			throw new Error(`Failed to update the page with ID ${id}`);
-		}
-	}
+  async makeTrashed(id: string, currentUser) {
+    try {
+      const existingPage = await this.pageModel
+        .findOne({
+          _id: id,
+          userId: mongoose.Types.ObjectId.createFromHexString(currentUser.id),
+        })
+        .lean();
 
-	async makeTrashed(id: string, currentUser) {
-		try {
-			const existingPage = await this.pageModel.findOne({ _id: id, userId: currentUser.id });
+      if (!existingPage)
+        throw new ServerError({ message: "Page not found", code: 404 });
 
-			if (!existingPage) {
-				throw new Error(`Page with ID ${id} not found for the current user`);
-			}
+      const page = await this.pageModel.findOneAndUpdate(
+        { _id: id },
+        { $set: { isTrashed: true } },
+        { new: true }
+      );
 
-			const page = await this.pageModel.findOneAndUpdate({ _id: id }, { $set: { isTrashed: true } }, { new: true });
+      return page;
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      console.log("error", error);
+      throw new InternalServerErrorException(
+        "Something went wrong while trying to trash page."
+      );
+    }
+  }
 
-			return page;
-		} catch (error) {
-			throw new Error(`Failed to move the page with ID ${id} to trash`);
-		}
-	}
+  async delete(id: string, currentUser) {
+    try {
+      const existingPage = await this.pageModel
+        .findOne({
+          _id: id,
+          userId: mongoose.Types.ObjectId.createFromHexString(currentUser.id),
+        })
+        .lean();
 
-	async delete(id: string, currentUser) {
-		try {
-			const existingPage = await this.pageModel.findOne({ _id: id, userId: currentUser.id });
+      if (!existingPage)
+        throw new ServerError({ message: "Page not found", code: 404 });
 
-			if (!existingPage) {
-				throw new Error(`Page with ID ${id} not found for the current user`);
-			}
+      const deletedPage = await this.pageModel.findOneAndDelete({ _id: id });
 
-			const deletedPage = await this.pageModel.findOneAndDelete({ _id: id });
+      return deletedPage;
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      console.log("error", error);
+      throw new InternalServerErrorException(
+        "Something went wrong while trying to delete page."
+      );
+    }
+  }
 
-			return deletedPage;
-		} catch (error) {
-			throw new Error(`Failed to delete the page with ID ${id}`);
-		}
-	}
+  async recover(id: string, currentUser) {
+    try {
+      const existingPage = await this.pageModel
+        .findOne({
+          _id: id,
+          userId: mongoose.Types.ObjectId.createFromHexString(currentUser.id),
+        })
+        .lean();
 
-	async recover(id: string, currentUser) {
-		try {
-			const existingPage = await this.pageModel.findOne({ _id: id, userId: currentUser.id });
+      if (!existingPage)
+        throw new ServerError({ message: "Page not found", code: 404 });
 
-			if (!existingPage) {
-				throw new Error(`Page with id ${id} not found for the current user`);
-			}
+      const page = await this.pageModel.findOneAndUpdate(
+        { _id: id },
+        { $set: { isTrashed: false } },
+        { new: true }
+      );
 
-			const page = await this.pageModel.findOneAndUpdate({ _id: id }, { $set: { isTrashed: false } }, { new: true });
+      return page;
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      console.log("error", error);
+      throw new InternalServerErrorException(
+        "Something went wrong while trying to recover pages."
+      );
+    }
+  }
 
-			return page;
-		} catch (error) {
-			throw new Error(`Failed to recover the page with ID ${id}`);
-		}
-	}
+  async addSharedUsers(pageId, userIds, currentUser) {
+    console.log("pageId, userIds, currentUser", pageId, userIds, currentUser);
+    try {
+      if (!userIds.length)
+        throw new ServerError({ message: "Invalid user id.", code: 400 });
 
-	async addSharedUsers(userIds: Array<string>, pageId: string, currentUser): Promise<string> {
-		try {
-			if (!userIds.length) {
-				throw new Error("Invalid user id");
-			}
-			const page = await this.pageModel.findOne({ _id: pageId, userId: currentUser.id ,isTrashed: false});
+      const page = await this.pageModel
+        .findOne({
+          _id: mongoose.Types.ObjectId.createFromHexString(pageId),
+          userId: mongoose.Types.ObjectId.createFromHexString(currentUser.id),
+          isTrashed: false,
+        })
+        .lean();
 
-			if (!page) {
-				throw new Error("Page not found");
-			}
+      if (!page)
+        throw new ServerError({ message: "Page not found", code: 404 });
 
-			const userObjectIds = userIds.map((userId) => new Types.ObjectId(userId))
+      const userObjectIds = userIds.map((userId) =>
+        mongoose.Types.ObjectId.createFromHexString(userId)
+      );
+      // console.log('userObjectIds', userObjectIds)
+      //       const users = await this.userModel.find({ _id: { $in: userObjectIds } });
+      //       if (users.length !== userIds.length) {
+      //         throw new ServerError({
+      //           message: "Some users were not found",
+      //           code: 404,
+      //         });
+      //       }
+      const data = await this.pageModel.findOneAndUpdate(
+        { _id: pageId },
+        { $set: { sharedUsers: userObjectIds } },
+        {
+          new: true,
+        }
+      );
+      return { message: "User added successfully.", data };
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      console.log("error", error);
+      throw new InternalServerErrorException(
+        "Something went wrong while trying to share page to user."
+      );
+    }
+  }
 
-			const users = await this.userModel.find({ _id: { $in: userObjectIds }});
-			if (users.length !== userIds.length) {
-				throw new Error("Some users were not found")
-			}
-			await this.pageModel.updateOne({ _id: pageId }, { $set: { sharedUsers: userObjectIds } })
-			return "User ";
-		} catch (error) {
-			throw new InternalServerErrorException(error)
-		}
-	}
+  async removeSharedUsers(pageId: string, userId: string, currentUser) {
+    try {
+      const page = await this.pageModel
+        .findOne({
+          _id: pageId,
+          userId: mongoose.Types.ObjectId.createFromHexString(currentUser.id),
+          isTrashed: false,
+        })
+        .lean();
 
-	async removeSharedUsers(userId: string, pageId: string, currentUser) {
-		try {
-			const page = await this.pageModel.findOne({ _id: pageId, userId: currentUser.id ,isTrashed: false});
+      if (!page)
+        throw new ServerError({ message: "Page not found", code: 404 });
 
-			if (!page) {
-				throw new Error("Page not found");
-			}
+      const user = await this.userModel.find({
+        _id: new Types.ObjectId(userId),
+      });
+      if (!user) {
+        throw new ServerError({ message: "User were not found", code: 404 });
+      }
+      await this.pageModel.updateOne(
+        { _id: pageId },
+        { $pull: { sharedUsers: new Types.ObjectId(userId) } }
+      );
+      return { message: "User removed successfully" };
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      console.log("error", error);
+      throw new InternalServerErrorException(
+        "Something went wrong while trying to remove shared user."
+      );
+    }
+  }
 
-			const user = await this.userModel.find({ _id: new Types.ObjectId(userId) });
-			if (!user) {
-				throw new Error("User were not found")
-			}
-			await this.pageModel.updateOne({ _id: pageId }, { $pull: { sharedUsers: new Types.ObjectId(userId) } })
-			return {message:"User removed successfully"};
-		} catch (error) {
-			throw new InternalServerErrorException(error)
-		}
-	}
+  async publishPage(pageId: string, currentUser) {
+    try {
+      const publishedPage = await this.pageModel.findOneAndUpdate(
+        {
+          _id: pageId,
+          userId: mongoose.Types.ObjectId.createFromHexString(currentUser.id),
+        },
+        { $set: { publishId: new Types.ObjectId() } },
+        { new: true }
+      );
+      return { message: "Page published successfully", data: publishedPage };
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
 
-	async publishPage(pageId:string,currentUser){
-		try {
- 
-			await this.pageModel.updateOne({ _id: pageId,userId:currentUser.id }, { $set: { publishId: new Types.ObjectId() } })
-			return {message:"Page published successfully"};
-		} catch (error) {
-			throw new InternalServerErrorException(error)
-		}
-	}
+  async unpublish(pageId: string, currentUser) {
+    try {
+      const unpublishedPage = await this.pageModel.findOneAndUpdate(
+        {
+          _id: pageId,
+          userId: mongoose.Types.ObjectId.createFromHexString(currentUser.id),
+        },
+        { $set: { publishId: null } },
+        { new: true }
+      );
+      return {
+        message: "Page unpublished successfully",
+        data: unpublishedPage,
+      };
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
 }

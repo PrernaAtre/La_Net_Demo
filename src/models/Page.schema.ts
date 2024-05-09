@@ -6,7 +6,7 @@ import { Types } from 'mongoose';
 })
 
 export class Page {
-  @Prop({ type: Types.ObjectId, ref: 'User' })
+  @Prop({ type: Types.ObjectId })
   userId: Types.ObjectId;
 
   @Prop({ default: 'Untitled Page' })
