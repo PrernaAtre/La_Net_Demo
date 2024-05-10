@@ -31,7 +31,6 @@ export class PageController {
 
   @Put("/shared-users/:id")
   @UseGuards(AuthGuard)
-  // @UsePipes(new ObjectIdValidationPipe())
   async addSharedUsers(
     @Param("id") id: string,
     @Req() { currentUser }: AuthenticatedRequest,
@@ -46,7 +45,6 @@ export class PageController {
 
   @Delete("/shared-users/:id")
   @UseGuards(AuthGuard)
-  // @UsePipes(new ObjectIdValidationPipe())
   async removeSharedUsers(
     @Param("id") id: string,
     @Req() { currentUser }: AuthenticatedRequest,

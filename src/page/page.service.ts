@@ -201,10 +201,7 @@ export class PageService {
   }
 
   async addSharedUsers(pageId, userIds, currentUser) {
-    console.log("pageId, userIds, currentUser", pageId, userIds, currentUser);
     try {
-      if (!userIds.length)
-        throw new ServerError({ message: "Invalid user id.", code: 400 });
 
       const page = await this.pageModel
         .findOne({
@@ -220,14 +217,13 @@ export class PageService {
       const userObjectIds = userIds.map((userId) =>
         mongoose.Types.ObjectId.createFromHexString(userId)
       );
-      // console.log('userObjectIds', userObjectIds)
-      //       const users = await this.userModel.find({ _id: { $in: userObjectIds } });
-      //       if (users.length !== userIds.length) {
-      //         throw new ServerError({
-      //           message: "Some users were not found",
-      //           code: 404,
-      //         });
-      //       }
+      const users = await this.userModel.find({ _id: { $in: userObjectIds } });
+      if (users.length !== userIds.length) {
+        throw new ServerError({
+          message: "Some users were not found",
+          code: 404,
+        });
+      }
       const data = await this.pageModel.findOneAndUpdate(
         { _id: pageId },
         { $set: { sharedUsers: userObjectIds } },

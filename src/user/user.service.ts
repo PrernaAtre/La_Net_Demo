@@ -6,7 +6,7 @@ import {
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
+import mongoose, { Model } from "mongoose";
 import { UpdateProfileDto } from "src/auth/dto/updateProfileDto.dto";
 import { CloudinaryService } from "src/cloudinary/cloudinary.service";
 import { BcryptService } from "src/common/bcrypt.service";
@@ -133,6 +133,23 @@ export class UserService {
       if (error instanceof HttpException) throw error;
       throw new InternalServerErrorException(
         "Something went wrong while trying to sign up."
+      );
+    }
+  }
+  async getUserDetails(currentUser): Promise<User> {
+    try {
+      const user = await this.userModel
+        .findOne(
+          { _id: mongoose.Types.ObjectId.createFromHexString(currentUser.id) },
+          { _id: 1, username: 1, email: 1, profile_image: 1, IsSubscribed:1 }
+        )
+        .lean();
+
+      return user;
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException(
+        "Something went wrong while trying to get user detail."
       );
     }
   }

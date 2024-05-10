@@ -80,4 +80,12 @@ export class UserController {
       return await this.userService.getUserByEmail(slug, currentUser);
      
   }
+  @Get("details")
+  @UseGuards(AuthGuard)
+  async getUserDetails(
+    @Req() { currentUser }: AuthenticatedRequest
+  ): Promise<User> {
+      return await this.userService.getUserDetails(currentUser);
+     
+  }
 }
