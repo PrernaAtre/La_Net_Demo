@@ -18,7 +18,7 @@ import { AuthService } from "./auth.service";
 import { UserLoginDto } from "./dto/loginDto.dto";
 import { ResetPasswordDto } from "./dto/resetpassword.dto";
 import { UserSignupDto } from "./dto/signupDto.dto";
-import { AuthGuard } from "./jwt-auth.guard"; // aa barabar chhe?
+import { AuthGuard } from "./jwt-auth.guard";
 
 const storage = diskStorage({
   destination: "./uploads",

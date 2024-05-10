@@ -1,4 +1,3 @@
-// signup.dto.ts
 import { IsString, IsNotEmpty, MinLength, IsOptional } from 'class-validator';
 
 export class UserSignupDto {
@@ -12,13 +11,8 @@ export class UserSignupDto {
 
   @IsString()
   @IsNotEmpty()
-  @MinLength(6) // Example validation for minimum length
+  @MinLength(6)
   password: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @MinLength(6) // Example validation for minimum length
-  confirm_password: string;
 
   @IsString()
   @IsOptional()

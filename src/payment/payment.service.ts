@@ -147,7 +147,7 @@ export class StripeService {
 
       const session = await this.stripe.billingPortal.sessions.create({
         customer: user.customerId,
-        return_url: 'https://example.com/account',
+        return_url: this.configService.get<string>('FRONTEND_URL'),
       });
       return {url:session.url}
     } catch (error) {

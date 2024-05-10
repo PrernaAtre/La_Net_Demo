@@ -44,7 +44,6 @@ export class AuthService {
 
       return decoded;
     } catch (error) {
-      // Handle invalid token or other errors
       throw new UnauthorizedException("Invalid token");
     }
   }
