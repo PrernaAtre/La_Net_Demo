@@ -10,10 +10,7 @@ import { CommonService } from "src/common/common.service";
 import { ServerError } from "src/common/utils/serverError";
 import { User } from "src/models/user.schema";
 import { Page } from "../models/Page.schema";
-import {
-  CreatePageDto,
-  UpdatePageDto
-} from "./dto/CreatePage.dto";
+import { CreatePageDto, UpdatePageDto } from "./dto/CreatePage.dto";
 
 @Injectable()
 export class PageService {
@@ -59,7 +56,7 @@ export class PageService {
       );
 
       const pages = await this.pageModel.find({
-         userId: userId 
+        userId: userId,
       });
 
       if (!pages)
@@ -94,10 +91,11 @@ export class PageService {
 
   async update(id: string, page: UpdatePageDto, currentUser) {
     try {
+      const userId = mongoose.Types.ObjectId.createFromHexString(currentUser.id);
       const existingPage = await this.pageModel
         .findOne({
           _id: id,
-          userId: mongoose.Types.ObjectId.createFromHexString(currentUser.id),
+          $or: [{ userId }, { sharedUsers: { $in: [userId] } }],
         })
         .lean();
 
@@ -202,7 +200,6 @@ export class PageService {
 
   async addSharedUsers(pageId, userIds, currentUser) {
     try {
-
       const page = await this.pageModel
         .findOne({
           _id: mongoose.Types.ObjectId.createFromHexString(pageId),
@@ -308,14 +305,14 @@ export class PageService {
       throw new InternalServerErrorException(error);
     }
   }
-  async getSharedPages(currentUser){
+  async getSharedPages(currentUser) {
     try {
       const userId = mongoose.Types.ObjectId.createFromHexString(
         currentUser.id
       );
 
       const pages = await this.pageModel.find({
-          sharedUsers: { $in: [userId] } 
+        sharedUsers: { $in: [userId] },
       });
 
       if (!pages)
@@ -328,6 +325,6 @@ export class PageService {
       throw new InternalServerErrorException(
         "Something went wrong while trying to fetch pages."
       );
+    }
   }
-}
 }
