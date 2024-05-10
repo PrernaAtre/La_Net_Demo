@@ -21,9 +21,9 @@ import {
   UpdatePageDto,
 } from "./dto/CreatePage.dto";
 import { AuthGuard } from "src/auth/jwt-auth.guard";
-import { AuthenticatedRequest } from "src/auth/auth.controller";
 import { CheckPublishLimitMiddleware } from "src/middleware/page.middleware";
 import { ObjectIdValidationPipe } from "src/common/utils/objectidvalidation.middleware";
+import { AuthenticatedRequest } from "src/common/utils/common.types";
 
 @Controller("page")
 export class PageController {

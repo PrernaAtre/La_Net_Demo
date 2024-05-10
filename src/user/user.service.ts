@@ -10,6 +10,7 @@ import mongoose, { Model } from "mongoose";
 import { UpdateProfileDto } from "src/auth/dto/updateProfileDto.dto";
 import { CloudinaryService } from "src/cloudinary/cloudinary.service";
 import { BcryptService } from "src/common/bcrypt.service";
+import { CurrentUser } from "src/common/utils/common.types";
 import { ServerError } from "src/common/utils/serverError";
 import { User } from "src/models/user.schema";
 
@@ -24,7 +25,7 @@ export class UserService {
   async updateProfile(
     imagePath: string,
     updateProfileDto: UpdateProfileDto,
-    currentUser
+    currentUser:CurrentUser
   ): Promise<Object> {
     try {
       const { username, profile_image } = updateProfileDto;
@@ -59,7 +60,7 @@ export class UserService {
   async searchUserByName(
     name: string,
     limit: number,
-    currentUser: { id: any }
+    currentUser: CurrentUser
   ): Promise<User[]> {
     try {
       const users = await this.userModel
@@ -84,7 +85,7 @@ export class UserService {
     }
   }
 
-  async fetchUsers(currentUser): Promise<User[]> {
+  async fetchUsers(currentUser:CurrentUser): Promise<User[]> {
     try {
       const users = await this.userModel.find(
         { _id: { $ne: currentUser.id } },
@@ -94,12 +95,12 @@ export class UserService {
     } catch (error) {
       if (error instanceof HttpException) throw error;
       throw new InternalServerErrorException(
-        "Something went wrong while trying to sign up."
+        "Something went wrong while trying to fetch users."
       );
     }
   }
 
-  async _findUserById(userId: string, currentUser): Promise<User> {
+  async _findUserById(userId: string, currentUser:CurrentUser): Promise<User> {
     try {
       const user = await this.userModel.findById(userId, {
         _id: 1,
@@ -114,12 +115,12 @@ export class UserService {
       if (error instanceof HttpException) throw error;
 
       throw new InternalServerErrorException(
-        "Something went wrong while trying to sign up."
+        "Something went wrong while trying to find user."
       );
     }
   }
 
-  async getUserByEmail(slug: string, currentUser): Promise<User[]> {
+  async getUserByEmail(slug: string, currentUser:CurrentUser): Promise<User[]> {
     try {
       const users = await this.userModel.find(
         {
@@ -132,11 +133,11 @@ export class UserService {
     } catch (error) {
       if (error instanceof HttpException) throw error;
       throw new InternalServerErrorException(
-        "Something went wrong while trying to sign up."
+        "Something went wrong while trying to fetch user by email."
       );
     }
   }
-  async getUserDetails(currentUser): Promise<User> {
+  async getUserDetails(currentUser:CurrentUser): Promise<User> {
     try {
       const user = await this.userModel
         .findOne(

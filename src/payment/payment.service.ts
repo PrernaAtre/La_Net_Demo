@@ -13,6 +13,7 @@ import Stripe from "stripe";
 import { StripeWebhookEvent } from "./dto/stripe-webhook-event.dto";
 import { ServerError } from "src/common/utils/serverError";
 import { Request, Response } from "express";
+import { CurrentUser } from "src/common/utils/common.types";
 
 @Injectable()
 export class StripeService {
@@ -54,7 +55,7 @@ export class StripeService {
     }
   }
 
-  async createCheckoutSession(currentUser):Promise<object> {
+  async createCheckoutSession(currentUser:CurrentUser):Promise<object> {
     try {
       const user = await this.userModel.findOne({ _id: currentUser.id });
 
@@ -133,7 +134,7 @@ export class StripeService {
     }
   }
 
-  async managePlan(currentUser){
+  async managePlan(currentUser:CurrentUser){
     try {
       const user = await this.userModel.findOne({ _id: currentUser.id }).lean();
 

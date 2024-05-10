@@ -2,9 +2,6 @@ import {
   Body,
   Controller,
   Get,
-  HttpException,
-  HttpStatus,
-  NotFoundException,
   Put,
   Query,
   Req,
@@ -15,15 +12,15 @@ import {
 import { InjectModel } from "@nestjs/mongoose";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Model } from "mongoose";
-import { AuthenticatedRequest } from "src/auth/auth.controller";
-import { AuthGuard } from "src/auth/jwt-auth.guard";
-import { UpdateProfileDto } from "../auth/dto/updateProfileDto.dto";
-import { User } from "../models/user.schema";
-import { UserService } from "./user.service";
-import { GetUserByEmailDto, SearchUserDto } from "./dto/user.dto";
 import { diskStorage } from "multer";
 import { extname } from "path";
+import { AuthGuard } from "src/auth/jwt-auth.guard";
 import { ServerError } from "src/common/utils/serverError";
+import { UpdateProfileDto } from "../auth/dto/updateProfileDto.dto";
+import { User } from "../models/user.schema";
+import { GetUserByEmailDto, SearchUserDto } from "./dto/user.dto";
+import { UserService } from "./user.service";
+import { AuthenticatedRequest } from "src/common/utils/common.types";
 
 const storage = diskStorage({
   destination: "./uploads",
@@ -35,11 +32,7 @@ const storage = diskStorage({
 
 @Controller("user")
 export class UserController {
-  constructor(
-    private userService: UserService,
-    @InjectModel(User.name)
-    private userModel: Model<User>
-  ) {}
+  constructor(private userService: UserService) {}
 
   @Put()
   @UseGuards(AuthGuard)
@@ -68,12 +61,7 @@ export class UserController {
   ): Promise<User[]> {
     const name = searchUserDto.name ?? "";
     const limit = Number(searchUserDto.limit) ?? 10;
-    const users = await this.userService.searchUserByName(
-      name,
-      limit,
-      currentUser
-    );
-    return users;
+    return this.userService.searchUserByName(name, limit, currentUser);
   }
 
   @Get("/fetchUsers")
@@ -81,7 +69,7 @@ export class UserController {
   async fetchUsers(
     @Req() { currentUser }: AuthenticatedRequest
   ): Promise<User[]> {
-    return await this.userService.fetchUsers(currentUser);
+    return this.userService.fetchUsers(currentUser);
   }
 
   @Get("/getUserByEmail")
@@ -91,13 +79,13 @@ export class UserController {
     @Req() { currentUser }: AuthenticatedRequest
   ): Promise<User[]> {
     const { slug } = getUserByEmailDto;
-    return await this.userService.getUserByEmail(slug, currentUser);
+    return this.userService.getUserByEmail(slug, currentUser);
   }
   @Get("details")
   @UseGuards(AuthGuard)
   async getUserDetails(
     @Req() { currentUser }: AuthenticatedRequest
   ): Promise<User> {
-    return await this.userService.getUserDetails(currentUser);
+    return this.userService.getUserDetails(currentUser);
   }
 }

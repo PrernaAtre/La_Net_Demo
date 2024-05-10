@@ -2,8 +2,8 @@ import { HttpException, HttpStatus, Injectable, InternalServerErrorException, Ne
 import { InjectModel } from '@nestjs/mongoose';
 import { NextFunction, Response } from 'express';
 import mongoose, { Model } from 'mongoose';
-import { AuthenticatedRequest } from 'src/auth/auth.controller';
 import { CommonService } from 'src/common/common.service';
+import { AuthenticatedRequest } from 'src/common/utils/common.types';
 import { ServerError } from 'src/common/utils/serverError';
 import { Page } from 'src/models/Page.schema';
 import { User } from 'src/models/user.schema';

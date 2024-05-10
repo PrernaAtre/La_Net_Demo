@@ -8,9 +8,9 @@ import {
   UseGuards,
 } from "@nestjs/common";
 import { Request, Response } from "express";
-import { AuthenticatedRequest } from "src/auth/auth.controller";
 import { AuthGuard } from "src/auth/jwt-auth.guard";
 import { StripeService } from "./payment.service";
+import { AuthenticatedRequest } from "src/common/utils/common.types";
 
 @Controller("payment")
 export class PaymentController {
