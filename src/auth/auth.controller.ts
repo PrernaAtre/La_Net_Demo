@@ -52,7 +52,7 @@ export class AuthController {
 
     @Post('/reset-password')
     @UseGuards(AuthGuard)
-    async resetPassword(@Body() resetPasswordDto: ResetPasswordDto, @Req() { currentUser }: AuthenticatedRequest): Promise<void> {
-        await this.authService.resetPassword(resetPasswordDto, currentUser);
+    async resetPassword(@Body() resetPasswordDto: ResetPasswordDto, @Req() { currentUser }: AuthenticatedRequest): Promise<object> {
+       return await this.authService.resetPassword(resetPasswordDto, currentUser);
     }
 }

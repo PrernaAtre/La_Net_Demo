@@ -59,7 +59,7 @@ export class PageService {
       );
 
       const pages = await this.pageModel.find({
-        $or: [{ userId: userId }, { sharedUsers: { $in: [userId] } }],
+         userId: userId 
       });
 
       if (!pages)
@@ -308,4 +308,26 @@ export class PageService {
       throw new InternalServerErrorException(error);
     }
   }
+  async getSharedPages(currentUser){
+    try {
+      const userId = mongoose.Types.ObjectId.createFromHexString(
+        currentUser.id
+      );
+
+      const pages = await this.pageModel.find({
+          sharedUsers: { $in: [userId] } 
+      });
+
+      if (!pages)
+        throw new ServerError({ message: "Pages not found", code: 404 });
+
+      return pages;
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      console.log("error", error);
+      throw new InternalServerErrorException(
+        "Something went wrong while trying to fetch pages."
+      );
+  }
+}
 }

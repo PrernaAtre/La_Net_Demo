@@ -28,7 +28,15 @@ import { ObjectIdValidationPipe } from "src/common/utils/objectidvalidation.midd
 @Controller("page")
 export class PageController {
   constructor(private pageService: PageService) {}
-
+  
+  @Get("sharedpages")
+  @UseGuards(AuthGuard)
+  async getSharedPages(
+    @Req() { currentUser }: AuthenticatedRequest
+  ): Promise<any> {
+    return await this.pageService.getSharedPages(currentUser);
+  }
+  
   @Put("/shared-users/:id")
   @UseGuards(AuthGuard)
   async addSharedUsers(

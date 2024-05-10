@@ -1,12 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
 @Injectable()
 export class CommonService {
+  constructor() {}
 
-  constructor() { }
+  public publishablePostCount: number = 5;
 
-  public publishablePostCount:number=5
-
-  convertUnixTimestampToDate (timestamp){
+  convertUnixTimestampToDate(timestamp: number): Date {
     return new Date(timestamp * 1000);
-  };
+  }
 }

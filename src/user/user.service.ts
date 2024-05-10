@@ -43,7 +43,7 @@ export class UserService {
           username,
           profile_image: image_url?.url,
         },
-        { new: true }
+        { new: true,projection:{_id:1,profile_image:1,username:1} }
       );
 
       return updated_user;
@@ -124,7 +124,7 @@ export class UserService {
       const users = await this.userModel.find(
         {
           email: { $regex: new RegExp(`^${slug}`) },
-          _id: { $ne: currentUser.id },
+          _id: { $ne: (currentUser.id) },
         },
         { userId: "$_id", _id: 0, email: 1 }
       );
