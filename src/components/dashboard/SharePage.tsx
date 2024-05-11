@@ -1,3 +1,5 @@
+"use client"
+
 import { useSharePage } from "@/modules/editor";
 import { useState } from "react";
 import AsyncSelect from "react-select/async";

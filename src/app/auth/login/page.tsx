@@ -1,11 +1,13 @@
 "use client";
-import { Button } from "@/components/ui/button";
 import { useLogin } from "@/modules/auth/login/hooks";
 import { Logo } from "@/modules/home";
 import { useFormik } from "formik";
 import Link from "next/link";
+import { Grid, TextField, Button } from '@mui/material';
 import React from "react";
 import "react-toastify/dist/ReactToastify.css";
+import { ForgotPasswordModal } from "../forgotPassword/ForgotPasswordModal";
+import { ToastContainer } from "react-toastify";
 
 const LoginForm: React.FC = () => {
   const { handleSubmit, initialValues, validationSchema } = useLogin();
@@ -19,103 +21,77 @@ const LoginForm: React.FC = () => {
   });
 
   return (
-    <>
-      <div className="flex min-h-screen flex-1 flex-col justify-center ite px-6 py-12 lg:px-8">
-        <div className="ml-[49%]">
-          <Logo />
-        </div>
-        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight dark:dark:text-white text-neutral-800">
-            Sign in to your account
-          </h2>
+    <Grid container className="h-screen fixed">
+    <Grid item xs={6} className="flex justify-center">
+      <img src="/login.svg" alt="" className="w-full h-full object-cover" />
+    </Grid>
+    <Grid item xs={6} className="flex justify-center">
+      <Grid item xs={12} sm={6} md={4}>
+        <div className="w-full max-w-md ml-[40%] mt-[52%]">
+          <p>Login</p>
         </div>
 
-        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form className="space-y-6" onSubmit={formik.handleSubmit}>
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium leading-6 dark:text-white text-neutral-600"
-              >
-                Email address
-              </label>
-              <div className="mt-2">
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={formik.values.email}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  autoComplete="email"
-                  required
-                  className="block w-full rounded-md border-0 p-1.5 dark:text-white text-neutral-600 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
-                />
-                {formik.errors.email && formik.touched.email ? (
-                  <p className="text-red-700 text-sm">{formik.errors.email}</p>
-                ) : null}
+        <form className="space-y-6 mt-6" onSubmit={formik.handleSubmit}>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TextField
+                id="email"
+                name="email"
+                type="email"
+                label="Email address"
+                value={formik.values.email}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                autoComplete="email"
+                required
+                fullWidth
+              />
+              {formik.errors.email && formik.touched.email && <p className="text-red-700">{formik.errors.email}</p>}
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                id="password"
+                name="password"
+                type="password"
+                label="Password"
+                value={formik.values.password}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                autoComplete="current-password"
+                required
+                fullWidth
+              />
+              {formik.errors.password && formik.touched.password && <p className="text-red-700">{formik.errors.password}</p>}
+            </Grid>
+            <Grid item xs={12}>
+              <div className="text-sm">
+                <ForgotPasswordModal />
               </div>
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between">
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium leading-6 dark:text-white text-neutral-600"
-                >
-                  Password
-                </label>
-              </div>
-              <div className="mt-2">
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  value={formik.values.password}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  autoComplete="current-password"
-                  required
-                  className="block w-full rounded-md border-0 p-1.5 dark:text-white text-neutral-600 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-                {formik.errors.password && formik.touched.password ? (
-                  <p className="text-red-700 text-sm">
-                    {formik.errors.password}
-                  </p>
-                ) : null}
-              </div>
-            </div>
-            <div className="text-sm">
-              <a
-                href="#"
-                className="font-semibold dark:text-white text-neutral-600 hover:text-indigo-500"
-              >
-                Forgot password?
-              </a>
-            </div>
-            <div>
+            </Grid>
+            <Grid item xs={12}>
               <Button
                 type="submit"
-                className="fflex w-full justify-center rounded-md bg-indigo-500 px-3 py-1.5 text-sm font-semibold leading-6 dark:text-white text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                variant="secondary"
-                size="lg"
+                variant="contained"
+                fullWidth
+                className="bg-black text-white font-semibold"
               >
                 Sign in
               </Button>
-            </div>
-
-            <div>
+            </Grid>
+            <Grid item xs={12}>
               <p>
-                Not Registered?{" "}
-                <Link href={"/auth/signup"} className="underline">
+                Not Registered?{' '}
+                <Link href="/auth/signup">
                   Sign Up
                 </Link>
               </p>
-            </div>
-          </form>
-        </div>
-      </div>
-    </>
+            </Grid>
+          </Grid>
+          <ToastContainer />
+        </form>
+      </Grid>
+    </Grid>
+  </Grid>
   );
 };
 

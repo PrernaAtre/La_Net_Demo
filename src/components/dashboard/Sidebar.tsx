@@ -169,7 +169,7 @@ const Sidebar: React.FC = () => {
           </li>
           <li>
             <Link
-              href="/routes/quickNote"
+              href="/quickNote"
               className="flex flex-row items-center h-10 rounded-lg text-muted-foreground hover:bg-primary/5"
             >
               <AddCircleOutlineIcon className="ml-2" fontSize="small" />

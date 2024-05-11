@@ -37,6 +37,10 @@ export const useSignUp = () => {
 
         router.push("/page");
       }
+      else
+      {
+        toast.error("Sign up Un successful");
+      }
     } catch (error: any) {
 
       toast.error(error?.message);

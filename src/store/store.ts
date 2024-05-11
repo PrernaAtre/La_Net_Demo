@@ -5,6 +5,7 @@ import { baseAPI } from "./baseApi";
 import { authReducer } from "./features/auth";
 import { pageReducer } from "./features/page";
 import { userReducer } from "./features/user";
+import { quickNoteReducer } from "./features/quickNote";
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     auth: persistReducer({ key: "auth", storage }, authReducer) as any,
     page: pageReducer,
     user: userReducer,
+    quickNote: quickNoteReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
