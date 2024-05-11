@@ -10,10 +10,12 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UserSchema } from 'src/models/user.schema';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { QuickNoteModule } from 'src/quick-note/quick-note.module';
+import { QuickNoteSchema } from 'src/quick-note/quickNote.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
+    MongooseModule.forFeature([{ name: 'User', schema: UserSchema },{ name: 'QuickNote', schema: QuickNoteSchema }]),
     JwtModule.registerAsync({
       imports : [ConfigModule],
       inject: [ConfigService],
@@ -26,7 +28,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         };
       },
     }),
-
   ],
   controllers: [UserController],
   providers: [UserService,AuthService,JwtStrategy,CloudinaryService,CommonService,BcryptService]

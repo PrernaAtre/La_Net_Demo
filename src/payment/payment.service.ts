@@ -78,7 +78,7 @@ export class StripeService {
         success_url: this.configService.get<string>('FRONTEND_URL'),
         line_items: [{ price: this.configService.get<string>('PRICE_ID'), quantity: 1 }],
         mode: "subscription",
-        currency: "USD",
+        currency: "INR",
         client_reference_id: user.customerId,
         customer: user.customerId,
         billing_address_collection:"required",

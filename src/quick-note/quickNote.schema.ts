@@ -7,14 +7,12 @@ import mongoose from 'mongoose';
 
 export class QuickNote
 {
-    @Prop({required:true})
-    title:  string;
 
     @Prop({required:true})
     userId : string;
 
     @Prop()
-    description : string
+    data : string
 }
 
 export const QuickNoteSchema = SchemaFactory.createForClass(QuickNote);

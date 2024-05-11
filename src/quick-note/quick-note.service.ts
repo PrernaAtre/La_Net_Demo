@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { QuickNote } from '../models/quickNote.schema';
-import { Model } from 'mongoose';
-import { CreateQuickNoteDto } from './dto/quickNote.dto';
+import { QuickNote } from './quickNote.schema';
+import mongoose, { Model } from 'mongoose';
+import { CreateQuickNoteDto, UpdateQuickNoteDto } from './dto/quickNote.dto';
 import OpenAI from "openai";
 // import { OpenAIApi, Configuration } from "openai";
 
@@ -11,52 +11,68 @@ export class QuickNoteService {
   constructor(
     @InjectModel('QuickNote') private quickNoteModel: Model<QuickNote>) { }
 
-  async createQuickNote(userId: string, title: string): Promise<QuickNote> {
-    console.log(" user id : ", userId)
-    console.log("title : ", title)
-    console.log("key ----------", process.env.OPEN_AI_KEY);
 
-    // Create a new quick note instance
-    // const openAI = new OpenAIApi(new Configuration({
-    //     apiKey: process.env.OPENAI_API_KEY,
-    //   }));
-    const openAI = new OpenAI(({
-      apiKey: process.env.OPEN_AI_KEY,
-    }));
-    const completion = await openAI.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: title }],
-    });
-    //  console.log(completion);
-    console.log(completion.choices[0].message.content);
-    const createdNote = new this.quickNoteModel({
-      title,
-      userId,
-      description: completion.choices[0].message.content
-    });
-    // Save the new quick note to the database
-    return await createdNote.save();
+  async create(data: CreateQuickNoteDto, currentUser): Promise<QuickNote> {
+    try {
+      const createdQuickNote = await this.quickNoteModel.create({
+        ...data,
+        userId: currentUser.id
+      });
+      console.log("createdQuickNote",createdQuickNote)
+      return createdQuickNote;
+    } catch (error) {
+      throw new Error(`Failed to create a new quick note`);
+    }
   }
 
-  async generateResponse(userMessage: string) {
-    console.log("userMessage---", userMessage);
+  async update(quickNoteDto: UpdateQuickNoteDto, currentUser): Promise<QuickNote> {
+    try {
+      console.log("quickNoteDto---",quickNoteDto.data)
+      const existingQuickNote = await this.quickNoteModel.findOne({userId: currentUser.id });
 
-    const openAI = new OpenAI(({
-      apiKey: process.env.OPEN_AI_KEY,
-    }));
-    const completion = await openAI.chat.completions.create({
-      messages: [
-        { role: 'system', content: 'You are a helpful assistant.' },
-        { role: 'user', content: userMessage },
-      ],
-      model: 'gpt-3.5-turbo',
-    });
-    const createdEmail = new this.quickNoteModel({
-      title: userMessage,
-      userId: "123456",
-      description: completion.choices[0].message.content
-    });
-    await createdEmail.save();
-    return completion.choices[0].message.content;
+      if (!existingQuickNote) {
+        throw new Error(`Quick note with id not found for the current user`);
+      }
+      const updatedData = existingQuickNote.data + quickNoteDto.data;
+      console.log("updatedData===", updatedData);
+      console.log(existingQuickNote.userId, currentUser.id)
+      const updatedQuickNote = await this.quickNoteModel.findOneAndUpdate(
+        { userId: currentUser.id },
+        { $set: { data: updatedData } },
+        { new: true }
+      );
+      console.log("updatedQuickNote---", updatedQuickNote)
+      return updatedQuickNote;
+    } catch (error) {
+      throw new Error(`Failed to update the quick note with ID`);
+    }
+  }
+
+  async get(currentUser): Promise<QuickNote> {
+    try {
+      const quickNote = await this.quickNoteModel.findOne({userId: currentUser.id });
+
+      if (!quickNote) {
+        throw new Error(`Quick note with ID  not found for the current user`);
+      }
+
+      return quickNote;
+    } catch (error) {
+      throw new Error(`Failed to fetch the quick note with ID`);
+    }
+  }
+
+  async delete(id: string, currentUser): Promise<QuickNote> {
+    try {
+      const deletedQuickNote = await this.quickNoteModel.findOneAndDelete({ _id: id, userId: currentUser.id });
+
+      if (!deletedQuickNote) {
+        throw new Error(`Quick note with ID ${id} not found for the current user`);
+      }
+
+      return deletedQuickNote;
+    } catch (error) {
+      throw new Error(`Failed to delete the quick note with ID ${id}`);
+    }
   }
 }

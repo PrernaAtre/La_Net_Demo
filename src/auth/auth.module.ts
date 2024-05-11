@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -10,10 +10,13 @@ import { JwtModule } from '@nestjs/jwt';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { CommonService } from 'src/common/common.service';
 import { BcryptService } from 'src/common/bcrypt.service';
+import { QuickNoteModule } from 'src/quick-note/quick-note.module';
+import { QuickNoteSchema } from 'src/quick-note/quickNote.schema';
 
 
 @Module({
   imports:[
+
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports : [ConfigModule],
@@ -27,11 +30,13 @@ import { BcryptService } from 'src/common/bcrypt.service';
         };
       },
     }),
-    MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
+    MongooseModule.forFeature([{ name: 'User', schema: UserSchema },{ name: 'QuickNote', schema: QuickNoteSchema }]),
+    forwardRef(()=>QuickNoteModule)
+
   ],
 
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy,CloudinaryService,CommonService,BcryptService],
+  providers: [AuthService, JwtStrategy,CloudinaryService,CommonService,BcryptService, ],
   exports: [JwtStrategy, PassportModule, AuthService]
 })
 export class AuthModule {}

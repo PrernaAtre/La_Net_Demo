@@ -2,7 +2,10 @@ import {
     Body,
     Controller,
     HttpException,
+    HttpStatus,
     InternalServerErrorException,
+    Param,
+    Patch,
     Post,
     Req,
     UploadedFile,
@@ -19,6 +22,8 @@ import { UserLoginDto } from "./dto/loginDto.dto";
 import { ResetPasswordDto } from "./dto/resetpassword.dto";
 import { UserSignupDto } from "./dto/signupDto.dto";
 import { AuthGuard } from "./jwt-auth.guard";
+import { ForgotPasswordDto } from "./dto/forgotPassword.dto";
+import { ResetPassworddto } from "./dto/resertPassword.dto";
 
 const storage = diskStorage({
   destination: "./uploads",
@@ -57,12 +62,54 @@ export class AuthController {
     return await this.authService.loginUser(userLoginDto);
   }
 
-  @Post("/reset-password")
-  @UseGuards(AuthGuard)
-  async resetPassword(
-    @Body() resetPasswordDto: ResetPasswordDto,
-    @Req() { currentUser }: AuthenticatedRequest
-  ): Promise<object> {
-    return this.authService.resetPassword(resetPasswordDto, currentUser);
+  // @Post("/reset-password")
+  // @UseGuards(AuthGuard)
+  // async resetPassword(
+  //   @Body() resetPasswordDto: ResetPasswordDto,
+  //   @Req() { currentUser }: AuthenticatedRequest
+  // ): Promise<object> {
+  //   return this.authService.resetPassword(resetPasswordDto, currentUser);
+  // }
+  @Post('/forgotPassword')
+  async ForgotPass(
+      @Body() data: ForgotPasswordDto,
+  ): Promise<{ message: string } | { error: string }> {
+      console.log(data);
+      try {
+          return await this.authService.sendForgotPasswordEmail(data);
+      } catch (error) {
+          throw new HttpException(
+              error.message || 'internal server error',
+              HttpStatus.BAD_REQUEST,
+          );
+      }
+  }
+
+  @Patch('/resetPassword/:id')
+  async resetPassword(@Body() resetData: ResetPassworddto,@Param('id') id:string) {
+      try
+      {
+          console.log("reset data", resetData);
+          return this.authService.resetPassword(resetData,id);
+      }
+      catch(err)
+      {
+          console.log(err);
+      }
+  }
+
+  @Post("/verifyToken/:userId/:token")
+  async verifyUser(@Param('userId') userId : string, @Param('token') token : string)
+  {
+      try
+      {
+          console.log(userId, token);
+          const result = await this.authService.verifyUser(userId, token);   
+          return result;
+      }
+      catch(err)
+      {
+          return new HttpException(err.message || 'Internal Server Error', HttpStatus.BAD_REQUEST)
+      }
   }
 }
