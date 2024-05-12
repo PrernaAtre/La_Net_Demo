@@ -10,9 +10,9 @@ export const usePage = (id?: string) => {
 
   useEffect(() => {
     if (!currentPage || currentPage?._id !== id) {
-      fetchPage(id || "");
+      fetchPage(id || "")
     }
-  }, [id, currentPage]);
+  }, [id, currentPage?._id]);
 
   return {
     page: currentPage,

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useSharePage } from "@/modules/editor";
 import { useState } from "react";
@@ -6,7 +6,10 @@ import AsyncSelect from "react-select/async";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 
-const SharePage: React.FC<{ id: string, onClose: Function }> = ({id, onClose}) => {
+const SharePage: React.FC<{ id: string; onClose: Function }> = ({
+  id,
+  onClose,
+}) => {
   const {
     defaultOptions,
     initialValues,
@@ -22,7 +25,10 @@ const SharePage: React.FC<{ id: string, onClose: Function }> = ({id, onClose}) =
   };
 
   const handleOnSubmit = () => {
-    handleSharePage(selectedUsers.map((d) => d.value), onClose);
+    handleSharePage(
+      selectedUsers.map((d) => d.value),
+      onClose
+    );
   };
 
   return (
@@ -36,7 +42,11 @@ const SharePage: React.FC<{ id: string, onClose: Function }> = ({id, onClose}) =
         defaultOptions={defaultOptions}
         loadOptions={loadOptions}
       />
-      <Button onClick={handleOnSubmit} disabled={isLoading}>
+      <Button
+        onClick={handleOnSubmit}
+        className="dark:bg-black dark:text-white"
+        disabled={isLoading}
+      >
         Share
       </Button>
     </div>

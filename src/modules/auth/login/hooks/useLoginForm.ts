@@ -30,8 +30,7 @@ export const useLogin = () => {
 
         router.push("/page");
       }
-      else
-      {
+      else {
         toast.error("Invalid username or passsword");
       }
 

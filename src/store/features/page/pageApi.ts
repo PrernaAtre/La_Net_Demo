@@ -1,5 +1,5 @@
 import { baseAPI } from "@/store/baseApi";
-import { addPage, deletePage, setPages, updatePage } from "./pageSlice";
+import { addPage, deletePage, setCurrentPage, setPages, updatePage } from "./pageSlice";
 
 export const pageApi = baseAPI.injectEndpoints({
   endpoints: (builder) => ({
@@ -9,7 +9,9 @@ export const pageApi = baseAPI.injectEndpoints({
         try {
           const { data } = await queryFulfilled;
 
-          dispatch(updatePage(data));
+          dispatch(setCurrentPage(data));
+
+          dispatch(updatePage(data))
 
           return data;
         } catch (e) {

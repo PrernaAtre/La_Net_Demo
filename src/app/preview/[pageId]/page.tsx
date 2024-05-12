@@ -3,7 +3,8 @@ import Toolbar from "@/components/Toolbar";
 import { Cover } from "@/components/dashboard";
 import { usePage } from "@/modules/editor";
 import "@blocknote/core/fonts/inter.css";
-import { BlockNoteView, useCreateBlockNote } from "@blocknote/react";
+import { useCreateBlockNote } from "@blocknote/react";
+import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/react/style.css";
 import { useTheme } from "next-themes";
 import Image from "next/image";
@@ -47,7 +48,13 @@ const page: React.FC<PageProps> = ({ params }) => {
     <>
       {page?.publishId ? (
         <div className="editor-container w-full h-screen">
-          <Cover pageId={pageId!} preview url={page?.coverImage} setOpen={(d: boolean) => {}} setId={(d) => {}}/>
+          <Cover
+            pageId={pageId!}
+            preview
+            url={page?.coverImage}
+            setOpen={(d: boolean) => {}}
+            setUrl={(d) => {}}
+          />
 
           <div className="h-screen">
             <Toolbar

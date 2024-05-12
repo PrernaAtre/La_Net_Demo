@@ -4,22 +4,19 @@ import { useState } from "react";
 
 import { SingleImageDropzone } from "@/components/single-image-dropzone";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
-import { useUpdatePage } from "@/modules/editor/hooks/useUpdatePage";
 import { debounce } from "lodash";
 
 interface CoverImageModalProps {
   isOpen: boolean;
   onClose: (args?: any) => void;
-  pageId: string;
+  handleUpdatePage: (args?: any) => void;
 }
 
 export const CoverImageModal: React.FC<CoverImageModalProps> = ({
   isOpen,
   onClose,
-  pageId,
+  handleUpdatePage,
 }) => {
-  const { handleUpdatePage, page } = useUpdatePage(pageId || "");
-
   const [file, setFile] = useState<File>();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -42,15 +39,12 @@ export const CoverImageModal: React.FC<CoverImageModalProps> = ({
         body: body,
       });
 
-      if (page._id) {
-        handleUpdatePage({
-          id: page._id,
-          coverImage: (await res.json()).data.url.replace(
-            "tmpfiles.org/",
-            "tmpfiles.org/dl/"
-          ),
-        });
-      }
+      handleUpdatePage({
+        coverImage: (await res.json()).data.url.replace(
+          "tmpfiles.org/",
+          "tmpfiles.org/dl/"
+        ),
+      });
       handleOnClose();
     }
   }, 500);

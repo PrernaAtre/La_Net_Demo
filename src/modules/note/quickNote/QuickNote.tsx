@@ -1,31 +1,32 @@
-"use client"
-import { useEffect, useState } from "react";
-import { Editor } from 'novel-lightweight';
-import { EditorRoot, EditorContent } from "novel";
+"use client";
+import { Editor } from "novel-lightweight";
+import { useState } from "react";
 import { useCreateQuickNote, useQuickNote, useUpdateQuickNote } from "./hooks";
-
 
 const QuickNote: React.FC = () => {
   const { quickNote } = useQuickNote();
-  const { handleCreateQuickNote, isLoading: isPageLoading, error: isPageError } = useCreateQuickNote();
+  const {
+    handleCreateQuickNote,
+    isLoading: isPageLoading,
+    error: isPageError,
+  } = useCreateQuickNote();
   const { handleUpdateQuickNote } = useUpdateQuickNote();
   const [data, setData] = useState("");
   const [question, setQuestion] = useState("");
   console.log("quickNote----", quickNote?.data);
 
-  // useEffect(()=>{   
+  // useEffect(()=>{
   // },[data])
   const handleSubmit = async (payload: any) => {
-      return handleUpdateQuickNote({
-        data: JSON.stringify(payload),
-      });
+    return handleUpdateQuickNote({
+      data: JSON.stringify(payload),
+    });
   };
-
 
   return (
     <>
       <Editor
-        defaultValue = {data}
+        defaultValue={data}
         disableLocalStorage={true}
         // onUpdate={(editor) => {
         //   console.log(typeof editor?.storage.markdown.getMarkdown());
@@ -37,8 +38,10 @@ const QuickNote: React.FC = () => {
         //     setData(editor?.storage.markdown.getMarkdown());
 
         // }}
-        
-        onUpdate={(editor) => handleSubmit(editor?.storage.markdown.getMarkdown())}
+
+        onUpdate={(editor) => {
+          handleSubmit(editor?.storage.markdown.getMarkdown());
+        }}
       />
       {/* <EditorRoot>
         <EditorContent
@@ -46,7 +49,6 @@ const QuickNote: React.FC = () => {
             onUpdate={(editor) => handleSubmit(editor?.storage.markdown.getMarkdown())}
         />
       </EditorRoot> */}
-
       <p>que-------{question}</p>
       data------{JSON.stringify(data)}
     </>
