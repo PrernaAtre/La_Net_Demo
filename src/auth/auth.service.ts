@@ -29,7 +29,7 @@ export class AuthService {
     private readonly cloudinaryService: CloudinaryService,
     private readonly commonService: CommonService,
     private readonly bcryptService: BcryptService
-  ) {}
+  ) { }
 
   verifyToken(token: string): string | object {
     try {
@@ -39,7 +39,7 @@ export class AuthService {
       ) as jwt.JwtPayload;
 
       if (!decoded || !decoded.id) {
-        throw new ServerError({code:400,message:'Invalid token'})
+        throw new ServerError({ code: 400, message: 'Invalid token' })
       }
 
       return decoded;
@@ -58,9 +58,9 @@ export class AuthService {
       const checkEmail = await this.userModel.findOne({ email }).lean();
       if (checkEmail) {
         throw new ServerError({
-            message: "Account with same email already exists. Please sign in.",
-            code: 409,
-          });
+          message: "Account with same email already exists. Please sign in.",
+          code: 409,
+        });
       }
 
       const hashedPassword = await this.bcryptService.hash(password);
@@ -75,14 +75,14 @@ export class AuthService {
         profile_image: image_url?.url,
       });
 
-      return {message:"User register succesfully"};
+      return { message: "User register succesfully" };
     } catch (error) {
-        if (error instanceof HttpException) throw error;
+      if (error instanceof HttpException) throw error;
 
-        throw new InternalServerErrorException(
-          "Something went wrong while trying to sign up."
-        );
-      }
+      throw new InternalServerErrorException(
+        "Something went wrong while trying to sign up."
+      );
+    }
   }
 
   async loginUser(
@@ -90,11 +90,11 @@ export class AuthService {
   ): Promise<{ token: string; user: Omit<User, 'password'> }> {
     try {
       const { email, password } = userLoginDto;
-      const user = await this.userModel.findOne({ email: email },{_id:1,username:1,email:1,profile_image:1,password:1}).lean();
+      const user = await this.userModel.findOne({ email: email }, { _id: 1, username: 1, email: 1, profile_image: 1, password: 1, IsSubscribed: 1 }).lean();
       if (user && (await bcrypt.compare(password, user.password))) {
         const token = this.jwtService.sign({ id: user._id });
-        const { password, ...userWithoutPassword } = user; 
-        return { token, user:userWithoutPassword };
+        const { password, ...userWithoutPassword } = user;
+        return { token, user: userWithoutPassword };
       }
       throw new ServerError({
         message: "Invalid email or password.",
@@ -113,14 +113,14 @@ export class AuthService {
   async resetPassword(
     resetPasswordDto: ResetPasswordDto,
     currentUser
-  ){
+  ) {
     try {
       const user = await this.userModel.findOne({ _id: currentUser.id });
 
       if (!user) throw new ServerError({
         message: "User not found.",
         code: 404,
-      });    
+      });
 
       const isMatch = await this.bcryptService.compare(
         resetPasswordDto.oldPassword,
@@ -128,9 +128,9 @@ export class AuthService {
       );
       if (!isMatch) {
         throw new ServerError({
-            message: "Old password is incorrect.",
-            code: 400,
-          });    
+          message: "Old password is incorrect.",
+          code: 400,
+        });
       }
 
       const hashedPassword = await this.bcryptService.hash(
@@ -138,13 +138,13 @@ export class AuthService {
       );
       user.password = hashedPassword;
       await user.save();
-      return {message:"User password updated successfully."};
+      return { message: "User password updated successfully." };
     } catch (error) {
-        if (error instanceof HttpException) throw error;
+      if (error instanceof HttpException) throw error;
 
-        throw new InternalServerErrorException(
-          "Something went wrong while trying to reset password."
-        );
-      }
+      throw new InternalServerErrorException(
+        "Something went wrong while trying to reset password."
+      );
+    }
   }
 }

@@ -39,7 +39,7 @@ export class UserController {
     private userService: UserService,
     @InjectModel(User.name)
     private userModel: Model<User>
-  ) {}
+  ) { }
 
   @Put()
   @UseGuards(AuthGuard)
@@ -93,6 +93,7 @@ export class UserController {
     const { slug } = getUserByEmailDto;
     return await this.userService.getUserByEmail(slug, currentUser);
   }
+
   @Get("details")
   @UseGuards(AuthGuard)
   async getUserDetails(
