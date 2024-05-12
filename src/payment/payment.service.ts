@@ -13,6 +13,7 @@ import Stripe from "stripe";
 import { StripeWebhookEvent } from "./dto/stripe-webhook-event.dto";
 import { ServerError } from "src/common/utils/serverError";
 import { Request, Response } from "express";
+import { CurrentUser } from "src/common/utils/common.types";
 
 @Injectable()
 export class StripeService {
@@ -54,7 +55,7 @@ export class StripeService {
     }
   }
 
-  async createCheckoutSession(currentUser):Promise<object> {
+  async createCheckoutSession(currentUser:CurrentUser):Promise<object> {
     try {
       const user = await this.userModel.findOne({ _id: currentUser.id });
 
@@ -77,7 +78,7 @@ export class StripeService {
         success_url: this.configService.get<string>('FRONTEND_URL'),
         line_items: [{ price: this.configService.get<string>('PRICE_ID'), quantity: 1 }],
         mode: "subscription",
-        currency: "USD",
+        currency: "INR",
         client_reference_id: user.customerId,
         customer: user.customerId,
         billing_address_collection:"required",
@@ -133,7 +134,7 @@ export class StripeService {
     }
   }
 
-  async managePlan(currentUser){
+  async managePlan(currentUser:CurrentUser){
     try {
       const user = await this.userModel.findOne({ _id: currentUser.id }).lean();
 
@@ -146,7 +147,7 @@ export class StripeService {
 
       const session = await this.stripe.billingPortal.sessions.create({
         customer: user.customerId,
-        return_url: 'https://example.com/account',
+        return_url: this.configService.get<string>('FRONTEND_URL'),
       });
       return {url:session.url}
     } catch (error) {

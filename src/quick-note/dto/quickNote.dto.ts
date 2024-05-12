@@ -4,12 +4,11 @@ import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateQuickNoteDto {
     @IsNotEmpty()
-    @IsString()
-    title: string;
+    data?: string;
+}
 
+export class UpdateQuickNoteDto 
+{
     @IsNotEmpty()
-    @IsString()
-    userId: string;
-
-    description?: string; // Optional field
+    data?: string;
 }

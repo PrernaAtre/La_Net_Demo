@@ -18,11 +18,6 @@ import { GlobalExceptionFilter } from './common/utils/errorHadler';
 
 @Module({
   imports: [
-    // CorsModule.forRoot({
-    //   origin: '*', // Allow requests from any origin, you can specify specific origins if needed
-    //   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Allow these HTTP methods
-    //   allowedHeaders: 'Content-Type,Authorization', // Allow these headers
-    // }),
     PaymentModule,
     ConfigModule.forRoot({
       envFilePath: '.env',
@@ -51,8 +46,4 @@ import { GlobalExceptionFilter } from './common/utils/errorHadler';
     },
   ],
 })
-export class AppModule {
-  // configure(consumer: MiddlewareConsumer) {
-  //   consumer.apply(CorsMiddleware).forRoutes('*');
-  // }
-}
+export class AppModule {}

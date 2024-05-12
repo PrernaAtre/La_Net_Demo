@@ -1,4 +1,3 @@
-// PageService.ts
 import {
   HttpException,
   Injectable,
@@ -10,10 +9,8 @@ import { CommonService } from "src/common/common.service";
 import { ServerError } from "src/common/utils/serverError";
 import { User } from "src/models/user.schema";
 import { Page } from "../models/Page.schema";
-import {
-  CreatePageDto,
-  UpdatePageDto
-} from "./dto/CreatePage.dto";
+import { CreatePageDto, UpdatePageDto } from "./dto/CreatePage.dto";
+import { CurrentUser } from "src/common/utils/common.types";
 
 @Injectable()
 export class PageService {
@@ -24,7 +21,7 @@ export class PageService {
     public commonService: CommonService
   ) {}
 
-  async get(id: string, currentUser): Promise<Page> {
+  async get(id: string, currentUser:CurrentUser): Promise<Page> {
     try {
       const userId = mongoose.Types.ObjectId.createFromHexString(
         currentUser.id
@@ -52,14 +49,14 @@ export class PageService {
     }
   }
 
-  async pages(currentUser): Promise<Page[]> {
+  async pages(currentUser:CurrentUser): Promise<Page[]> {
     try {
       const userId = mongoose.Types.ObjectId.createFromHexString(
         currentUser.id
       );
 
       const pages = await this.pageModel.find({
-         userId: userId 
+        userId: userId,
       });
 
       if (!pages)
@@ -75,7 +72,7 @@ export class PageService {
     }
   }
 
-  async create(page: CreatePageDto, currentUser) {
+  async create(page: CreatePageDto, currentUser:CurrentUser) {
     try {
       return await this.pageModel.create(
         new this.pageModel({
@@ -92,12 +89,13 @@ export class PageService {
     }
   }
 
-  async update(id: string, page: UpdatePageDto, currentUser) {
+  async update(id: string, page: UpdatePageDto, currentUser:CurrentUser) {
     try {
+      const userId = mongoose.Types.ObjectId.createFromHexString(currentUser.id);
       const existingPage = await this.pageModel
         .findOne({
           _id: id,
-          userId: mongoose.Types.ObjectId.createFromHexString(currentUser.id),
+          $or: [{ userId }, { sharedUsers: { $in: [userId] } }],
         })
         .lean();
 
@@ -120,7 +118,7 @@ export class PageService {
     }
   }
 
-  async makeTrashed(id: string, currentUser) {
+  async makeTrashed(id: string, currentUser:CurrentUser) {
     try {
       const existingPage = await this.pageModel
         .findOne({
@@ -148,7 +146,7 @@ export class PageService {
     }
   }
 
-  async delete(id: string, currentUser) {
+  async delete(id: string, currentUser:CurrentUser) {
     try {
       const existingPage = await this.pageModel
         .findOne({
@@ -172,7 +170,7 @@ export class PageService {
     }
   }
 
-  async recover(id: string, currentUser) {
+  async recover(id: string, currentUser:CurrentUser) {
     try {
       const existingPage = await this.pageModel
         .findOne({
@@ -200,9 +198,8 @@ export class PageService {
     }
   }
 
-  async addSharedUsers(pageId, userIds, currentUser) {
+  async addSharedUsers(pageId, userIds, currentUser:CurrentUser) {
     try {
-
       const page = await this.pageModel
         .findOne({
           _id: mongoose.Types.ObjectId.createFromHexString(pageId),
@@ -241,7 +238,7 @@ export class PageService {
     }
   }
 
-  async removeSharedUsers(pageId: string, userId: string, currentUser) {
+  async removeSharedUsers(pageId: string, userId: string, currentUser:CurrentUser) {
     try {
       const page = await this.pageModel
         .findOne({
@@ -274,7 +271,7 @@ export class PageService {
     }
   }
 
-  async publishPage(pageId: string, currentUser) {
+  async publishPage(pageId: string, currentUser:CurrentUser) {
     try {
       const publishedPage = await this.pageModel.findOneAndUpdate(
         {
@@ -290,7 +287,7 @@ export class PageService {
     }
   }
 
-  async unpublish(pageId: string, currentUser) {
+  async unpublish(pageId: string, currentUser:CurrentUser) {
     try {
       const unpublishedPage = await this.pageModel.findOneAndUpdate(
         {
@@ -308,14 +305,14 @@ export class PageService {
       throw new InternalServerErrorException(error);
     }
   }
-  async getSharedPages(currentUser){
+  async getSharedPages(currentUser:CurrentUser) {
     try {
       const userId = mongoose.Types.ObjectId.createFromHexString(
         currentUser.id
       );
 
       const pages = await this.pageModel.find({
-          sharedUsers: { $in: [userId] } 
+        sharedUsers: { $in: [userId] },
       });
 
       if (!pages)
@@ -328,6 +325,6 @@ export class PageService {
       throw new InternalServerErrorException(
         "Something went wrong while trying to fetch pages."
       );
+    }
   }
-}
 }
