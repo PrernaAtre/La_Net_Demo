@@ -11,6 +11,8 @@ const resetPassword = () => {
     const router = useRouter();
     const userId = searchParams.get('userId')
     const token = searchParams.get('token')
+    console.log(userId, token);
+    
     const [currentPassword, setCurrentPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 

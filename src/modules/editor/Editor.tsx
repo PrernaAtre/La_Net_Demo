@@ -54,7 +54,7 @@ const Editor: React.FC<EditorProps> = ({ pageId }) => {
 
       return updatedPage;
     },
-    [page, handleUpdatePage]
+    [page?._id]
   );
 
   function handleShare(event: any): void {

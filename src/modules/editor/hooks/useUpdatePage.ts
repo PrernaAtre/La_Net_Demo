@@ -5,11 +5,12 @@ import { useUpdatePageMutation } from "@/store/features/page";
 export const useUpdatePage = (id?: string) => {
   const { page, isLoading: isPageLoading, error: isPageError } = usePage(id!);
 
+  console.log("page._id", page?._id)
+
   const [updatePage, { data, isLoading, error }] = useUpdatePageMutation();
 
   const handleUpdatePage = debounce(
     async (input: Record<string, any>, onComplete?: Function) => {
-
       const updatedPage = await updatePage({
         ...input,
         id: page?._id,
@@ -21,7 +22,7 @@ export const useUpdatePage = (id?: string) => {
 
       return updatedPage;
     },
-    300
+    700
   );
 
   return {

@@ -58,6 +58,7 @@ const EditorBlock: React.FC<EditorBlockProps> = ({
         editor={editor}
         editable={editable}
         theme={resolvedTheme === "dark" ? "dark" : "light"}
+        
       />
     </div>
   );

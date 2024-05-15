@@ -4,10 +4,12 @@ import AuthToken from "@/lib/AuthToken";
 import { useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useEffect } from "react";
+import { useCurrentUser } from "@/modules/hooks";
 
 export const useLogin = () => {
   const [login, { isLoading, error }] = useLoginMutation({});
-
+  const { user } = useCurrentUser();
   const dispatch = useDispatch();
 
   const router = useRouter();
@@ -25,7 +27,7 @@ export const useLogin = () => {
         AuthToken.set(response?.data?.token);
 
         dispatch(setCurrentUser(response?.data?.user));
-
+        
         toast.success("Login successful");
 
         router.push("/page");
@@ -41,6 +43,12 @@ export const useLogin = () => {
       console.log(`[Login User] [Error]: ${error?.message}`);
     }
   };
+  
+  useEffect(() => {
+    if (user) {
+      router.push("/page");
+    }
+  }, [user, router]);
 
   return {
     initialValues: loginSchema.cast({}, { assert: false, stripUnknown: false }),

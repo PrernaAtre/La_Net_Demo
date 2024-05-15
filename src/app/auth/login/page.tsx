@@ -4,8 +4,6 @@ import { Button, Grid, TextField } from "@mui/material";
 import { useFormik } from "formik";
 import Link from "next/link";
 import React from "react";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { ForgotPasswordModal } from "../forgotPassword/ForgotPasswordModal";
 
 const LoginForm: React.FC = () => {
@@ -87,7 +85,6 @@ const LoginForm: React.FC = () => {
                 </p>
               </Grid>
             </Grid>
-            <ToastContainer />
           </form>
         </Grid>
       </Grid>

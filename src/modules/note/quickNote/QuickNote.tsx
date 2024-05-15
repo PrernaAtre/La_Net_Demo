@@ -1,57 +1,56 @@
-"use client";
-import { Editor } from "novel-lightweight";
-import { useState } from "react";
-import { useCreateQuickNote, useQuickNote, useUpdateQuickNote } from "./hooks";
+"use client"
+import { useEffect, useState } from "react";
+import { Editor } from 'novel-lightweight';
+import Button from "@mui/material/Button";
+import { useTheme } from "next-themes";
+import { useGetQuickNoteQuery } from "@/store/features/quickNote";
+import { useUpdateQuickNote } from "./hooks";
+import LoadingButton from '@mui/lab/LoadingButton';
+import SaveIcon from '@mui/icons-material/Save';
 
 const QuickNote: React.FC = () => {
-  const { quickNote } = useQuickNote();
-  const {
-    handleCreateQuickNote,
-    isLoading: isPageLoading,
-    error: isPageError,
-  } = useCreateQuickNote();
   const { handleUpdateQuickNote } = useUpdateQuickNote();
-  const [data, setData] = useState("");
-  const [question, setQuestion] = useState("");
-  console.log("quickNote----", quickNote?.data);
+  const { data, error, isLoading } = useGetQuickNoteQuery("");
+  const [solution, setSolution] = useState(data || "");
+  const [editorData, setEditorData] = useState(null);
+  const { resolvedTheme } = useTheme();
+  const [theme, setTheme] = useState(resolvedTheme);
+  const [loading, setLoading] = useState(false); // Step 1: Loading state
 
-  // useEffect(()=>{
-  // },[data])
+  useEffect(() => {
+    setTheme(resolvedTheme);
+  }, [resolvedTheme]);
+
+  useEffect(() => {
+    if (data?.data) {
+      setSolution(data?.data);
+    }
+  }, [data?.data]);
+
   const handleSubmit = async (payload: any) => {
-    return handleUpdateQuickNote({
-      data: JSON.stringify(payload),
-    });
+    setLoading(true); // Step 2: Set loading to true on submit
+    try {
+      await handleUpdateQuickNote({
+        data: payload,
+      });
+      setLoading(false); // Step 4: Set loading to false after data is saved
+    } catch (error) {
+      console.error("Error saving data:", error);
+      setLoading(false); // Step 4: Set loading to false in case of error
+    }
   };
 
   return (
     <>
       <Editor
-        defaultValue={data}
+        className="w-[80%]"
+        defaultValue={solution}
         disableLocalStorage={true}
-        // onUpdate={(editor) => {
-        //   console.log(typeof editor?.storage.markdown.getMarkdown());
-        //     if(editor?.storage.markdown.getMarkdown())
-        //     {
-        //         console.log("if caaling");
-        //         setQuestion(editor?.storage.markdown.getMarkdown());
-        //     }
-        //     setData(editor?.storage.markdown.getMarkdown());
-
-        // }}
-
-        onUpdate={(editor) => {
-          handleSubmit(editor?.storage.markdown.getMarkdown());
-        }}
+        onUpdate={(editor) => setEditorData(editor?.storage.markdown.getMarkdown())}
       />
-      {/* <EditorRoot>
-        <EditorContent
-            {...quickNote}
-            onUpdate={(editor) => handleSubmit(editor?.storage.markdown.getMarkdown())}
-        />
-      </EditorRoot> */}
-      <p>que-------{question}</p>
-      data------{JSON.stringify(data)}
+      <Button onClick={() => handleSubmit(editorData)} disabled={loading}>SUBMIT</Button> 
     </>
   );
 };
+
 export default QuickNote;

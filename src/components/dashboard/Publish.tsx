@@ -47,7 +47,7 @@ const Publish = () => {
     }, 1000);
   };
 
-  return user.IsSubscribed ? (
+  return user.isSubscribed ? (
     <Popover>
       <PopoverTrigger asChild>
         <Button size="sm" variant="default">
