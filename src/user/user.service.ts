@@ -142,7 +142,7 @@ export class UserService {
       const user = await this.userModel
         .findOne(
           { _id: mongoose.Types.ObjectId.createFromHexString(currentUser.id) },
-          { _id: 1, username: 1, email: 1, profile_image: 1, IsSubscribed:1 }
+          { _id: 1, username: 1, email: 1, profile_image: 1, isSubscribed:1 }
         )
         .lean();
 

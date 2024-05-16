@@ -38,7 +38,7 @@ export class PageService {
 
       if (!page)
         throw new ServerError({ message: "Page not found", code: 404 });
-
+      console.log("page---",page);
       return page;
     } catch (error) {
       if (error instanceof HttpException) throw error;

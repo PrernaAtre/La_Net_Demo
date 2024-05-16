@@ -120,7 +120,7 @@ export class AuthService {
         profile_image: image_url?.url,
       });
 
-      const createdQuickNote = await this.quickNoteModel.create({ data: "", userId: newUser._id });
+      const createdQuickNote = await this.quickNoteModel.create({ data: null, userId: newUser._id });
 
       return { message: "User register succesfully" };
     } catch (error) {
@@ -141,7 +141,7 @@ export class AuthService {
       if (user && (await bcrypt.compare(password, user.password))) {
         const token = this.jwtService.sign({ id: user._id });
         const { password, ...userWithoutPassword } = user;
-        return { token, user: userWithoutPassword };
+        return { token, user: userWithoutPassword }; 
       }
       throw new ServerError({
         message: "Invalid email or password.",
@@ -157,41 +157,113 @@ export class AuthService {
     }
   }
 
-  async resetPassword(
-    resetPasswordDto: ResetPasswordDto,
-    currentUser
-  ) {
+  async resetToken(
+    userid: string,
+    username: string,
+  ): Promise<{ reset_token: string }> {
+    const payload = {
+      id: userid,
+      username,
+    };
+    const token = this.jwtService.sign(payload, {
+      expiresIn: '5m',
+      secret: process.env.JWT_SECRET,
+    });
+    return {
+      reset_token: token,
+    };
+  }
+
+
+  async sendForgotPasswordEmail(data: ForgotPasswordDto): Promise<{ message: string } | { error: string }> {
+    // Validate email address
     try {
-      const user = await this.userModel.findOne({ _id: currentUser.id });
-
-      if (!user) throw new ServerError({
-        message: "User not found.",
-        code: 404,
-      });
-
-      const isMatch = await this.bcryptService.compare(
-        resetPasswordDto.oldPassword,
-        user.password
-      );
-      if (!isMatch) {
-        throw new ServerError({
-          message: "Old password is incorrect.",
-          code: 400,
-        });
+      const email = data.email;
+      const user = await this.userModel.findOne({ email });          // Send email using the EmailService
+      if (!user) {
+        return { message: "User not found" }
       }
-
-      const hashedPassword = await this.bcryptService.hash(
-        resetPasswordDto.newPassword
-      );
-      user.password = hashedPassword;
-      await user.save();
-      return { message: "User password updated successfully." };
+      const resetToken = await this.resetToken(String(user._id), user.username);
+      const mailOptions = {
+        from: this.configService.get('EMAIL_USER'),
+        to: email,
+        subject: 'Token to reset your password',
+        text: `I you want to reset your password then click on the given below link ,else ignore this email :: http://localhost:3000/auth/resetPassword/?userId=${user._id}&token=${resetToken.reset_token}`,
+      };
+      if (!this.transporter) {
+        throw new Error('Transporter is not initialized');
+      }
+      await this.transporter.sendMail(mailOptions);
+      return { message: 'Email sent successfully' };
     } catch (error) {
-      if (error instanceof HttpException) throw error;
-
-      throw new InternalServerErrorException(
-        "Something went wrong while trying to reset password."
-      );
+      throw new Error('Internal server error');
     }
   }
+
+  async resetPassword(resetinfo: ResetPassworddto, id: string) {
+    try {
+      // Verify reset token
+      const hash = await bcrypt.hash(resetinfo.currentPassword, 10);
+      console.log(hash, id);
+      const updatePassword = await this.userModel.findByIdAndUpdate(
+        id,
+        { password: hash },
+        { new: true }
+      );
+
+      if (!updatePassword)
+        throw new HttpException('Password is not updated.', 404);
+
+      return {
+        success: true,
+        message: 'Successfully password has been updated',
+        statusCode: 200, // Success status code
+      };
+    } catch (error) {
+      // Handle errors and return failure message
+      console.error('Password reset failed:', error.message);
+      return {
+        success: false,
+        message: 'Password reset failed. Please try again.',
+        statusCode: 404, // Failure status code
+      };
+    }
+  }
+  // async resetPassword(
+  //   resetPasswordDto: ResetPasswordDto,
+  //   currentUser
+  // ) {
+  //   try {
+  //     const user = await this.userModel.findOne({ _id: currentUser.id });
+
+  //     if (!user) throw new ServerError({
+  //       message: "User not found.",
+  //       code: 404,
+  //     });
+
+  //     const isMatch = await this.bcryptService.compare(
+  //       resetPasswordDto.oldPassword,
+  //       user.password
+  //     );
+  //     if (!isMatch) {
+  //       throw new ServerError({
+  //         message: "Old password is incorrect.",
+  //         code: 400,
+  //       });
+  //     }
+
+  //     const hashedPassword = await this.bcryptService.hash(
+  //       resetPasswordDto.newPassword
+  //     );
+  //     user.password = hashedPassword;
+  //     await user.save();
+  //     return { message: "User password updated successfully." };
+  //   } catch (error) {
+  //     if (error instanceof HttpException) throw error;
+
+  //     throw new InternalServerErrorException(
+  //       "Something went wrong while trying to reset password."
+  //     );
+  //   }
+  // }
 }

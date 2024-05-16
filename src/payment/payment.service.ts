@@ -48,7 +48,7 @@ export class StripeService {
       }
     } catch (error) {
       if (error instanceof HttpException) throw error;
-
+console.log('error', error)
       throw new InternalServerErrorException(
         "Something went wrong while trying to process webhook event."
       );
@@ -59,7 +59,7 @@ export class StripeService {
     try {
       const user = await this.userModel.findOne({ _id: currentUser.id });
 
-      if (user.IsSubscribed){
+      if (user.isSubscribed){
         throw new ServerError({
           code: 400,
           message: "User already have a plan.",
@@ -113,7 +113,7 @@ export class StripeService {
         }
         await this.userModel.updateOne(
           { _id: userId },
-          { $set: { IsSubscribed: true } }
+          { $set: { isSubscribed: true } }
         );
 
         break;
@@ -124,7 +124,7 @@ export class StripeService {
         await this.userModel.updateOne(
           { _id: subscriptionScheduleCanceled.metadata.userId },
           {
-            $set: { IsSubscribed: false },
+            $set: { isSubscribed: false },
           }
         );
 
@@ -137,8 +137,9 @@ export class StripeService {
   async managePlan(currentUser:CurrentUser){
     try {
       const user = await this.userModel.findOne({ _id: currentUser.id }).lean();
+      console.log("user-------",user);
 
-      if (!user.IsSubscribed){
+      if (!user.isSubscribed){
         throw new ServerError({
           code: 400,
           message: "User has not taken plan.",
@@ -149,7 +150,8 @@ export class StripeService {
         customer: user.customerId,
         return_url: this.configService.get<string>('FRONTEND_URL'),
       });
-      return {url:session.url}
+
+      return {url:session.url, isSubscribed: user.isSubscribed}
     } catch (error) {
       console.log('error', error)
       if (error instanceof HttpException) throw error;

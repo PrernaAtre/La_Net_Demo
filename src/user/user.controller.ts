@@ -57,6 +57,13 @@ export class UserController {
     );
   }
 
+  @Get()
+  @UseGuards(AuthGuard)
+  async getUser(@Req() { currentUser }: AuthenticatedRequest): Promise<User> {
+    console.log(currentUser)
+    return this.userService.getUserDetails(currentUser);
+  }
+
   @Get("/search")
   @UseGuards(AuthGuard)
   async searchUser(

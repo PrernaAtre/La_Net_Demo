@@ -64,6 +64,7 @@ export class PageController {
       currentUser
     );
   }
+  
   @Post("/")
   @UseGuards(AuthGuard)
   async create(

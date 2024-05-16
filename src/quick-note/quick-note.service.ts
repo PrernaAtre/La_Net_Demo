@@ -33,7 +33,7 @@ export class QuickNoteService {
       if (!existingQuickNote) {
         throw new Error(`Quick note with id not found for the current user`);
       }
-      const updatedData = existingQuickNote.data + quickNoteDto.data;
+      const updatedData = quickNoteDto.data;
       console.log("updatedData===", updatedData);
       console.log(existingQuickNote.userId, currentUser.id)
       const updatedQuickNote = await this.quickNoteModel.findOneAndUpdate(

@@ -10,6 +10,7 @@ export class SearchUserDto {
     @IsString()
     @IsOptional()
     name: string;
+    
     @IsNumber()
     @IsOptional()
     limit: number;

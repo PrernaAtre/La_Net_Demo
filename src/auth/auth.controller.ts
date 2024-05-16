@@ -62,14 +62,6 @@ export class AuthController {
     return await this.authService.loginUser(userLoginDto);
   }
 
-  // @Post("/reset-password")
-  // @UseGuards(AuthGuard)
-  // async resetPassword(
-  //   @Body() resetPasswordDto: ResetPasswordDto,
-  //   @Req() { currentUser }: AuthenticatedRequest
-  // ): Promise<object> {
-  //   return this.authService.resetPassword(resetPasswordDto, currentUser);
-  // }
   @Post('/forgotPassword')
   async ForgotPass(
       @Body() data: ForgotPasswordDto,
@@ -103,7 +95,6 @@ export class AuthController {
   {
       try
       {
-          console.log(userId, token);
           const result = await this.authService.verifyUser(userId, token);   
           return result;
       }

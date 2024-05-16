@@ -22,7 +22,7 @@ export class CheckPublishLimitMiddleware implements NestMiddleware {
       const userId= mongoose.Types.ObjectId.createFromHexString(currentUser.id);
 
       const user =await this.userModel.findOne({_id:userId}).lean()
-      if(user.IsSubscribed){
+      if(user.isSubscribed){
         return next()
       }
       const page = await this.pageModel.findOne({ _id: pageId, userId, isTrashed: false }).lean();

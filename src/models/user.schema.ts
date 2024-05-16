@@ -22,8 +22,7 @@ export class User {
     customerId: string
 
     @Prop({ default: false })
-    IsSubscribed: boolean
-
+    isSubscribed: boolean
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
