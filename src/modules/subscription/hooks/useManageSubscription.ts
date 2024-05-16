@@ -10,7 +10,7 @@ export const useManageSubscription = () => {
     useLazyManageSubscriptionsQuery();
 
   const handleManageSubscription = debounce(async () => {
-    const response = await manageSubscription({});
+    const response = await manageSubscription({}); 
 
     if (response?.data?.url) {
       return router.push(response?.data?.url);

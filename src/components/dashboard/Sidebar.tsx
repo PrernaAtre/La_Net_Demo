@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { useCreatePage } from "@/modules/editor/hooks/useCreatePage";
 import { useCurrentUserPages } from "@/modules/editor/hooks/useCurrentUserPages";
+import { removeCurrentUser } from "@/store/features/auth";
 import { useMakeTrashPage } from "@/modules/editor/hooks/useMakeTrashPage";
 import { useCurrentUser } from "@/modules/hooks";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
@@ -28,13 +29,14 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { BsTrash } from "react-icons/bs";
-import { ToastContainer } from "react-toastify";
+import PushPinIcon from '@mui/icons-material/PushPin';
 import { toast } from "sonner";
 import TrashWindow from "./TrashWindow";
 import { useManageSubscription } from "@/modules/subscription/hooks";
-import { useLogout } from "@/modules/auth/logout/hooks";
 import { useCreateSubscription } from "@/modules/user/hooks/useCreateSubsciption";
 import { ProfileForm } from "@/modules/user/profile";
+import { useDispatch } from "react-redux";
+import AuthToken from "@/lib/AuthToken";
 
 const Sidebar: React.FC = () => {
   const router = useRouter();
@@ -50,8 +52,14 @@ const Sidebar: React.FC = () => {
   const { handleCreatePage, isLoading } = useCreatePage();
 
   const { handleClick } = useCreateSubscription();
+  const dispatch = useDispatch();
 
-  const { logout } = useLogout();
+  // const { logout } = useLogout();
+  const logout = () => {
+    AuthToken.remove();
+    dispatch(removeCurrentUser())
+    toast.success("Logout successful");
+  }
 
   const { handleManageSubscription, isLoading: manageSubscriptionLoading } =
     useManageSubscription();
@@ -87,8 +95,8 @@ const Sidebar: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-row bg-secondary w-52">
-      <div className="flex flex-col">
+    <div className="flex flex-row bg-secondary w-56 overflow-y-auto h-[700px]">
+      <div className="flex flex-col w-56">
         <div className="flex items-center justify-start ml-4 bg-secondary h-14">
           <Avatar sx={{ width: 24, height: 24 }} src={user?.profile_image} />
           <span className="text-lg font-medium pl-2 text-gray-800 dark:text-white/80">
@@ -172,15 +180,14 @@ const Sidebar: React.FC = () => {
               href="/quickNote"
               className="flex flex-row items-center h-10 rounded-lg text-muted-foreground hover:bg-primary/5"
             >
-              <AddCircleOutlineIcon className="ml-2" fontSize="small" />
-              <span className="text-sm font-medium pl-2">Quick Email</span>
+              <PushPinIcon className="ml-2" fontSize="small" />
+              <span className="text-sm font-medium pl-2">Quick Note</span>
             </Link>
           </li>
           <li className="flex flex-row items-center h-10 rounded-lg text-muted-foreground hover:bg-primary/5">
             <DeleteOutlineIcon className="ml-2" />
             &nbsp;
             <TrashWindow />
-            <ToastContainer />
           </li>
 
           <li>
@@ -193,7 +200,7 @@ const Sidebar: React.FC = () => {
             </div>
           </li>
           <li className="">
-            {!user?.IsSubscribed ? (
+            {!user?.isSubscribed ? (
               <Dialog>
                 <DialogTrigger className="" asChild>
                   <div className="flex flex-row items-center h-10 rounded-lg hover:bg-primary/5">

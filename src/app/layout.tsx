@@ -11,10 +11,16 @@ import { cn } from "@/lib/utils";
 import { persistor, store } from "@/store/store";
 import React from "react";
 import { PersistGate } from "redux-persist/integration/react";
+import { Logo } from "@/components/icons";
 
 export default function RootLayout({ children }: React.PropsWithChildren) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <meta charSet="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>JetBrain</title>
+      </head>
       <body
         className={cn(
           fontSans.variable,

@@ -35,7 +35,7 @@ export const useSignUp = () => {
 
         toast.success("Sign up successful");
 
-        router.push("/page");
+        router.push("/auth/login");
       }
       else
       {

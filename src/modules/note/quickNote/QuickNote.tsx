@@ -43,12 +43,14 @@ const QuickNote: React.FC = () => {
   return (
     <>
       <Editor
-        className="w-[80%]"
+        className="w-[80%] bg-slate-50 ml-5 mt-5"
         defaultValue={solution}
         disableLocalStorage={true}
         onUpdate={(editor) => setEditorData(editor?.storage.markdown.getMarkdown())}
       />
-      <Button onClick={() => handleSubmit(editorData)} disabled={loading}>SUBMIT</Button> 
+      <div className="bottom-0 left-0 w-full text-center">
+        <button className="bg-black w-[8%] p-1 text-white rounded-md pr-[10px]" onClick={() => handleSubmit(editorData)} disabled={loading}>SUBMIT</button>
+      </div>
     </>
   );
 };

@@ -36,7 +36,6 @@ const TrashWindow: React.FC = () => {
   };
 
   const trashedPages = pages?.filter((d: any) => d?.isTrashed) || [];
-  console.log("trashed pages-------------",trashedPages);
 
   return (
     <div className="w-full">
@@ -78,13 +77,13 @@ const TrashWindow: React.FC = () => {
                   className="border border-gray-300 rounded-lg p-3 flex justify-between items-center"
                 >
                   <span>{page.name}</span>
-                  <div className="flex">
+                  <div className="flex gap-3 mr-2">
                     <RestorePageIcon
-                      className="cursor-pointer"
+                      className="cursor-pointer size-4"
                       onClick={() => handleTrashPage(page._id, true)}
                     />
                     <BsTrash
-                      className="ml-2 cursor-pointer"
+                      className=" cursor-pointer size-5 mt-1"
                       onClick={() => handleDeletePage(page._id)}
                     />
                   </div>

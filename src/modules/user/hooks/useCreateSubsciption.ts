@@ -14,7 +14,7 @@ export const useCreateSubscription = () => {
     const response: any = await makeSubscription({});
 
     if (response.data) {
-      dispatch(updateCurrentUser({ isSubscribed: true }));
+      dispatch(updateCurrentUser({ isSubscribed: true })); 
       router.push(response.data.url);
     }
   };

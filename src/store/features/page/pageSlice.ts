@@ -35,7 +35,8 @@ export const pageSlice = createSlice({
       state.pages = [action.payload, ...state.pages];
     },
     updatePage: (state, action) => {
-      if (!state.currentPage || state.currentPage?._id === action.payload._id) {
+      if (!state.currentPage || state.currentPage?._id === action.payload._id)  //change by by me === to !==
+      {
         state.currentPage = action.payload;
       }
 
@@ -43,7 +44,6 @@ export const pageSlice = createSlice({
         if (d._id === action.payload._id) {
           return action.payload;
         }
-
         return d;
       });
     },
@@ -51,7 +51,6 @@ export const pageSlice = createSlice({
       if (state.currentPage?._id === action.payload._id) {
         state.currentPage = undefined;
       }
-
       state.pages = state.pages.filter((d) => d._id !== action.payload._id);
     },
     setCurrentPage: (state, action) => {

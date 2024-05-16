@@ -24,7 +24,7 @@ const Editor: React.FC<EditorProps> = ({ pageId }) => {
 
   const EditorBlock = useMemo(
     () => dynamic(() => import("./EditorBlock"), { ssr: false }),
-    []
+    [page?._id]
   );
 
   useEffect(() => {

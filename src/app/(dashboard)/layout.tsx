@@ -1,14 +1,19 @@
 "use client";
 import { Sidebar } from "@/components/dashboard";
-import { useCurrentUser } from "@/modules/hooks/useCurrentUser";
+import { useGetCurrentUser } from "@/modules/user/hooks/useGetCurrentUser";
 import { redirect } from "next/navigation";
+import { useEffect } from "react";
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
-  const { user } = useCurrentUser();
+  const { user, fetchUser } = useGetCurrentUser();
 
-  if (!user) {
-    return redirect("/");
-  }
+  //fetch the user every time the page is loaded
+  useEffect(() => {
+    if (!user) {
+      redirect("/");
+    }
+    fetchUser();
+  }, []);
 
   return (
     <div className="h-screen flex dark:bg-[#1F1F1F]">

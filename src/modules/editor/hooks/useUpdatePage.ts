@@ -5,7 +5,6 @@ import { useUpdatePageMutation } from "@/store/features/page";
 export const useUpdatePage = (id?: string) => {
   const { page, isLoading: isPageLoading, error: isPageError } = usePage(id!);
 
-  console.log("page._id", page?._id)
 
   const [updatePage, { data, isLoading, error }] = useUpdatePageMutation();
 

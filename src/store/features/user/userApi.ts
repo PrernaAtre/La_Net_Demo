@@ -1,5 +1,5 @@
 import { baseAPI } from "@/store/baseApi";
-import { updateCurrentUser } from "../auth";
+import { setCurrentUser, updateCurrentUser } from "../auth";
 
 export const userApi = baseAPI.injectEndpoints({
   endpoints: (builder) => ({
@@ -51,7 +51,26 @@ export const userApi = baseAPI.injectEndpoints({
         }
       },
     }),
+    getCurrentUser: builder.query({
+      query: () => ({
+        url: `user`,
+        method: "GET",
+      }),
+      onQueryStarted: async (_payload, { queryFulfilled, dispatch }) => {
+        try {
+          const { data } = await queryFulfilled;
+
+          console.log("data", data)
+
+          if (data) dispatch(setCurrentUser(data))
+
+          return data || [];
+        } catch (e) {
+          console.log("Error while fetching current user", e);
+        }
+      },
+    }),
   }),
 });
 
-export const { useUsersQuery, useUpdateUserMutation, useGetAllUsersQuery, useLazyUsersQuery } = userApi;
+export const { useUsersQuery, useUpdateUserMutation, useGetAllUsersQuery, useLazyUsersQuery, useGetCurrentUserQuery, useLazyGetCurrentUserQuery } = userApi;
