@@ -59,6 +59,7 @@ const Sidebar: React.FC = () => {
     AuthToken.remove();
     dispatch(removeCurrentUser())
     toast.success("Logout successful");
+    router.push("/");
   }
 
   const { handleManageSubscription, isLoading: manageSubscriptionLoading } =
@@ -99,7 +100,7 @@ const Sidebar: React.FC = () => {
       <div className="flex flex-col w-56">
         <div className="flex items-center justify-start ml-4 bg-secondary h-14">
           <Avatar sx={{ width: 24, height: 24 }} src={user?.profile_image} />
-          <span className="text-lg font-medium pl-2 text-gray-800 dark:text-white/80">
+          <span className="text-lg font-medium pl-2 text-black dark:text-white/80">
             {!user?.username ? "User" : user?.username}
           </span>
         </div>
@@ -138,7 +139,7 @@ const Sidebar: React.FC = () => {
               {unTrashedPages.map((page: any) => (
                 <li
                   key={page._id}
-                  className="flex flex-row items-center h-10 rounded-lg text-muted-foreground"
+                  className="flex flex-row items-center h-10 rounded-lg text-black border-2"
                 >
                   <div className="hover:bg-primary/5 py-1 rounded-lg w-36">
                     <NoteAddIcon className="ml-2" fontSize="small" />

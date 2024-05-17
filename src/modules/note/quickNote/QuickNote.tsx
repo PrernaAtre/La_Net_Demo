@@ -1,12 +1,12 @@
 "use client"
 import { useEffect, useState } from "react";
 import { Editor } from 'novel-lightweight';
-import Button from "@mui/material/Button";
 import { useTheme } from "next-themes";
 import { useGetQuickNoteQuery } from "@/store/features/quickNote";
 import { useUpdateQuickNote } from "./hooks";
-import LoadingButton from '@mui/lab/LoadingButton';
-import SaveIcon from '@mui/icons-material/Save';
+import { ReloadIcon } from "@radix-ui/react-icons";
+import { Button } from "@/components/ui/button";
+
 
 const QuickNote: React.FC = () => {
   const { handleUpdateQuickNote } = useUpdateQuickNote();
@@ -43,13 +43,23 @@ const QuickNote: React.FC = () => {
   return (
     <>
       <Editor
-        className="w-[80%] bg-slate-50 ml-5 mt-5"
+        className="w-[80%] h-[80%] ml-5 mt-5"
         defaultValue={solution}
         disableLocalStorage={true}
         onUpdate={(editor) => setEditorData(editor?.storage.markdown.getMarkdown())}
       />
-      <div className="bottom-0 left-0 w-full text-center">
-        <button className="bg-black w-[8%] p-1 text-white rounded-md pr-[10px]" onClick={() => handleSubmit(editorData)} disabled={loading}>SUBMIT</button>
+      <div>
+      <Button
+        type="submit"
+        variant="default"
+        className="flex w-[10%] justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+      >
+        {isLoading ? (
+          <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+        ) : (
+          "Save Changes"
+        )}
+      </Button>
       </div>
     </>
   );

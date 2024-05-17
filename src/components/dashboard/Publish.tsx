@@ -47,12 +47,12 @@ const Publish = () => {
     }, 1000);
   };
 
-  return user.isSubscribed ? (
+  return user?.isSubscribed ? (
     <Popover>
       <PopoverTrigger asChild>
         <Button size="sm" variant="default">
           Publish
-          {!!page?.publishId && <Globe className="text-sky-500 w-4 h-4 ml-2" />}
+          {!!page?.publishId}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-72" align="end" alignOffset={8} forceMount>
@@ -99,10 +99,10 @@ const Publish = () => {
               Share your work with others.
             </span>
             <Button
-              disabled={isLoading}
               onClick={() => handlePublishChange()}
               className="w-full text-xs"
               size="sm"
+              variant="default"
             >
               Publish
             </Button>

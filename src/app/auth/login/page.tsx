@@ -1,10 +1,11 @@
 "use client";
 import { useLogin } from "@/modules/auth/login/hooks";
-import { Button, Grid, TextField } from "@mui/material";
+import { Grid, TextField } from "@mui/material";
 import { useFormik } from "formik";
 import Link from "next/link";
 import React from "react";
 import { ForgotPasswordModal } from "../forgotPassword/ForgotPasswordModal";
+import { Button } from "@/components/ui/button";
 
 const LoginForm: React.FC = () => {
   const { handleSubmit, initialValues, validationSchema } = useLogin();
@@ -72,11 +73,10 @@ const LoginForm: React.FC = () => {
               <Grid item xs={12}>
                 <Button
                   type="submit"
-                  variant="contained"
-                  fullWidth
-                  className="bg-black text-white font-semibold"
+                  variant="default"
+                  className="w-[100%]"
                 >
-                  Sign in
+                  Login
                 </Button>
               </Grid>
               <Grid item xs={12}>

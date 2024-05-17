@@ -3,7 +3,7 @@ import { OpenAIStream, StreamingTextResponse } from "ai";
 
 
 const openai = new OpenAI({
-  apiKey: "sk-proj-zI6E8vQ257jBfy6o3fKlT3BlbkFJpFW66SOoW4aWUoGct46e",
+  apiKey: "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",
 });
 
 export const runtime = "edge";

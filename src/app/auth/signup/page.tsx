@@ -1,9 +1,10 @@
 "use client"
-import { Button, Grid, TextField } from "@mui/material";
+import { Grid, TextField } from "@mui/material";
 import { useSignUp } from "@/modules/auth/signup/hooks";
 import { useFormik } from "formik";
 import Link from "next/link";
 import React from "react";
+import { Button } from "@/components/ui/button";
 
 const SignUpForm: React.FC = () => {
   const { handleSubmit, initialValues, validationSchema } = useSignUp();
@@ -23,9 +24,6 @@ const SignUpForm: React.FC = () => {
         </div>
       </Grid>
       <Grid item xs={6} className="flex justify-center items-center">
-        <div className="pb-[75%]">
-          <p>Sign Up</p>
-        </div>
         <Grid item xs={12} sm={8} md={6} lg={4}>
           <form onSubmit={formik.handleSubmit} className="space-y-6">
             <TextField
@@ -104,9 +102,8 @@ const SignUpForm: React.FC = () => {
             )}
             <Button
               type="submit"
-              variant="contained"
-              fullWidth
-              className="bg-indigo-500 text-white font-semibold"
+              variant="default"
+              className="w-[100%]"
             >
               Sign Up
             </Button>

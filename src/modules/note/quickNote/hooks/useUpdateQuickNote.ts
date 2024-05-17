@@ -18,8 +18,8 @@ export const useUpdateQuickNote = () => {
         const updatedQuickNote = await updateQuickNote({ ...quickNote, ...input });
 
         if (onComplete) {
-            onComplete(updatedQuickNote);   
             toast.success("Data save successfully");
+            onComplete(updatedQuickNote);   
         }
         refetchQuickNote();
         return updatedQuickNote;

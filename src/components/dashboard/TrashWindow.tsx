@@ -50,6 +50,7 @@ const TrashWindow: React.FC = () => {
         open={isModalOpen}
         onOk={handleOk}
         onCancel={handleCancel}
+        okButtonProps={{ style: { backgroundColor: 'black', borderColor: 'black' } }} // Change the color here
       >
         <ul>
           {trashedPages.length > 0 ? (

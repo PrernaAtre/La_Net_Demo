@@ -38,7 +38,7 @@ export default function RootLayout({ children }: React.PropsWithChildren) {
           storageKey="jotion-theme-2"
         >
           <Provider store={store}>
-            <Toaster position="bottom-center" />
+            <Toaster position="top-center" />
             <PersistGate loading={null} persistor={persistor}>
               {children}
             </PersistGate>
