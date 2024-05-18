@@ -11,7 +11,7 @@ import { UserSchema } from 'src/models/user.schema';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { QuickNoteModule } from 'src/quick-note/quick-note.module';
-import { QuickNoteSchema } from 'src/quick-note/quickNote.schema';
+import { QuickNoteSchema } from 'src/models/quickNote.schema';
 
 @Module({
   imports: [

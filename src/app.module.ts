@@ -15,6 +15,7 @@ import { UserModule } from './user/user.module';
 import { AuthGuard } from './auth/jwt-auth.guard';
 import { APP_FILTER } from '@nestjs/core';
 import { GlobalExceptionFilter } from './common/utils/errorHadler';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -34,7 +35,7 @@ import { GlobalExceptionFilter } from './common/utils/errorHadler';
       }),
     }),
 
-     AuthModule, CloudinaryModule, QuickNoteModule, PageModule, PaymentModule, UserModule],
+     AuthModule, CloudinaryModule, QuickNoteModule, PageModule, PaymentModule, UserModule, NotificationsModule],
   controllers: [AppController, AuthController],
   providers: [AppService, CloudinaryService, AuthGuard],
 })

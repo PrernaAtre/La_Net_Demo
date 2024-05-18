@@ -30,11 +30,6 @@ export class Page {
   @Prop({ type: Date, default: Date.now })
   updatedAt: Date;
 
-  @Prop({ type: Array, default: [] })
-  sharedUsers: [{
-    type: Types.ObjectId,
-    ref: 'User'
-  }]
 }
 
 export const PageSchema = SchemaFactory.createForClass(Page);

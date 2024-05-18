@@ -27,7 +27,7 @@ import { ResetPassworddto } from "./dto/resertPassword.dto";
 // import { QuickNote } from "src/models/quickNote.schema";
 import { QuickNoteService } from "src/quick-note/quick-note.service";
 import { CreateQuickNoteDto } from "src/quick-note/dto/quickNote.dto";
-import { QuickNote } from "src/quick-note/quickNote.schema";
+import { QuickNote } from "src/models/quickNote.schema";
 
 
 @Injectable()

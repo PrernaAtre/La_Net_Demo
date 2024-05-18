@@ -21,7 +21,6 @@ import {
   UpdatePageDto,
 } from "./dto/CreatePage.dto";
 import { AuthGuard } from "src/auth/jwt-auth.guard";
-import { CheckPublishLimitMiddleware } from "src/middleware/page.middleware";
 import { ObjectIdValidationPipe } from "src/common/utils/objectidvalidation.middleware";
 import { AuthenticatedRequest } from "src/common/utils/common.types";
 
@@ -37,16 +36,17 @@ export class PageController {
     return await this.pageService.getSharedPages(currentUser);
   }
   
-  @Put("/shared-users/:id")
+  @Post('/shared-users/:id')
   @UseGuards(AuthGuard)
   async addSharedUsers(
-    @Param("id") id: string,
+    @Param('id') id: string,
     @Req() { currentUser }: AuthenticatedRequest,
     @Body() addSharedUsersDto: AddSharedUsersDto
   ): Promise<any> {
-    return await this.pageService.addSharedUsers(
+    return await this.pageService.addSharedUser(
       id,
-      addSharedUsersDto.userIds,
+      addSharedUsersDto.userId,
+      addSharedUsersDto.url,
       currentUser
     );
   }

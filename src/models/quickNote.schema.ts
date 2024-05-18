@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import mongoose from 'mongoose';
+import { Types } from 'mongoose';
 
 @Schema({
     timestamps: true
@@ -7,9 +7,8 @@ import mongoose from 'mongoose';
 
 export class QuickNote
 {
-
-    @Prop({required:true})
-    userId : string;
+    @Prop({type: Types.ObjectId})
+    userId :Types.ObjectId;
 
     @Prop()
     data : string

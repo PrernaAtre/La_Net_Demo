@@ -27,10 +27,12 @@ export class UpdatePageDto {
 }
 
 export class AddSharedUsersDto {
-    @IsArray()
-    @IsString({ each: true, message: 'Each user ID must be a string' })
-    userIds: string[];
-  }
+  @IsString()
+  userId: string;
+
+  @IsString()
+  url: string;
+}
 
 export class RemoveSharedUsersDto {
     @IsString()

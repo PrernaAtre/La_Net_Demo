@@ -4,7 +4,7 @@ import { QuickNoteService } from './quick-note.service';
 import { MongooseModule } from '@nestjs/mongoose';
 // import { QuickNoteSchema } from './quickNote.schema';
 import { AuthModule } from 'src/auth/auth.module';
-import { QuickNoteSchema } from './quickNote.schema';
+import { QuickNoteSchema } from '../models/quickNote.schema';
 
 @Module({
   imports : [

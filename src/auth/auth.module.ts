@@ -11,7 +11,7 @@ import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { CommonService } from 'src/common/common.service';
 import { BcryptService } from 'src/common/bcrypt.service';
 import { QuickNoteModule } from 'src/quick-note/quick-note.module';
-import { QuickNoteSchema } from 'src/quick-note/quickNote.schema';
+import { QuickNoteSchema } from 'src/models/quickNote.schema';
 
 
 @Module({
