@@ -190,7 +190,18 @@ export const pageApi = baseAPI.injectEndpoints({
         }
       },
     }),
-    
+    getSharedPages: builder.query({
+      query: () => `page/sharedpages`,
+      onQueryStarted: async ({ dispatch, queryFulfilled }) => {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setPages(data));
+          return data;
+        } catch (e) {
+          console.log("error while fetching shared pages", e);
+        }
+      },
+    }),
   }),
 });
 
@@ -206,5 +217,6 @@ export const {
   useLazyGetPageQuery,
   usePublishMutation,
   useUnpublishMutation,
-  useSharePageMutation
+  useSharePageMutation,
+  useGetSharedPagesQuery
 } = pageApi;

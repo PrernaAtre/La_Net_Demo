@@ -8,10 +8,12 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { BsTrash } from "react-icons/bs";
 import { useSelector } from "react-redux";
+import Person2Icon from '@mui/icons-material/Person2';
+import { useGetSharedPagesQuery } from "@/store/features/page";
 
 const NotificationWindow: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const { data, error, isLoading } = useGetSharedPagesQuery("");
   const { user } = useCurrentUser();
   const [sender, setSender] = useState(null);
   const [url, setUrl] = useState(null);
@@ -20,6 +22,7 @@ const NotificationWindow: React.FC = () => {
 
   const [isConnected, setIsConnected] = useState(false);
   const [transport, setTransport] = useState("N/A");
+
 
   useEffect(() => {
     if (socket.connected) {
@@ -49,13 +52,14 @@ const NotificationWindow: React.FC = () => {
       socket.off("connect", onConnect);
       socket.off("disconnect", onDisconnect);
     };
+
+
   }, []);
 
   const handleNotification = (data: any) => {
     const notificationData = JSON.parse(data);
     setSender(notificationData.senderName);
     setUrl(notificationData.message)
-    console.log("data---", sender, url);
   }
 
   const showModal = () => {
@@ -81,7 +85,7 @@ const NotificationWindow: React.FC = () => {
           <span className="text-sm font-medium">Notification</span>
         </div>
         <Modal
-          title="Deleted Items"
+          title="Notifications"
           open={isModalOpen}
           onOk={handleOk}
           onCancel={handleCancel}
@@ -89,14 +93,21 @@ const NotificationWindow: React.FC = () => {
         >
           <ul>
 
-            <li
-              className="border border-gray-300 rounded-lg p-3 flex justify-between items-center"
-            >
-              <span>From : {sender}</span>
-              <span className="text-sm font-medium pl-2">
-                {url}
-              </span>
-            </li>
+            {data && data.map((notification : any, index : any) => (
+              <li key={index} className="border border-gray-300 rounded-lg p-3 flex flex-col">
+                <div className="flex flex-row items-center">
+                  <Person2Icon /><span className="pl-2">{notification.senderName}</span>
+                </div>
+                <div className="pt-2">
+                  <span className="text-sm font-medium">
+                    <span>Document Url</span>
+                    <Link href={notification.message} passHref>
+                      {notification.message}
+                    </Link>
+                  </span>
+                </div>
+              </li>
+            ))}
           </ul>
         </Modal>
       </div>

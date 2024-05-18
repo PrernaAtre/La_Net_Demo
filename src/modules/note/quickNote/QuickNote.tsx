@@ -50,8 +50,9 @@ const QuickNote: React.FC = () => {
       />
       <div>
       <Button
+      style={{backgroundColor:"black"}}
         type="submit"
-        variant="default"
+        // variant="default"
         className="flex w-[10%] justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
       >
         {isLoading ? (

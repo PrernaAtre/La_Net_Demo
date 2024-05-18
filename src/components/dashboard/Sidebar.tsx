@@ -98,7 +98,7 @@ const Sidebar: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-row bg-secondary w-56 overflow-y-auto h-[700px]">
+    <div className="flex flex-row bg-slate-200 w-56 overflow-y-auto h-[700px]">
       <div className="flex flex-col w-56">
         <div className="flex items-center justify-start ml-4 bg-secondary h-14">
           <Avatar sx={{ width: 24, height: 24 }} src={user?.profile_image} />

@@ -101,6 +101,7 @@ const SignUpForm: React.FC = () => {
               <p className="text-red-700">{formik.errors.profile_image}</p>
             )}
             <Button
+              style={{backgroundColor:"black"}}
               type="submit"
               variant="default"
               className="w-[100%]"
