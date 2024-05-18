@@ -5,6 +5,7 @@ import { useState } from "react";
 import AsyncSelect from "react-select/async";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
+import { useOrigin } from "@/hooks/use-origin";
 
 const SharePage: React.FC<{ id: string; onClose: Function }> = ({
   id,
@@ -18,26 +19,28 @@ const SharePage: React.FC<{ id: string; onClose: Function }> = ({
     isLoading,
   } = useSharePage(id);
 
-  const [selectedUsers, setSelectedUsers] = useState(initialValues);
+  const [selectedUser, setSelectedUser] = useState(initialValues[0] || null);
+  const origin = useOrigin();
+  const url = `${origin}/previewNotification/${id}`;
 
-  const handleOnSelect = (inputs: any) => {
-    setSelectedUsers(inputs);
+
+
+  const handleOnSelect = (input: any) => {
+    setSelectedUser(input);
   };
 
   const handleOnSubmit = () => {
-    handleSharePage(
-      selectedUsers.map((d) => d.value),
-      onClose
-    );
+    if (selectedUser) {
+      handleSharePage(selectedUser.value, url);
+    }
   };
 
   return (
     <div className="w-96 flex flex-col gap-4 justify-center">
       <Label>Share Page</Label>
       <AsyncSelect
-        isMulti
         cacheOptions
-        defaultValue={selectedUsers}
+        defaultValue={selectedUser}
         onChange={handleOnSelect}
         defaultOptions={defaultOptions}
         loadOptions={loadOptions}

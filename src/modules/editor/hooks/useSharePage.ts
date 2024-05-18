@@ -17,14 +17,15 @@ export const useSharePage = (id?: string) => {
   const [sharePage, { data, isLoading, error }] = useSharePageMutation();
 
   const handleSharePage = debounce(
-    async (input: string[], onComplete?: Function) => {
+    async (userId: string, url: string, onComplete?: Function) => {
       try {
         if (!page?._id) throw new Error("Invalid input.");
 
         const updatedPage = await sharePage({
           id: page?._id,
           input: {
-            userIds: input,
+            userId,
+            url,
           },
         });
 

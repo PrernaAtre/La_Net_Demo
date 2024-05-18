@@ -37,6 +37,8 @@ import { useCreateSubscription } from "@/modules/user/hooks/useCreateSubsciption
 import { ProfileForm } from "@/modules/user/profile";
 import { useDispatch } from "react-redux";
 import AuthToken from "@/lib/AuthToken";
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import NotificationWindow from "./NotificationWindow";
 
 const Sidebar: React.FC = () => {
   const router = useRouter();
@@ -190,7 +192,11 @@ const Sidebar: React.FC = () => {
             &nbsp;
             <TrashWindow />
           </li>
-
+          <li className="flex flex-row items-center h-10 rounded-lg text-muted-foreground hover:bg-primary/5">
+            <NotificationsIcon className="ml-2" />
+            &nbsp;
+            <NotificationWindow />
+          </li>
           <li>
             <div
               className="flex flex-row items-center h-10 rounded-lg text-muted-foreground hover:bg-primary/5 cursor-pointer"

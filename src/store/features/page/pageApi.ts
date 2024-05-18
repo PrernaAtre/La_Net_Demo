@@ -171,25 +171,26 @@ export const pageApi = baseAPI.injectEndpoints({
       },
     }),
     sharePage: builder.mutation({
-      query: ({ id, input }: { id: string; input: Record<string, any> }) => ({
+      query: ({ id, input }: { id: string; input: { userId: string; url: string } }) => ({
         url: `page/shared-users/${id}`,
-        method: "PUT",
+        method: "POST",
         body: input,
       }),
       onQueryStarted: async (_d, { dispatch, queryFulfilled }) => {
         try {
           const { data } = await queryFulfilled;
-
+    
           if (data?.data) {
             dispatch(updatePage(data?.data));
           }
-
+    
           return data;
         } catch (e) {
           console.log("Error while sharing the page", e);
         }
       },
     }),
+    
   }),
 });
 
