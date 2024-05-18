@@ -6,12 +6,14 @@ import {
 import { InjectModel } from "@nestjs/mongoose";
 import mongoose, { Model, Types } from "mongoose";
 import { CommonService } from "src/common/common.service";
+
 import { ServerError } from "src/common/utils/serverError";
 import { User } from "src/models/user.schema";
-import { Page } from "../models/page.schema";
 import { CreatePageDto, UpdatePageDto } from "./dto/CreatePage.dto";
 import { CurrentUser } from "src/common/utils/common.types";
 import { NotificationsGateway } from "src/notifications/notifications.gateway";
+import { Page } from "src/models/Page.schema";
+import { Notification } from "src/models/notification.schema";
 
 @Injectable()
 export class PageService {
@@ -19,10 +21,12 @@ export class PageService {
     @InjectModel("Page")
     private pageModel: Model<Page>,
     @InjectModel("User") private userModel: Model<User>,
+    @InjectModel("Notification")
+    private notificationModel: Model<Notification>,
     public commonService: CommonService,
     private notificationGateway: NotificationsGateway
   ) { }
-  d
+  
   async get(id: string, currentUser: CurrentUser): Promise<Page> {
     try {
       const userId = mongoose.Types.ObjectId.createFromHexString(
@@ -32,7 +36,7 @@ export class PageService {
         .findOne({
           $or: [
             { _id: id, userId: userId },
-            { _id: id, sharedUsers: { $in: [userId] } },
+            { _id: id},
             { publishId: mongoose.Types.ObjectId.createFromHexString(id) },
           ],
         })
@@ -200,7 +204,7 @@ export class PageService {
     }
   }
 
-  async addSharedUser(pageId: string, userId: string, url: string, currentUser: CurrentUser): Promise<any> {
+  async sharePage(pageId: string, userId: string, url: string, currentUser: CurrentUser): Promise<any> {
     try {
       const page = await this.pageModel
         .findOne({
@@ -226,10 +230,13 @@ export class PageService {
       const sendingData = {
         sender: currentUser.id,
         senderName : senderUser.username,
-        reciever: `${user._id}`,
+        receiver: `${user._id}`,
         message: url,
       }
-      console.log("sending data-----",sendingData);
+      console.log("sending data------",sendingData);
+      
+      const data = await this.notificationModel.create(sendingData);
+      console.log("daata========",data);
       
       this.notificationGateway.socket.emit(`${user._id}`, JSON.stringify(sendingData))
       
@@ -324,14 +331,11 @@ export class PageService {
       const userId = mongoose.Types.ObjectId.createFromHexString(
         currentUser.id
       );
-
-      const pages = await this.pageModel.find({
-        sharedUsers: { $in: [userId] },
-      });
-
+      console.log("uid--------",currentUser.id)
+      const pages = await this.notificationModel.find({receiver : currentUser.id});
       if (!pages)
         throw new ServerError({ message: "Pages not found", code: 404 });
-
+      
       return pages;
     } catch (error) {
       if (error instanceof HttpException) throw error;

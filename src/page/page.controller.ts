@@ -38,12 +38,12 @@ export class PageController {
   
   @Post('/shared-users/:id')
   @UseGuards(AuthGuard)
-  async addSharedUsers(
+  async sharePage(
     @Param('id') id: string,
     @Req() { currentUser }: AuthenticatedRequest,
     @Body() addSharedUsersDto: AddSharedUsersDto
   ): Promise<any> {
-    return await this.pageService.addSharedUser(
+    return await this.pageService.sharePage(
       id,
       addSharedUsersDto.userId,
       addSharedUsersDto.url,
