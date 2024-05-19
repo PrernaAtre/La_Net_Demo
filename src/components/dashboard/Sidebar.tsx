@@ -98,7 +98,7 @@ const Sidebar: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-row bg-slate-200 w-56 overflow-y-auto h-[700px]">
+    <div className="flex flex-row bg-secondary w-60 overflow-y-auto h-[700px]">
       <div className="flex flex-col w-56">
         <div className="flex items-center justify-start ml-4 bg-secondary h-14">
           <Avatar sx={{ width: 24, height: 24 }} src={user?.profile_image} />
@@ -107,14 +107,14 @@ const Sidebar: React.FC = () => {
           </span>
         </div>
 
-        <ul className="flex flex-col px-2">
+        <ul className="flex flex-col px-2 space-y-0">
           <li>
             <div
-              className="flex flex-row items-center h-10 rounded-lg text-muted-foreground hover:bg-primary/5 cursor-pointer"
+              className="flex flex-row items-center h-10 rounded-lg text-black dark:text-white/80 hover:bg-primary/5 cursor-pointer"
               onClick={() => setIsSearchModalOpen(true)}
             >
               <SearchIcon className="ml-2" fontSize="small" />
-              <span className="text-sm font-medium w-28 text-left pl-2">
+              <span className="text-base font-medium w-28 text-left pl-2">
                 Search
               </span>
             </div>
@@ -125,11 +125,11 @@ const Sidebar: React.FC = () => {
           </li>
           <li>
             <div
-              className="flex flex-row items-center h-10 rounded-lg text-muted-foreground hover:bg-primary/5 cursor-pointer"
+              className="flex flex-row items-center h-10 rounded-lg text-black dark:text-white/80 hover:bg-primary/5 cursor-pointer"
               onClick={() => setIsSettingsModalOpen(true)}
             >
               <SettingsIcon className="ml-2" fontSize="small" />
-              <span className="text-sm font-medium pl-2">Settings</span>
+              <span className="text-base font-medium pl-2">Settings</span>
             </div>
             <SettingsModal
               isOpen={isSettingsModalOpen}
@@ -137,16 +137,16 @@ const Sidebar: React.FC = () => {
             />
           </li>
           {unTrashedPages?.length > 0 && (
-            <ul className="flex flex-col w-full">
+            <ul className="flex flex-col w-full space-y-0">
               {unTrashedPages.map((page: any) => (
                 <li
                   key={page._id}
-                  className="flex flex-row items-center h-10 rounded-lg text-black border-2"
+                  className="flex flex-row items-center h-10 rounded-lg text-black dark:text-white/80 border-2"
                 >
                   <div className="hover:bg-primary/5 py-1 rounded-lg w-36">
                     <NoteAddIcon className="ml-2" fontSize="small" />
                     <Link href={`/page/${page._id}`} className="w-20">
-                      <span className="text-sm font-medium pl-2">
+                      <span className="text-base font-medium pl-2">
                         {page.name}
                       </span>
                     </Link>
@@ -170,40 +170,40 @@ const Sidebar: React.FC = () => {
           <li>
             <button
               // href="/page"
-              className="flex flex-row w-full items-center h-10 rounded-lg text-muted-foreground hover:bg-primary/5"
+              className="flex flex-row w-full items-center h-10 rounded-lg text-black dark:text-white/80 hover:bg-primary/5"
               onClick={createPage}
               disabled={isLoading}
             >
               <AddCircleOutlineIcon className="ml-2" fontSize="small" />
-              <span className="text-sm font-medium pl-2">Add Page</span>
+              <span className="text-base font-medium pl-2">Add Page</span>
             </button>
           </li>
           <li>
             <Link
               href="/quickNote"
-              className="flex flex-row items-center h-10 rounded-lg text-muted-foreground hover:bg-primary/5"
+              className="flex flex-row items-center h-10 rounded-lg text-black dark:text-white/80 hover:bg-primary/5"
             >
               <PushPinIcon className="ml-2" fontSize="small" />
-              <span className="text-sm font-medium pl-2">Quick Note</span>
+              <span className="text-base font-medium pl-2">Quick Note</span>
             </Link>
           </li>
-          <li className="flex flex-row items-center h-10 rounded-lg text-muted-foreground hover:bg-primary/5">
+          <li className="flex flex-row items-center h-10 rounded-lg text-black dark:text-white/80 hover:bg-primary/5">
             <DeleteOutlineIcon className="ml-2" />
             &nbsp;
             <TrashWindow />
           </li>
-          <li className="flex flex-row items-center h-10 rounded-lg text-muted-foreground hover:bg-primary/5">
+          <li className="flex flex-row items-center h-10 rounded-lg text-black dark:text-white/80 hover:bg-primary/5">
             <NotificationsIcon className="ml-2" />
             &nbsp;
             <NotificationWindow />
           </li>
           <li>
-            <div
-              className="flex flex-row items-center h-10 rounded-lg text-muted-foreground hover:bg-primary/5 cursor-pointer"
+            <div 
+              className="flex flex-row items-center h-10 rounded-lg text-black dark:text-white/80 hover:bg-primary/5 cursor-pointer"
               onClick={() => setIsProfileModalOpen(true)}
             >
               <UserIcon className="ml-2" />
-              <span className="text-sm font-medium pl-2">Profile</span>
+              <span className="text-base font-medium pl-2">Profile</span>
             </div>
           </li>
           <li className="">
@@ -213,7 +213,7 @@ const Sidebar: React.FC = () => {
                   <div className="flex flex-row items-center h-10 rounded-lg hover:bg-primary/5">
                     <Button
                       size="sm"
-                      className="px-0 ml-2 text-muted-foreground hover:bg-transparent hover:text-muted-foreground"
+                      className="px-0 ml-2 text-black dark:text-white/80 hover:bg-transparent hover:text-black"
                       variant="ghost"
                     >
                       <StarIcon />
@@ -241,7 +241,7 @@ const Sidebar: React.FC = () => {
                   <div className="flex flex-row items-center h-10 rounded-lg hover:bg-primary/5">
                     <Button
                       size="sm"
-                      className="px-0 ml-2 text-muted-foreground hover:bg-transparent hover:text-muted-foreground"
+                      className="px-0 ml-2 text-black dark:text-white/80 hover:bg-transparent hover:text-black"
                       variant="ghost"
                     >
                       <StarIcon />
@@ -272,11 +272,11 @@ const Sidebar: React.FC = () => {
           <hr className="border-t border-gray-300 my-2" />
           <li>
             <div
-              className="w-full flex flex-row items-center text h-10 rounded-lg text-muted-foreground hover:bg-primary/5 cursor-pointer"
+              className="w-full flex flex-row items-center text h-10 rounded-lg text-black dark:text-white/80 hover:bg-primary/5 cursor-pointer"
               onClick={logout}
             >
               <LogoutIcon className="ml-2" fontSize="small" />
-              <span className="text-sm font-medium pl-2">Logout</span>
+              <span className="text-base font-medium pl-2">Logout</span>
             </div>
           </li>
         </ul>

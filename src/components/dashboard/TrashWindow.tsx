@@ -41,9 +41,9 @@ const TrashWindow: React.FC = () => {
     <div className="w-full">
       <div
         onClick={showModal}
-        className="flex flex-row w-full items-center h-10 rounded-sm text-muted-foreground cursor-pointer"
+        className="flex flex-row w-full items-center h-10 rounded-sm text-black dark:text-white/80 cursor-pointer"
       >
-        <span className="text-sm font-medium">Trash</span>
+        <span className="text-base font-medium">Trash</span>
       </div>
       <Modal
         title="Deleted Items"

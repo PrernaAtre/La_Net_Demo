@@ -195,7 +195,6 @@ export const pageApi = baseAPI.injectEndpoints({
       onQueryStarted: async ({ dispatch, queryFulfilled }) => {
         try {
           const { data } = await queryFulfilled;
-          dispatch(setPages(data));
           return data;
         } catch (e) {
           console.log("error while fetching shared pages", e);
@@ -218,5 +217,5 @@ export const {
   usePublishMutation,
   useUnpublishMutation,
   useSharePageMutation,
-  useGetSharedPagesQuery
+  useGetSharedPagesQuery,
 } = pageApi;

@@ -49,18 +49,18 @@ const QuickNote: React.FC = () => {
         onUpdate={(editor) => setEditorData(editor?.storage.markdown.getMarkdown())}
       />
       <div>
-      <Button
-      style={{backgroundColor:"black"}}
-        type="submit"
-        // variant="default"
-        className="flex w-[10%] justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-      >
-        {isLoading ? (
-          <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-        ) : (
-          "Save Changes"
-        )}
-      </Button>
+          <Button
+            style={{ backgroundColor: "black" }}
+            type="submit"
+            // variant="default"
+            className="flex w-[10%] pl-[50%] rounded-md px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+          >
+            {isLoading ? (
+              <ReloadIcon className="h-4 w-4 animate-spin" />
+            ) : (
+              "Save Changes"
+            )}
+          </Button>
       </div>
     </>
   );

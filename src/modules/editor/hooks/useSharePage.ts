@@ -1,8 +1,9 @@
 import { useGetAllUsers } from "@/modules/user/hooks/useGetAllUsers";
-import { useSharePageMutation } from "@/store/features/page";
 import { debounce } from "lodash";
 import { useMemo } from "react";
 import { usePage } from "./usePage";
+import { useSharePageMutation } from "@/store/features/page";
+import { toast } from "sonner";
 
 interface Option {
   label: string;
@@ -32,7 +33,7 @@ export const useSharePage = (id?: string) => {
         if (onComplete) {
           onComplete(updatedPage);
         }
-
+        toast.success("page shared successfully");
         return updatedPage;
       } catch (error: any) {
         console.log(`[Share Page]: Error while sharing page: ${error.message}`);
