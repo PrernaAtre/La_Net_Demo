@@ -16,14 +16,14 @@ Welcome to the Notion Clone! This project aims to replicate the core functionali
 
 ## Technologies Used
 ### Frontend
-**Next.js** : A React framework for server-side rendering and static site generation.
-**Shadcn UI** : A component library for building consistent and responsive user interfaces.
-**Material-UI (MUI)** : A popular React UI framework for creating intuitive and customizable components.
+* **Next.js** : A React framework for server-side rendering and static site generation.
+* **Shadcn UI** : A component library for building consistent and responsive user interfaces.
+* **Material-UI (MUI)** : A popular React UI framework for creating intuitive and customizable components.
 ### Backend
-**NestJS** : A progressive Node.js framework for building efficient and scalable server-side applications.
-**MongoDB** : A NoSQL database known for its flexibility and scalability.
+* **NestJS** : A progressive Node.js framework for building efficient and scalable server-side applications.
+* **MongoDB** : A NoSQL database known for its flexibility and scalability.
 ### Authentication
-**JWT (JSON Web Token)**: A secure method for authenticating users and transmitting information.
+* **JWT (JSON Web Token)**: A secure method for authenticating users and transmitting information.
 ## Features
 - **Create Dynamic Notes** : Users can create notes with a flexible and rich text editor.
 - **Block Note Editor** : The editor allows users to add various types of content blocks to their notes.
