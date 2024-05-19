@@ -26,7 +26,7 @@ export class PageService {
     public commonService: CommonService,
     private notificationGateway: NotificationsGateway
   ) { }
-  
+
   async get(id: string, currentUser: CurrentUser): Promise<Page> {
     try {
       const userId = mongoose.Types.ObjectId.createFromHexString(
@@ -36,7 +36,7 @@ export class PageService {
         .findOne({
           $or: [
             { _id: id, userId: userId },
-            { _id: id},
+            { _id: id },
             { publishId: mongoose.Types.ObjectId.createFromHexString(id) },
           ],
         })
@@ -229,17 +229,17 @@ export class PageService {
       const senderUser = await this.userModel.findById(currentUser.id)
       const sendingData = {
         sender: currentUser.id,
-        senderName : senderUser.username,
+        senderName: senderUser.username,
         receiver: `${user._id}`,
         message: url,
       }
-      console.log("sending data------",sendingData);
-      
+      console.log("sending data------", sendingData);
+
       const data = await this.notificationModel.create(sendingData);
-      console.log("daata========",data);
-      
+      console.log("daata========", data);
+
       this.notificationGateway.socket.emit(`${user._id}`, JSON.stringify(sendingData))
-      
+
       // Log the processed data instead of updating the database
       console.log("Page to be shared:", {
         pageId,
@@ -331,17 +331,31 @@ export class PageService {
       const userId = mongoose.Types.ObjectId.createFromHexString(
         currentUser.id
       );
-      console.log("uid--------",currentUser.id)
-      const pages = await this.notificationModel.find({receiver : currentUser.id});
+      console.log("uid--------", currentUser.id)
+      const pages = await this.notificationModel.find({ receiver: currentUser.id });
+      console.log("not pages----------",pages);
       if (!pages)
         throw new ServerError({ message: "Pages not found", code: 404 });
-      
+
       return pages;
     } catch (error) {
       if (error instanceof HttpException) throw error;
       console.log("error", error);
       throw new InternalServerErrorException(
         "Something went wrong while trying to fetch pages."
+      );
+    }
+  }
+
+  async upadteNotificationStatus(id: string, isRead: boolean) {
+    try {
+      await this.notificationModel.findOneAndUpdate({ _id: id }, { isRead: isRead })
+    }
+    catch (error) {
+      if (error instanceof HttpException) throw error;
+      console.log("error", error);
+      throw new InternalServerErrorException(
+        "Something went wrong while trying to updatinng notification."
       );
     }
   }

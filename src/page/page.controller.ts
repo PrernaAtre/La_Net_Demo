@@ -26,8 +26,8 @@ import { AuthenticatedRequest } from "src/common/utils/common.types";
 
 @Controller("page")
 export class PageController {
-  constructor(private pageService: PageService) {}
-  
+  constructor(private pageService: PageService) { }
+
   @Get("sharedpages")
   @UseGuards(AuthGuard)
   async getSharedPages(
@@ -35,7 +35,7 @@ export class PageController {
   ): Promise<any> {
     return await this.pageService.getSharedPages(currentUser);
   }
-  
+
   @Post('/shared-users/:id')
   @UseGuards(AuthGuard)
   async sharePage(
@@ -64,7 +64,7 @@ export class PageController {
       currentUser
     );
   }
-  
+
   @Post("/")
   @UseGuards(AuthGuard)
   async create(
@@ -152,5 +152,13 @@ export class PageController {
     @Req() { currentUser }: AuthenticatedRequest
   ): Promise<any> {
     return await this.pageService.unpublish(id, currentUser);
+  }
+
+  @Put("/updateNotification/:id")
+  async updateNotificationStatus(@Param("id") id: string, @Body() body: { isRead: boolean }
+  ): Promise<any> {
+    const isRead = body.isRead;
+    console.log(id, isRead);
+    return await this.pageService.upadteNotificationStatus(id, isRead);
   }
 }

@@ -100,4 +100,12 @@ export class UserController {
   ): Promise<User> {
     return this.userService.getUserDetails(currentUser);
   }
+
+  @Get('/getUsers')
+  async getAllUsers(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10
+  ): Promise<{ users: User[], total: number, page: number, limit: number }> {
+    return this.userService.getAllUsers(page, limit);
+  }
 }

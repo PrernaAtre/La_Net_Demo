@@ -20,12 +20,12 @@ export class UserService {
     @InjectModel(User.name)
     private userModel: Model<User>,
     private readonly cloudinaryService: CloudinaryService
-  ) {}
+  ) { }
 
   async updateProfile(
     imagePath: string,
     updateProfileDto: UpdateProfileDto,
-    currentUser:CurrentUser
+    currentUser: CurrentUser
   ): Promise<Object> {
     try {
       const { username, profile_image } = updateProfileDto;
@@ -44,7 +44,7 @@ export class UserService {
           username,
           profile_image: image_url?.url,
         },
-        { new: true,projection:{_id:1,profile_image:1,username:1} }
+        { new: true, projection: { _id: 1, profile_image: 1, username: 1 } }
       );
 
       return updated_user;
@@ -85,7 +85,7 @@ export class UserService {
     }
   }
 
-  async fetchUsers(currentUser:CurrentUser): Promise<User[]> {
+  async fetchUsers(currentUser: CurrentUser): Promise<User[]> {
     try {
       const users = await this.userModel.find(
         { _id: { $ne: currentUser.id } },
@@ -100,7 +100,7 @@ export class UserService {
     }
   }
 
-  async _findUserById(userId: string, currentUser:CurrentUser): Promise<User> {
+  async _findUserById(userId: string, currentUser: CurrentUser): Promise<User> {
     try {
       const user = await this.userModel.findById(userId, {
         _id: 1,
@@ -120,7 +120,7 @@ export class UserService {
     }
   }
 
-  async getUserByEmail(slug: string, currentUser:CurrentUser): Promise<User[]> {
+  async getUserByEmail(slug: string, currentUser: CurrentUser): Promise<User[]> {
     try {
       const users = await this.userModel.find(
         {
@@ -137,12 +137,12 @@ export class UserService {
       );
     }
   }
-  async getUserDetails(currentUser:CurrentUser): Promise<User> {
+  async getUserDetails(currentUser: CurrentUser): Promise<User> {
     try {
       const user = await this.userModel
         .findOne(
           { _id: mongoose.Types.ObjectId.createFromHexString(currentUser.id) },
-          { _id: 1, username: 1, email: 1, profile_image: 1, isSubscribed:1 }
+          { _id: 1, username: 1, email: 1, profile_image: 1, isSubscribed: 1 }
         )
         .lean();
 
@@ -151,6 +151,24 @@ export class UserService {
       if (error instanceof HttpException) throw error;
       throw new InternalServerErrorException(
         "Something went wrong while trying to get user detail."
+      );
+    }
+  }
+
+  async getAllUsers(page: number, limit: number): Promise<{ users: User[], total: number, page: number, limit: number }> {
+    try {
+      const users = await this.userModel
+        .find()
+        .skip((page - 1) * limit)
+        .limit(limit);
+      console.log("users=====",users);
+      const total = await this.userModel.countDocuments();
+
+      return { users, total, page, limit };
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException(
+        'Something went wrong while trying to get user detail.'
       );
     }
   }
