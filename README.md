@@ -1,5 +1,3 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
-
 ## Getting Started
 
 First, run the development server:
@@ -13,24 +11,26 @@ pnpm dev
 # or
 bun dev
 ```
+# Notion Clone
+Welcome to the Notion Clone! This project aims to replicate the core functionalities of the popular note-taking application, Notion, with a focus on simplicity, efficiency, and user-friendly interactions.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## Technologies Used
+### Frontend
+**Next.js** : A React framework for server-side rendering and static site generation.
+**Shadcn UI** : A component library for building consistent and responsive user interfaces.
+**Material-UI (MUI)** : A popular React UI framework for creating intuitive and customizable components.
+### Backend
+**NestJS** : A progressive Node.js framework for building efficient and scalable server-side applications.
+**MongoDB** : A NoSQL database known for its flexibility and scalability.
+### Authentication
+**JWT (JSON Web Token)**: A secure method for authenticating users and transmitting information.
+## Features
+- **Create Dynamic Notes** : Users can create notes with a flexible and rich text editor.
+- **Block Note Editor** : The editor allows users to add various types of content blocks to their notes.
+- **Upload and Manage Cover Images** : Users can upload, change, and remove cover images for their notes.
+- **Trash Functionality** : Users can delete notes, which are moved to a trash section. Deleted notes can be recovered or permanently removed.
+- **Subscription with Stripe** : Users can subscribe to publish their notes.
+- **Cancel Subscription** : Users have the option to cancel their subscription at any time.
+- **Search Notes** : Users can search for notes by their name.
+- **Share Published Notes** : Users can share published note URLs in notifications to other registered users, who can view these notes.
+- **Theme Functionality** : Users can switch between different themes to customize their viewing experience.
