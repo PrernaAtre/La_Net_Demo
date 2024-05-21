@@ -137,7 +137,6 @@ console.log('error', error)
   async managePlan(currentUser:CurrentUser){
     try {
       const user = await this.userModel.findOne({ _id: currentUser.id }).lean();
-      console.log("user-------",user);
 
       if (!user.isSubscribed){
         throw new ServerError({

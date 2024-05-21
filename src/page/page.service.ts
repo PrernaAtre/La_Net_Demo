@@ -44,7 +44,6 @@ export class PageService {
 
       if (!page)
         throw new ServerError({ message: "Page not found", code: 404 });
-      console.log("page---", page);
       return page;
     } catch (error) {
       if (error instanceof HttpException) throw error;
@@ -213,7 +212,6 @@ export class PageService {
           isTrashed: false,
         })
         .lean();
-      console.log("page------", page);
 
       if (!page) {
         throw new ServerError({ message: "Page not found", code: 404 });
@@ -221,7 +219,6 @@ export class PageService {
 
       const userObjectId = mongoose.Types.ObjectId.createFromHexString(userId);
       const user = await this.userModel.findOne({ _id: userObjectId });
-      console.log("user--------", user);
 
       if (!user) {
         throw new ServerError({ message: "User not found", code: 404 });
@@ -233,20 +230,12 @@ export class PageService {
         receiver: `${user._id}`,
         message: url,
       }
-      console.log("sending data------", sendingData);
 
       const data = await this.notificationModel.create(sendingData);
-      console.log("daata========", data);
 
       this.notificationGateway.socket.emit(`${user._id}`, JSON.stringify(sendingData))
 
-      // Log the processed data instead of updating the database
-      console.log("Page to be shared:", {
-        pageId,
-        userId: user._id.toString(),
-        email: user.email,
-        url
-      });
+     
 
       return { message: "User validated successfully.", data: { pageId, userId: user._id.toString(), email: user.email, url } };
 
@@ -326,14 +315,13 @@ export class PageService {
       throw new InternalServerErrorException(error);
     }
   }
+  
   async getSharedPages(currentUser: CurrentUser) {
     try {
       const userId = mongoose.Types.ObjectId.createFromHexString(
         currentUser.id
       );
-      console.log("uid--------", currentUser.id)
-      const pages = await this.notificationModel.find({ receiver: currentUser.id });
-      console.log("not pages----------",pages);
+      const pages = await this.notificationModel.find({ receiver: currentUser.id , isRead : false});
       if (!pages)
         throw new ServerError({ message: "Pages not found", code: 404 });
 

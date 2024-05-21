@@ -60,7 +60,6 @@ export class UserController {
   @Get()
   @UseGuards(AuthGuard)
   async getUser(@Req() { currentUser }: AuthenticatedRequest): Promise<User> {
-    console.log(currentUser)
     return this.userService.getUserDetails(currentUser);
   }
 
@@ -99,13 +98,5 @@ export class UserController {
     @Req() { currentUser }: AuthenticatedRequest
   ): Promise<User> {
     return this.userService.getUserDetails(currentUser);
-  }
-
-  @Get('/getUsers')
-  async getAllUsers(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10
-  ): Promise<{ users: User[], total: number, page: number, limit: number }> {
-    return this.userService.getAllUsers(page, limit);
   }
 }

@@ -155,21 +155,4 @@ export class UserService {
     }
   }
 
-  async getAllUsers(page: number, limit: number): Promise<{ users: User[], total: number, page: number, limit: number }> {
-    try {
-      const users = await this.userModel
-        .find()
-        .skip((page - 1) * limit)
-        .limit(limit);
-      console.log("users=====",users);
-      const total = await this.userModel.countDocuments();
-
-      return { users, total, page, limit };
-    } catch (error) {
-      if (error instanceof HttpException) throw error;
-      throw new InternalServerErrorException(
-        'Something went wrong while trying to get user detail.'
-      );
-    }
-  }
 }

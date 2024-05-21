@@ -137,7 +137,7 @@ export class AuthService {
   ): Promise<{ token: string; user: Omit<User, 'password'> }> {
     try {
       const { email, password } = userLoginDto;
-      const user = await this.userModel.findOne({ email: email }, { _id: 1, username: 1, email: 1, profile_image: 1, password: 1, IsSubscribed: 1 }).lean();
+      const user = await this.userModel.findOne({ email: email }, { _id: 1, username: 1, email: 1, profile_image: 1, password: 1, isSubscribed: 1 }).lean();
       if (user && (await bcrypt.compare(password, user.password))) {
         const token = this.jwtService.sign({ id: user._id });
         const { password, ...userWithoutPassword } = user;

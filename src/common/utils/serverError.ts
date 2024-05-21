@@ -2,8 +2,6 @@ import { HttpException } from "@nestjs/common";
 
 export enum ServerErrorCause {
   UNKNOWN,
-
-  // TODO: add known error types here
 }
 
 interface ErrorDetails {

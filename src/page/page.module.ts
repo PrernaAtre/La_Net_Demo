@@ -7,7 +7,7 @@ import { PageController } from './page.controller';
 import { PageService } from './page.service';
 import { CommonService } from 'src/common/common.service';
 import { NotificationsModule } from 'src/notifications/notifications.module';
-import { CheckPublishLimitMiddleware } from 'src/middleware/page.middleware';
+// import { CheckPublishLimitMiddleware } from 'src/middleware/page.middleware';
 import { PageSchema } from 'src/models/Page.schema';
 import { NotificationsService } from 'src/notifications/notifications.service';
 import { NotificationSchema } from 'src/models/notification.schema';
@@ -21,10 +21,10 @@ import { NotificationSchema } from 'src/models/notification.schema';
 })
 
 export class PageModule { 
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(CheckPublishLimitMiddleware)
-      .forRoutes('publish');
-  }
+  // configure(consumer: MiddlewareConsumer) {
+  //   consumer
+  //     .apply(CheckPublishLimitMiddleware)
+  //     .forRoutes('publish');
+  // }
 
 }

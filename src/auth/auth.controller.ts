@@ -81,7 +81,6 @@ export class AuthController {
   async resetPassword(@Body() resetData: ResetPassworddto,@Param('id') id:string) {
       try
       {
-          console.log("reset data", resetData);
           return this.authService.resetPassword(resetData,id);
       }
       catch(err)
