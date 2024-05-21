@@ -35,7 +35,7 @@ export default function RootLayout({ children }: React.PropsWithChildren) {
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
-          storageKey="jotion-theme-2"
+          storageKey="netbins-theme-2"
         >
           <Provider store={store}>
             <Toaster position="top-center" />

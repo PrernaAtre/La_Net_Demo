@@ -26,7 +26,7 @@ const LoginForm: React.FC = () => {
       <Grid item xs={6} className="flex justify-center">
         <Grid item xs={12} sm={6} md={4}>
           <div className="w-full max-w-md ml-[40%] mt-[52%]">
-            <p>Login</p>
+            <p>LOGIN</p>
           </div>
 
           <form className="space-y-6 mt-6" onSubmit={formik.handleSubmit}>

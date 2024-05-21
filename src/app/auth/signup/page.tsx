@@ -25,6 +25,7 @@ const SignUpForm: React.FC = () => {
       </Grid>
       <Grid item xs={6} className="flex justify-center items-center">
         <Grid item xs={12} sm={8} md={6} lg={4}>
+          <span className="pl-[38%] mb-6">SIGN UP</span>
           <form onSubmit={formik.handleSubmit} className="space-y-6">
             <TextField
               id="username"

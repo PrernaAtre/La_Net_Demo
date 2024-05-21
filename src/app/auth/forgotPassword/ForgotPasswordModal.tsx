@@ -28,28 +28,35 @@ export const ForgotPasswordModal = () => {
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
-    const [email, setEmail] = useState();
+    const [email, setEmail] = useState("");
+
+    const handleChangeEmail = (email: string) => {
+        setEmail(email)
+    }
 
     async function handleSubmit() {
         try {
             console.log("email=", email);
-            const response = await axios.post("http://localhost:3001/auth/forgotPassword", { email })
-            console.log("resssssss", response);
+            const response = await axios.post("http://localhost:3001/auth/forgotPassword", { email })       
             const resMsg = response.data.message;
-            console.log("resMsg", resMsg);
-            // await toast(resMsg);
-            toast.promise(
-                Promise.resolve(resMsg), // Convert resMsg to a promise
+            //await toast(resMsg);
+            if(resMsg)
                 {
-                    loading: 'Loading...',
-                    success: (resMsg) => `${resMsg}`, // Display resMsg on success
-                    error: 'Error',
+                    toast.success(resMsg);
                 }
-            );
-            
+            // toast.promise(
+            //     Promise.resolve(resMsg), // Convert resMsg to a promise
+            //     {
+            //         loading: 'Loading...',
+            //         success: (resMsg) => `${resMsg}`, // Display resMsg on success
+            //         error: 'Error',
+            //     }
+            // );
+
         }
         catch (err) {
-
+            console.log(err);
+            
         }
     }
 
@@ -75,11 +82,11 @@ export const ForgotPasswordModal = () => {
                                     name="email"
                                     label="Email Address"
                                     variant="standard"
-                                    onChange={(e) => {setEmail(e.target.value)}}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => { handleChangeEmail(e.target.value) }}
                                 />
                             </Grid>
                             <Grid item xs={12}>
-                                <Button type="submit" variant="contained" color="primary">Submit</Button>
+                                <Button type="submit" color="inherit">Submit</Button>
                             </Grid>
                             <Toaster />
                         </Grid>
